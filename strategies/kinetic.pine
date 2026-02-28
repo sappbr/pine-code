@@ -1,0 +1,491 @@
+//@version=6
+// ╔════════════════════════════════════════════════════════════════════════════════════════════════════╗
+// ║                  ALPHAFORGE v6 — INSTITUTIONAL PINE SCRIPT MASTER OPTIMIZER TEMPLATE v5.5          ║
+// ║                                                                                                    ║
+// ║  CHANGELOG:                                                                                        ║
+// ║   v38.5 (2026-02-27) — Implemented Alpha Sensitivity Matrix. Added 0-100% feature scoring.         ║
+// ║                        Anchored permanent dashboard. Full Auto-Pilot Walk-Forward enabled.         ║
+// ╚════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+strategy("Kinetic Reversion v38 - Auto-Pilot Matrix", 
+    overlay                 = true, 
+    calc_on_every_tick      = false, 
+    pyramiding              = 0, 
+    process_orders_on_close = true, 
+    initial_capital         = 100000, 
+    default_qty_type        = strategy.cash, 
+    margin_long             = 0.0, 
+    margin_short            = 0.0, 
+    slippage                = 1, 
+    max_bars_back           = 1000)
+
+// === 1. INPUTS ===
+grp_p1 = "🔎 PHASE 1: SYSTEM STATE"
+run_baseline    = input.bool(false, "♻️ Run Baseline Mode (Bypass ML)", group=grp_p1, tooltip="Runs standard logic with no filters. Good for gathering initial data.")
+
+grp_p2 = "🧠 PHASE 2: AUTO-ML ENGINE (WALK-FORWARD)"
+auto_ml         = input.bool(true,  "Enable Auto-Pilot ML Brain", group=grp_p2, tooltip="Automatically ranks features by Sensitivity Score and applies the optimal ranges.")
+enigma_mode     = input.string("MFE/MAE Edge Ratio", "Optimization Target", options=["MFE/MAE Edge Ratio", "Net Profit ($)", "Max Runup (MFE)"], group=grp_p2)
+auto_feat_count = input.int(4,      "Top N Features to Auto-Engage", minval=1, maxval=10, group=grp_p2, tooltip="The engine will dynamically select the highest scoring features.")
+ml_lookback     = input.int(100,    "Rolling Trade Memory Window", minval=10, group=grp_p2)
+win_sample_pct  = input.float(25.0, "Top Winners Sample (%)", minval=1, maxval=50, group=grp_p2)
+lose_sample_pct = input.float(25.0, "Worst Losers Sample (%)", minval=1, maxval=50, group=grp_p2)
+
+grp_p3 = "🛡️ PHASE 3: MANUAL OVERRIDES"
+lock_pee  = input.bool(false, "Lock PEE", inline="pee1", group=grp_p3)
+pee_min   = input.float(0.0, "Min", inline="pee1", group=grp_p3)
+pee_max   = input.float(10.0, "Max", inline="pee1", group=grp_p3)
+
+lock_brr  = input.bool(false, "Lock BRR", inline="brr1", group=grp_p3)
+brr_min   = input.float(0.0, "Min", inline="brr1", group=grp_p3)
+brr_max   = input.float(1.0, "Max", inline="brr1", group=grp_p3)
+
+lock_adx  = input.bool(false, "Lock ADX", inline="adx1", group=grp_p3)
+adx_min   = input.float(0.0, "Min", inline="adx1", group=grp_p3)
+adx_max   = input.float(100.0, "Max", inline="adx1", group=grp_p3)
+
+lock_bb   = input.bool(false, "Lock BB Width", inline="bb1", group=grp_p3)
+bb_min    = input.float(0.0, "Min", inline="bb1", group=grp_p3)
+bb_max    = input.float(20.0, "Max", inline="bb1", group=grp_p3)
+
+lock_cvd  = input.bool(false, "Lock CVD ROC", inline="cvd1", group=grp_p3)
+cvd_min   = input.float(-20.0, "Min", inline="cvd1", group=grp_p3)
+cvd_max   = input.float(20.0, "Max", inline="cvd1", group=grp_p3)
+
+lock_atr  = input.bool(false, "Lock ATR Ratio", inline="atr1", group=grp_p3)
+atr_min   = input.float(0.0, "Min", inline="atr1", group=grp_p3)
+atr_max   = input.float(10.0, "Max", inline="atr1", group=grp_p3)
+
+lock_mac  = input.bool(false, "Lock MACD Hist", inline="mac1", group=grp_p3)
+mac_min   = input.float(-20.0, "Min", inline="mac1", group=grp_p3)
+mac_max   = input.float(20.0, "Max", inline="mac1", group=grp_p3)
+
+lock_mrs  = input.bool(false, "Lock 1m RSI", inline="mrs1", group=grp_p3)
+mrs_min   = input.float(0.0, "Min", inline="mrs1", group=grp_p3)
+mrs_max   = input.float(100.0, "Max", inline="mrs1", group=grp_p3)
+
+lock_vix  = input.bool(false, "Lock VIX", inline="vix1", group=grp_p3)
+vix_min   = input.float(0.0, "Min", inline="vix1", group=grp_p3)
+vix_max   = input.float(100.0, "Max", inline="vix1", group=grp_p3)
+
+lock_sco  = input.bool(false, "Lock Conf Score", inline="sco1", group=grp_p3)
+sco_min   = input.float(0.0, "Min", inline="sco1", group=grp_p3)
+sco_max   = input.float(10.0, "Max", inline="sco1", group=grp_p3)
+
+grp_ui = "🎨 UI COMMAND CENTER"
+show_dashboard   = input.bool(true,  "Show Sensitivity Matrix", group=grp_ui)
+show_ghost_trail = input.bool(true,  "Show Ghost Trail Exits", group=grp_ui)
+
+grp_prop = "💼 EXECUTION RISK"
+prop_tier         = input.string("100k", "Account Tier", options=["50k", "100k", "150k"], group=grp_prop)
+prop_risk_pct     = input.float(0.5, "Risk Per Trade (%)", step=0.1, group=grp_prop)
+max_mnq_contracts = input.int(7, "Absolute Max Contracts", group=grp_prop)
+base_mfe_trigger  = input.float(150.0, "Fallback MFE Target ($)", group=grp_prop)
+vwap_mult         = input.float(1.0, "VWAP Band Mult", step=0.1, group=grp_prop)
+rsi_len           = input.int(14, "RSI Length", group=grp_prop)
+ema_fast_len      = input.int(9, "Fast EMA Length", group=grp_prop)
+
+// === 2. TYPES & METHODS ===
+type MLFeature
+    float rec_min = na
+    float rec_max = na
+    float sens_score = 0.0 // 0 to 100
+    bool  is_active = false
+
+method f_calc_bounds(array<float> w_arr, array<float> l_arr) =>
+    float r_min = na
+    float r_max = na
+    float weight = 0.0
+    if w_arr.size() > 0 and l_arr.size() > 0
+        array.sort(w_arr)
+        array.sort(l_arr)
+        float w_p15 = array.percentile_nearest_rank(w_arr, 15)
+        float w_p85 = array.percentile_nearest_rank(w_arr, 85)
+        float l_med = array.median(l_arr)
+        float pooled_iqr = math.max(array.percentile_nearest_rank(w_arr, 75) - array.percentile_nearest_rank(w_arr, 25), array.percentile_nearest_rank(l_arr, 75) - array.percentile_nearest_rank(l_arr, 25))
+        weight := pooled_iqr == 0 ? 0 : math.abs(array.median(w_arr) - l_med) / pooled_iqr
+        r_min := w_p15
+        r_max := w_p85
+        if l_med >= w_p15 and l_med <= w_p85
+            if math.abs(l_med - w_p15) < math.abs(w_p85 - l_med)
+                r_min := math.max(w_p15, array.percentile_nearest_rank(l_arr, 60))
+            else
+                r_max := math.min(w_p85, array.percentile_nearest_rank(l_arr, 40))
+        if r_min >= r_max
+            r_min := w_arr.min()
+            r_max := w_arr.max()
+    
+    // Normalize weight to a 0-100 Sensitivity Score ceiling
+    float norm_score = math.min(100.0, weight * 40.0) 
+    [r_min, r_max, norm_score]
+
+method f_clean(array<float> arr) =>
+    array<float> clean = array.new<float>()
+    for val in arr
+        if not na(val)
+            clean.push(val)
+    clean
+
+method f_eval(float val, bool is_locked, float man_min, float man_max, MLFeature obj, bool _auto_ml) =>
+    bool pass = true
+    float eff_min = is_locked ? man_min : (_auto_ml and obj.is_active ? obj.rec_min : na)
+    float eff_max = is_locked ? man_max : (_auto_ml and obj.is_active ? obj.rec_max : na)
+    if not na(eff_min) and not na(eff_max) and not na(val)
+        if val < eff_min or val > eff_max
+            pass := false
+    pass
+
+method f_str(float val) => na(val) ? "0.00" : str.tostring(val, "#.##")
+
+// === 3. CALCULATIONS & PRE-COMPUTES ===
+var float prop_base_equity = prop_tier == "50k" ? 50000 : (prop_tier == "100k" ? 100000 : 150000)
+var float pt_value = 2.0
+float ny_time = hour(time, "America/New_York") + (minute(time, "America/New_York") / 60.0)
+
+float atr_safe   = math.max(ta.atr(14), syminfo.mintick)
+float ema_fast   = ta.ema(close, ema_fast_len)
+float vwap_val   = ta.vwap
+float vwap_dev   = ta.stdev(close, 50)
+float upper_vwap = vwap_val + (vwap_dev * vwap_mult)
+float lower_vwap = vwap_val - (vwap_dev * vwap_mult)
+
+float rsi_val = ta.rsi(close, rsi_len)
+float vol_sma = ta.sma(volume, 20)
+float VR      = volume / math.max(1, vol_sma)
+float brr     = high == low ? 0.5 : (close - low) / (high - low)
+
+[_, _, adx_val] = ta.dmi(14, 14)
+[_, bb_upper, bb_lower] = ta.bb(close, 20, 2.0)
+float bb_width_atr = (bb_upper - bb_lower) / atr_safe
+[_, _, macd_hist] = ta.macd(close, 12, 26, 9)
+float atr_ratio = ta.atr(5) / math.max(ta.atr(20), syminfo.mintick)
+
+var float cvd = 0.0
+if nz(ta.change(time("D"))) != 0
+    cvd := 0.0
+cvd += volume * (close > open ? 1.0 : (close < open ? -1.0 : 0.0))
+float cvd_roc = (cvd - nz(cvd[3])) / math.max(vol_sma, 1)
+
+float micro_rsi = request.security(syminfo.tickerid, "1", ta.rsi(close, 14), barmerge.gaps_off, barmerge.lookahead_off)
+float vix_val   = request.security("VIX", timeframe.period, close, barmerge.gaps_off, barmerge.lookahead_off)
+
+// === 4. ML SENSITIVITY ENGINE (Guarded Execution) ===
+var MLFeature ml_pee_obj = MLFeature.new()
+var MLFeature ml_brr_obj = MLFeature.new()
+var MLFeature ml_adx_obj = MLFeature.new()
+var MLFeature ml_bb_obj  = MLFeature.new()
+var MLFeature ml_cvd_obj = MLFeature.new()
+var MLFeature ml_atr_obj = MLFeature.new()
+var MLFeature ml_mac_obj = MLFeature.new()
+var MLFeature ml_mrs_obj = MLFeature.new()
+var MLFeature ml_vix_obj = MLFeature.new()
+var MLFeature ml_sco_obj = MLFeature.new()
+
+var float a_target_mfe_usd   = base_mfe_trigger
+var float a_loser_bar_cutoff = 15.0
+var float a_byp_min = 9.5
+var float a_byp_max = 10.5
+var float disp_avg_mfe = 0.0
+var float disp_avg_mae = 0.0
+var float disp_win_bars = 0.0
+var float disp_lose_bars = 0.0
+var int last_trade_count = 0
+var int current_trade_count = 0
+
+current_trade_count := strategy.closedtrades
+
+if auto_ml and current_trade_count > last_trade_count and barstate.isconfirmed
+    last_trade_count := current_trade_count
+    int total = current_trade_count
+    int valid_trades = math.min(total, ml_lookback)
+    
+    if valid_trades >= 10
+        array<float> t_sort = array.new<float>()
+        array<string> t_ids = array.new<string>()
+        array<float> tmp_w_mfe = array.new<float>()
+        array<float> tmp_w_mae = array.new<float>()
+        array<float> tmp_w_bars = array.new<float>()
+        array<float> tmp_l_bars = array.new<float>()
+        
+        for i = 0 to valid_trades - 1
+            int idx = total - 1 - i
+            float runup = strategy.closedtrades.max_runup(idx)
+            float drawdown = math.abs(strategy.closedtrades.max_drawdown(idx))
+            
+            float sort_val = 0.0
+            if enigma_mode == "MFE/MAE Edge Ratio"
+                sort_val := drawdown == 0 ? runup : runup / drawdown
+            else if enigma_mode == "Net Profit ($)"
+                sort_val := strategy.closedtrades.profit(idx)
+            else if enigma_mode == "Max Runup (MFE)"
+                sort_val := runup
+                
+            t_sort.push(sort_val)
+            t_ids.push(strategy.closedtrades.entry_id(idx))
+
+        array<int> sorted_idx = array.sort_indices(t_sort)
+        int w_samp = math.max(1, math.floor(valid_trades * (win_sample_pct / 100)))
+        int l_samp = math.max(1, math.floor(valid_trades * (lose_sample_pct / 100)))
+        
+        array<string> w_ids = array.new<string>()
+        array<string> l_ids = array.new<string>()
+        
+        for i = 0 to l_samp - 1
+            int loc_idx = sorted_idx.get(i)
+            l_ids.push(t_ids.get(loc_idx))
+            tmp_l_bars.push(strategy.closedtrades.exit_bar_index(total - 1 - loc_idx) - strategy.closedtrades.entry_bar_index(total - 1 - loc_idx))
+
+        for i = 0 to w_samp - 1
+            int loc_idx = sorted_idx.get(valid_trades - 1 - i)
+            w_ids.push(t_ids.get(loc_idx))
+            tmp_w_mfe.push(strategy.closedtrades.max_runup(total - 1 - loc_idx))
+            tmp_w_mae.push(math.abs(strategy.closedtrades.max_drawdown(total - 1 - loc_idx)))
+            tmp_w_bars.push(strategy.closedtrades.exit_bar_index(total - 1 - loc_idx) - strategy.closedtrades.entry_bar_index(total - 1 - loc_idx))
+            
+        a_target_mfe_usd   := array.median(tmp_w_mfe)
+        a_loser_bar_cutoff := array.median(tmp_l_bars)
+        disp_avg_mfe       := array.avg(tmp_w_mfe)
+        disp_avg_mae       := array.avg(tmp_w_mae)
+        disp_win_bars      := array.avg(tmp_w_bars)
+        disp_lose_bars     := array.avg(tmp_l_bars)
+            
+        matrix<float> w_mat = matrix.new<float>(11, w_ids.size(), na)
+        matrix<float> l_mat = matrix.new<float>(11, l_ids.size(), na)
+        
+        for [i, id] in w_ids
+            string[] p = str.split(id, "_")
+            if p.size() >= 12
+                for j = 0 to 10
+                    w_mat.set(j, i, nz(str.tonumber(p.get(j+1))))
+        for [i, id] in l_ids
+            string[] p = str.split(id, "_")
+            if p.size() >= 12
+                for j = 0 to 10
+                    l_mat.set(j, i, nz(str.tonumber(p.get(j+1))))
+
+        [w0_min, w0_max, s0] = w_mat.row(0).f_clean().f_calc_bounds(l_mat.row(0).f_clean())
+        [w1_min, w1_max, s1] = w_mat.row(1).f_clean().f_calc_bounds(l_mat.row(1).f_clean())
+        [w2_min, w2_max, s2] = w_mat.row(2).f_clean().f_calc_bounds(l_mat.row(2).f_clean())
+        [w3_min, w3_max, s3] = w_mat.row(3).f_clean().f_calc_bounds(l_mat.row(3).f_clean())
+        [w4_min, w4_max, s4] = w_mat.row(4).f_clean().f_calc_bounds(l_mat.row(4).f_clean())
+        [w5_min, w5_max, s5] = w_mat.row(5).f_clean().f_calc_bounds(l_mat.row(5).f_clean())
+        [w6_min, w6_max, s6] = w_mat.row(6).f_clean().f_calc_bounds(l_mat.row(6).f_clean())
+        [w7_min, w7_max, s7] = w_mat.row(7).f_clean().f_calc_bounds(l_mat.row(7).f_clean())
+        [w8_min, w8_max, s8] = w_mat.row(8).f_clean().f_calc_bounds(l_mat.row(8).f_clean())
+        [w9_min, w9_max, s9] = w_mat.row(9).f_clean().f_calc_bounds(l_mat.row(9).f_clean())
+        [w10_min, w10_max, s10] = w_mat.row(10).f_clean().f_calc_bounds(l_mat.row(10).f_clean())
+        
+        a_byp_min := w10_min
+        a_byp_max := w10_max
+
+        // Auto-Engage Engine: Select Top N
+        array<float> sorted_scores = array.from(s0, s1, s2, s3, s4, s5, s6, s7, s8, s9)
+        array.sort(sorted_scores, order.descending)
+        float cutoff = sorted_scores.get(math.min(auto_feat_count - 1, 9))
+
+        ml_pee_obj.sens_score := s0, ml_pee_obj.is_active := s0 >= cutoff, ml_pee_obj.rec_min := w0_min, ml_pee_obj.rec_max := w0_max
+        ml_brr_obj.sens_score := s1, ml_brr_obj.is_active := s1 >= cutoff, ml_brr_obj.rec_min := w1_min, ml_brr_obj.rec_max := w1_max
+        ml_adx_obj.sens_score := s2, ml_adx_obj.is_active := s2 >= cutoff, ml_adx_obj.rec_min := w2_min, ml_adx_obj.rec_max := w2_max
+        ml_bb_obj.sens_score  := s3, ml_bb_obj.is_active  := s3 >= cutoff, ml_bb_obj.rec_min  := w3_min, ml_bb_obj.rec_max  := w3_max
+        ml_cvd_obj.sens_score := s4, ml_cvd_obj.is_active := s4 >= cutoff, ml_cvd_obj.rec_min := w4_min, ml_cvd_obj.rec_max := w4_max
+        ml_atr_obj.sens_score := s5, ml_atr_obj.is_active := s5 >= cutoff, ml_atr_obj.rec_min := w5_min, ml_atr_obj.rec_max := w5_max
+        ml_mac_obj.sens_score := s6, ml_mac_obj.is_active := s6 >= cutoff, ml_mac_obj.rec_min := w6_min, ml_mac_obj.rec_max := w6_max
+        ml_mrs_obj.sens_score := s7, ml_mrs_obj.is_active := s7 >= cutoff, ml_mrs_obj.rec_min := w7_min, ml_mrs_obj.rec_max := w7_max
+        ml_vix_obj.sens_score := s8, ml_vix_obj.is_active := s8 >= cutoff, ml_vix_obj.rec_min := w8_min, ml_vix_obj.rec_max := w8_max
+        ml_sco_obj.sens_score := s9, ml_sco_obj.is_active := s9 >= cutoff, ml_sco_obj.rec_min := w9_min, ml_sco_obj.rec_max := w9_max
+
+// === 5. SIGNALS & LAZY EVALUATION ===
+bool trap_long_armed  = low <= lower_vwap and rsi_val <= 48.0
+bool trap_short_armed = high >= upper_vwap and rsi_val >= 52.0
+
+var bool latch_long = false
+var bool latch_short = false
+var float pre_ent_hh = na
+var float pre_ent_ll = na
+
+if barstate.isconfirmed
+    if trap_long_armed
+        latch_long := true, pre_ent_hh := high, pre_ent_ll := low
+    if trap_short_armed
+        latch_short := true, pre_ent_hh := high, pre_ent_ll := low
+    if latch_long or latch_short
+        pre_ent_hh := math.max(nz(pre_ent_hh, high), high)
+        pre_ent_ll := math.min(nz(pre_ent_ll, low), low)
+    if latch_long and close > vwap_val
+        latch_long := false
+    if latch_short and close < vwap_val
+        latch_short := false
+
+bool trigger_long  = ta.crossover(close, ema_fast)
+bool trigger_short = ta.crossunder(close, ema_fast)
+
+float active_pee = latch_long ? ((close - nz(pre_ent_ll, close)) / atr_safe) : ((nz(pre_ent_hh, close) - close) / atr_safe)
+
+int score = 0
+if latch_long and rsi_val >= 49.3
+    score += 1
+if latch_short and rsi_val >= 56.8
+    score += 1
+if latch_short and brr <= 0.15
+    score += 1
+if latch_long and brr >= 0.20
+    score += 1
+if active_pee >= 1.17 and active_pee <= 1.43
+    score += 1
+if VR >= 0.75 and VR <= 1.10
+    score += 1
+
+// v6 Short-Circuit Lazy Evaluation: Only calculates heavy logic if base triggers are met
+bool base_long  = latch_long and trigger_long and barstate.isconfirmed
+bool base_short = latch_short and trigger_short and barstate.isconfirmed
+
+bool bypass_guards = run_baseline
+
+bool guards_cleared_long = base_long and (bypass_guards or (
+  active_pee.f_eval(lock_pee, pee_min, pee_max, ml_pee_obj, auto_ml) and
+  brr.f_eval(lock_brr, brr_min, brr_max, ml_brr_obj, auto_ml) and
+  adx_val.f_eval(lock_adx, adx_min, adx_max, ml_adx_obj, auto_ml) and
+  bb_width_atr.f_eval(lock_bb, bb_min, bb_max, ml_bb_obj, auto_ml) and
+  cvd_roc.f_eval(lock_cvd, cvd_min, cvd_max, ml_cvd_obj, auto_ml) and
+  atr_ratio.f_eval(lock_atr, atr_min, atr_max, ml_atr_obj, auto_ml) and
+  macd_hist.f_eval(lock_mac, mac_min, mac_max, ml_mac_obj, auto_ml) and
+  micro_rsi.f_eval(lock_mrs, mrs_min, mrs_max, ml_mrs_obj, auto_ml) and
+  vix_val.f_eval(lock_vix, vix_min, vix_max, ml_vix_obj, auto_ml) and
+  float(score).f_eval(lock_sco, sco_min, sco_max, ml_sco_obj, auto_ml)))
+
+bool guards_cleared_short = base_short and (bypass_guards or (
+  active_pee.f_eval(lock_pee, pee_min, pee_max, ml_pee_obj, auto_ml) and
+  brr.f_eval(lock_brr, brr_min, brr_max, ml_brr_obj, auto_ml) and
+  adx_val.f_eval(lock_adx, adx_min, adx_max, ml_adx_obj, auto_ml) and
+  bb_width_atr.f_eval(lock_bb, bb_min, bb_max, ml_bb_obj, auto_ml) and
+  cvd_roc.f_eval(lock_cvd, cvd_min, cvd_max, ml_cvd_obj, auto_ml) and
+  atr_ratio.f_eval(lock_atr, atr_min, atr_max, ml_atr_obj, auto_ml) and
+  macd_hist.f_eval(lock_mac, mac_min, mac_max, ml_mac_obj, auto_ml) and
+  micro_rsi.f_eval(lock_mrs, mrs_min, mrs_max, ml_mrs_obj, auto_ml) and
+  vix_val.f_eval(lock_vix, vix_min, vix_max, ml_vix_obj, auto_ml) and
+  float(score).f_eval(lock_sco, sco_min, sco_max, ml_sco_obj, auto_ml)))
+
+if guards_cleared_long
+    latch_long := false
+if guards_cleared_short
+    latch_short := false
+
+// === 6. RISK MANAGEMENT ===
+var float trade_sl = na
+var float trade_trail_dist = na
+var bool  mfe_unlocked = false
+var string active_id = ""
+var bool bar_mfe_unlocked = false
+var bool bar_time_cut = false
+
+if barstate.isnew
+    bar_mfe_unlocked := false
+    bar_time_cut := false
+
+float vix_mult = na(vix_val) ? 1.0 : (vix_val < 16.1 ? 0.75 : (vix_val <= 20.0 ? 1.0 : 1.35))
+float target_risk_usd = prop_base_equity * (prop_risk_pct / 100) * vix_mult
+
+if strategy.position_size == 0
+    mfe_unlocked := false, active_id := ""
+
+if (guards_cleared_long or guards_cleared_short) and strategy.position_size == 0
+    active_id := (guards_cleared_long ? "L_" : "S_") + active_pee.f_str() + "_" + brr.f_str() + "_" + adx_val.f_str() + "_" + bb_width_atr.f_str() + "_" + cvd_roc.f_str() + "_" + atr_ratio.f_str() + "_" + macd_hist.f_str() + "_" + micro_rsi.f_str() + "_" + vix_val.f_str() + "_" + str.tostring(score) + "_" + ny_time.f_str()
+    int calculated_qty = math.max(1, int(target_risk_usd / math.max(atr_safe * 1.5 * pt_value, 1)))
+    int final_qty = math.min(calculated_qty, max_mnq_contracts)
+    trade_sl := guards_cleared_long ? close - (atr_safe * 1.5) : close + (atr_safe * 1.5)
+    trade_trail_dist := atr_safe * 1.0
+    
+    if guards_cleared_long
+        strategy.entry(active_id, strategy.long, qty=final_qty)
+    else
+        strategy.entry(active_id, strategy.short, qty=final_qty)
+
+if strategy.position_size != 0
+    float e_px = strategy.opentrades.entry_price(0)
+    int bars_held = bar_index - strategy.opentrades.entry_bar_index(0)
+    float current_pnl_usd = strategy.opentrades.profit(0)
+    
+    string[] p = str.split(active_id, "_")
+    float entry_time = p.size() >= 12 ? nz(str.tonumber(p.get(11))) : 0.0
+    
+    bool in_vol_zone = auto_ml and not na(a_byp_min) and not na(a_byp_max) and entry_time >= a_byp_min and entry_time <= a_byp_max
+    float current_cutoff = in_vol_zone ? math.round(a_loser_bar_cutoff * 3.0) : math.round(a_loser_bar_cutoff)
+    
+    if bars_held > current_cutoff and current_pnl_usd < 0
+        strategy.close_all(comment="Time Cutoff")
+        bar_time_cut := true
+        
+    if strategy.position_size > 0
+        float runup_usd = (high - e_px) * strategy.position_size * pt_value
+        if runup_usd >= a_target_mfe_usd and not mfe_unlocked
+            mfe_unlocked := true, bar_mfe_unlocked := true
+            trade_sl := math.max(trade_sl, e_px + (syminfo.mintick * 4))
+        if mfe_unlocked
+            trade_sl := math.max(trade_sl, close - trade_trail_dist)
+        strategy.exit(active_id + "_Run", from_entry=active_id, stop=trade_sl)
+
+    if strategy.position_size < 0
+        float runup_usd = (e_px - low) * math.abs(strategy.position_size) * pt_value
+        if runup_usd >= a_target_mfe_usd and not mfe_unlocked
+            mfe_unlocked := true, bar_mfe_unlocked := true
+            trade_sl := math.min(trade_sl, e_px - (syminfo.mintick * 4))
+        if mfe_unlocked
+            trade_sl := math.min(trade_sl, close + trade_trail_dist)
+        strategy.exit(active_id + "_Run", from_entry=active_id, stop=trade_sl)
+
+// === 7. COMMAND CENTER MATRIX (Permanently Anchored UI) ===
+plot(show_ghost_trail and strategy.position_size != 0 ? trade_sl : na, "Ghost Trail", color=strategy.position_size > 0 ? color.new(color.lime, 40) : color.new(color.fuchsia, 40), style=plot.style_stepline, linewidth=2)
+
+// Global declaration ensures the table object is never destroyed between bars
+var table db = table.new(position.middle_right, 5, 14, border_width=1, border_color=color.new(color.black, 0))
+
+method fill_row(table t, int row, string name, bool is_locked, MLFeature obj) =>
+    color row_bg = color.new(color.gray, 90)
+    string status = "BYPASSED"
+    color stat_col = color.new(color.gray, 50)
+    
+    if is_locked
+        status := "LOCKED [MANUAL]"
+        stat_col := color.new(color.orange, 0)
+        row_bg := color.new(color.orange, 90)
+    else if auto_ml and obj.is_active
+        status := "ENGAGED [AUTO]"
+        stat_col := color.new(color.lime, 0)
+        row_bg := color.new(color.lime, 90)
+        
+    table.cell(t, 0, row, name, bgcolor=row_bg, text_color=color.new(color.white, 0), text_halign=text.align_left)
+    table.cell(t, 1, row, obj.sens_score.f_str() + "%", bgcolor=row_bg, text_color=color.new(color.white, 0))
+    table.cell(t, 2, row, na(obj.rec_min) ? "-" : obj.rec_min.f_str(), bgcolor=row_bg, text_color=color.new(color.silver, 0))
+    table.cell(t, 3, row, na(obj.rec_max) ? "-" : obj.rec_max.f_str(), bgcolor=row_bg, text_color=color.new(color.silver, 0))
+    table.cell(t, 4, row, status, bgcolor=row_bg, text_color=stat_col)
+
+if show_dashboard and barstate.islast
+    int valid_trades = math.min(current_trade_count, ml_lookback)
+    string state_msg = run_baseline ? "BASELINE RUN (DATA GATHERING)" : (valid_trades < 10 ? "CALIBRATING (" + str.tostring(valid_trades) + "/10 Trades)" : "AUTO-PILOT ARMED")
+    color state_col = run_baseline ? color.new(color.yellow, 0) : (valid_trades < 10 ? color.new(color.orange, 0) : color.new(color.lime, 0))
+
+    // Headers
+    table.merge_cells(db, 0, 0, 4, 0)
+    table.cell(db, 0, 0, "SYSTEM STATUS: " + state_msg, bgcolor=color.new(color.black, 10), text_color=state_col)
+    
+    table.cell(db, 0, 1, "FEATURE MATRIX", bgcolor=color.new(color.navy, 30), text_color=color.new(color.white, 0))
+    table.cell(db, 1, 1, "SENSITIVITY", bgcolor=color.new(color.navy, 30), text_color=color.new(color.white, 0), tooltip="0-100% Score of how well this feature separates winners from losers.")
+    table.cell(db, 2, 1, "OPT MIN", bgcolor=color.new(color.navy, 30), text_color=color.new(color.white, 0))
+    table.cell(db, 3, 1, "OPT MAX", bgcolor=color.new(color.navy, 30), text_color=color.new(color.white, 0))
+    table.cell(db, 4, 1, "STATE", bgcolor=color.new(color.navy, 30), text_color=color.new(color.white, 0))
+
+    // Populate Matrix Rows
+    db.fill_row(2, "1. PEE (Trap Dist)", lock_pee, ml_pee_obj)
+    db.fill_row(3, "2. Body Range Ratio", lock_brr, ml_brr_obj)
+    db.fill_row(4, "3. ADX", lock_adx, ml_adx_obj)
+    db.fill_row(5, "4. BB Width", lock_bb, ml_bb_obj)
+    db.fill_row(6, "5. CVD ROC", lock_cvd, ml_cvd_obj)
+    db.fill_row(7, "6. ATR Ratio", lock_atr, ml_atr_obj)
+    db.fill_row(8, "7. MACD Hist", lock_mac, ml_mac_obj)
+    db.fill_row(9, "8. Micro 1m RSI", lock_mrs, ml_mrs_obj)
+    db.fill_row(10,"9. VIX", lock_vix, ml_vix_obj)
+    db.fill_row(11,"10. Conf Score", lock_sco, ml_sco_obj)
+    
+    // Bottom Metrics
+    table.merge_cells(db, 0, 12, 4, 12)
+    table.cell(db, 0, 12, "DYNAMIC TARGETS: MFE $" + a_target_mfe_usd.f_str() + " | Cutoff: " + a_loser_bar_cutoff.f_str() + " Bars", bgcolor=color.new(color.black, 20), text_color=color.new(color.silver, 0))
