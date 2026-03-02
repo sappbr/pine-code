@@ -59,28 +59,28 @@ s_prim_tf_adv = input.string("HTF 2 or HTF 3", "Short Trigger Combo", options=["
 // =========================================================================
 var G_L_COND = "2. 🛡️ LONG CONDITIONS (FILTERS)"
 l_f1_tf     = input.string("Chart", "Trend Filter 1:", options=["None", "Chart", "HTF 1", "HTF 2", "HTF 3", "Any HTF 1-3", "Any Timeframe (Chart+HTFs)", "Advanced Combo"], inline="l_f1", group=G_L_COND)
-l_f1_ind    = input.string("Smart Trail", "", options=["Smart Trail", "EMA Trail", "EMA Slope", "Close", "Open", "High", "Low", "hl2", "hlc3", "ohlc4", "Exhaustion L1", "Exhaustion L2", "Exhaustion L3", "Any L1-L3", "L2 or L3", "L2 and L3", "Opposing L1 Exhaustion", "Opposing L2 Exhaustion", "Opposing L3 Exhaustion", "BOS", "ChoCh", "BOS or ChoCh"], inline="l_f1", group=G_L_COND)
+l_f1_ind    = input.string("Smart Trail", "", options=["Smart Trail", "EMA Trail", "EMA Slope", "Close", "Open", "High", "Low", "hl2", "hlc3", "ohlc4", "Exhaustion L1", "Exhaustion L2", "Exhaustion L3", "Any L1-L3", "L2 or L3", "L2 and L3", "Opposing L1 Exhaustion", "Opposing L2 Exhaustion", "Opposing L3 Exhaustion", "BOS", "ChoCh", "BOS or ChoCh", "Liquidity Sweep", "Bullish Swing Sweep", "Bearish Swing Sweep"], inline="l_f1", group=G_L_COND)
 l_f1_cond   = input.string("Is Bullish", "", options=["Is Bullish", "Is Bearish", "Greater Than", "Less Than", "Printed Bullish", "Printed Bearish", "Printed Opposing", "Is Active (Has Not Reset)", "Is Active (Bullish)", "Is Active (Bearish)", "Is Active (Opposing)", "Occurred Within X Bars"], inline="l_f1", group=G_L_COND)
 l_f1_comp   = input.bool(false, "└─ Compare/Lookback:", inline="l_f1b", group=G_L_COND)
 l_f1_targ   = input.string("Value/Price", "", options=["Value/Price", "Custom Value", "Smart Trail", "EMA Trend", "Support", "Resistance"], inline="l_f1b", group=G_L_COND)
 l_f1_val    = input.float(0.0, "", inline="l_f1b", group=G_L_COND)
 
 l_f2_tf     = input.string("HTF 1", "Trend Filter 2:", options=["None", "Chart", "HTF 1", "HTF 2", "HTF 3", "Any HTF 1-3", "Any Timeframe (Chart+HTFs)", "Advanced Combo"], inline="l_f2", group=G_L_COND)
-l_f2_ind    = input.string("EMA Slope", "", options=["Smart Trail", "EMA Trail", "EMA Slope", "Close", "Open", "High", "Low", "hl2", "hlc3", "ohlc4", "Exhaustion L1", "Exhaustion L2", "Exhaustion L3", "Any L1-L3", "L2 or L3", "L2 and L3", "Opposing L1 Exhaustion", "Opposing L2 Exhaustion", "Opposing L3 Exhaustion", "BOS", "ChoCh", "BOS or ChoCh"], inline="l_f2", group=G_L_COND)
+l_f2_ind    = input.string("EMA Slope", "", options=["Smart Trail", "EMA Trail", "EMA Slope", "Close", "Open", "High", "Low", "hl2", "hlc3", "ohlc4", "Exhaustion L1", "Exhaustion L2", "Exhaustion L3", "Any L1-L3", "L2 or L3", "L2 and L3", "Opposing L1 Exhaustion", "Opposing L2 Exhaustion", "Opposing L3 Exhaustion", "BOS", "ChoCh", "BOS or ChoCh", "Liquidity Sweep", "Bullish Swing Sweep", "Bearish Swing Sweep"], inline="l_f2", group=G_L_COND)
 l_f2_cond   = input.string("Greater Than", "", options=["Is Bullish", "Is Bearish", "Greater Than", "Less Than", "Printed Bullish", "Printed Bearish", "Printed Opposing", "Is Active (Has Not Reset)", "Is Active (Bullish)", "Is Active (Bearish)", "Is Active (Opposing)", "Occurred Within X Bars"], inline="l_f2", group=G_L_COND)
 l_f2_comp   = input.bool(false, "└─ Compare/Lookback:", inline="l_f2b", group=G_L_COND)
 l_f2_targ   = input.string("Custom Value", "", options=["Value/Price", "Custom Value", "Smart Trail", "EMA Trend", "Support", "Resistance"], inline="l_f2b", group=G_L_COND)
 l_f2_val    = input.float(0.5, "", inline="l_f2b", group=G_L_COND)
 
 l_f3_tf     = input.string("HTF 2", "Trend Filter 3:", options=["None", "Chart", "HTF 1", "HTF 2", "HTF 3", "Any HTF 1-3", "Any Timeframe (Chart+HTFs)", "Advanced Combo"], inline="l_f3", group=G_L_COND)
-l_f3_ind    = input.string("Close", "", options=["Smart Trail", "EMA Trail", "EMA Slope", "Close", "Open", "High", "Low", "hl2", "hlc3", "ohlc4", "Exhaustion L1", "Exhaustion L2", "Exhaustion L3", "Any L1-L3", "L2 or L3", "L2 and L3", "Opposing L1 Exhaustion", "Opposing L2 Exhaustion", "Opposing L3 Exhaustion", "BOS", "ChoCh", "BOS or ChoCh"], inline="l_f3", group=G_L_COND)
+l_f3_ind    = input.string("Close", "", options=["Smart Trail", "EMA Trail", "EMA Slope", "Close", "Open", "High", "Low", "hl2", "hlc3", "ohlc4", "Exhaustion L1", "Exhaustion L2", "Exhaustion L3", "Any L1-L3", "L2 or L3", "L2 and L3", "Opposing L1 Exhaustion", "Opposing L2 Exhaustion", "Opposing L3 Exhaustion", "BOS", "ChoCh", "BOS or ChoCh", "Liquidity Sweep", "Bullish Swing Sweep", "Bearish Swing Sweep"], inline="l_f3", group=G_L_COND)
 l_f3_cond   = input.string("Greater Than", "", options=["Is Bullish", "Is Bearish", "Greater Than", "Less Than", "Printed Bullish", "Printed Bearish", "Printed Opposing", "Is Active (Has Not Reset)", "Is Active (Bullish)", "Is Active (Bearish)", "Is Active (Opposing)", "Occurred Within X Bars"], inline="l_f3", group=G_L_COND)
 l_f3_comp   = input.bool(true, "└─ Compare/Lookback:", inline="l_f3b", group=G_L_COND)
 l_f3_targ   = input.string("Smart Trail", "", options=["Value/Price", "Custom Value", "Smart Trail", "EMA Trend", "Support", "Resistance"], inline="l_f3b", group=G_L_COND)
 l_f3_val    = input.float(0.0, "", inline="l_f3b", group=G_L_COND)
 
 l_blk_tf    = input.string("HTF 3", "Invalidation Blocker:", options=["None", "Chart", "HTF 1", "HTF 2", "HTF 3", "Any HTF 1-3", "Any Timeframe (Chart+HTFs)", "Advanced Combo"], inline="l_blk", group=G_L_COND, tooltip="Kills trade if true.")
-l_blk_ind   = input.string("Exhaustion L3", "", options=["Smart Trail", "EMA Trail", "EMA Slope", "Close", "Open", "High", "Low", "hl2", "hlc3", "ohlc4", "Exhaustion L1", "Exhaustion L2", "Exhaustion L3", "Any L1-L3", "L2 or L3", "L2 and L3", "Opposing L1 Exhaustion", "Opposing L2 Exhaustion", "Opposing L3 Exhaustion", "BOS", "ChoCh", "BOS or ChoCh"], inline="l_blk", group=G_L_COND)
+l_blk_ind   = input.string("Exhaustion L3", "", options=["Smart Trail", "EMA Trail", "EMA Slope", "Close", "Open", "High", "Low", "hl2", "hlc3", "ohlc4", "Exhaustion L1", "Exhaustion L2", "Exhaustion L3", "Any L1-L3", "L2 or L3", "L2 and L3", "Opposing L1 Exhaustion", "Opposing L2 Exhaustion", "Opposing L3 Exhaustion", "BOS", "ChoCh", "BOS or ChoCh", "Liquidity Sweep", "Bullish Swing Sweep", "Bearish Swing Sweep"], inline="l_blk", group=G_L_COND)
 l_blk_cond  = input.string("Occurred Within X Bars", "", options=["Is Active (Has Not Reset)", "Is Active (Bullish)", "Is Active (Bearish)", "Is Active (Opposing)", "Occurred Within X Bars", "Printed Bullish", "Printed Bearish", "Printed Opposing"], inline="l_blk", group=G_L_COND)
 l_blk_comp  = input.bool(true, "└─ Compare/Lookback:", inline="l_blkb", group=G_L_COND)
 l_blk_targ  = input.string("Custom Value", "", options=["Custom Value", "Value/Price"], inline="l_blkb", group=G_L_COND)
@@ -102,28 +102,28 @@ l_prim_val  = input.float(0.0, "", inline="l_primb", group=G_L_ENT)
 // =========================================================================
 var G_S_COND = "4. 🛡️ SHORT CONDITIONS (FILTERS)"
 s_f1_tf     = input.string("Chart", "Trend Filter 1:", options=["None", "Chart", "HTF 1", "HTF 2", "HTF 3", "Any HTF 1-3", "Any Timeframe (Chart+HTFs)", "Advanced Combo"], inline="s_f1", group=G_S_COND)
-s_f1_ind    = input.string("Smart Trail", "", options=["Smart Trail", "EMA Trail", "EMA Slope", "Close", "Open", "High", "Low", "hl2", "hlc3", "ohlc4", "Exhaustion L1", "Exhaustion L2", "Exhaustion L3", "Any L1-L3", "L2 or L3", "L2 and L3", "Opposing L1 Exhaustion", "Opposing L2 Exhaustion", "Opposing L3 Exhaustion", "BOS", "ChoCh", "BOS or ChoCh"], inline="s_f1", group=G_S_COND)
+s_f1_ind    = input.string("Smart Trail", "", options=["Smart Trail", "EMA Trail", "EMA Slope", "Close", "Open", "High", "Low", "hl2", "hlc3", "ohlc4", "Exhaustion L1", "Exhaustion L2", "Exhaustion L3", "Any L1-L3", "L2 or L3", "L2 and L3", "Opposing L1 Exhaustion", "Opposing L2 Exhaustion", "Opposing L3 Exhaustion", "BOS", "ChoCh", "BOS or ChoCh", "Liquidity Sweep", "Bullish Swing Sweep", "Bearish Swing Sweep"], inline="s_f1", group=G_S_COND)
 s_f1_cond   = input.string("Is Bearish", "", options=["Is Bullish", "Is Bearish", "Greater Than", "Less Than", "Printed Bullish", "Printed Bearish", "Printed Opposing", "Is Active (Has Not Reset)", "Is Active (Bullish)", "Is Active (Bearish)", "Is Active (Opposing)", "Occurred Within X Bars"], inline="s_f1", group=G_S_COND)
 s_f1_comp   = input.bool(false, "└─ Compare/Lookback:", inline="s_f1b", group=G_S_COND)
 s_f1_targ   = input.string("Value/Price", "", options=["Value/Price", "Custom Value", "Smart Trail", "EMA Trend", "Support", "Resistance"], inline="s_f1b", group=G_S_COND)
 s_f1_val    = input.float(0.0, "", inline="s_f1b", group=G_S_COND)
 
 s_f2_tf     = input.string("HTF 1", "Trend Filter 2:", options=["None", "Chart", "HTF 1", "HTF 2", "HTF 3", "Any HTF 1-3", "Any Timeframe (Chart+HTFs)", "Advanced Combo"], inline="s_f2", group=G_S_COND)
-s_f2_ind    = input.string("EMA Slope", "", options=["Smart Trail", "EMA Trail", "EMA Slope", "Close", "Open", "High", "Low", "hl2", "hlc3", "ohlc4", "Exhaustion L1", "Exhaustion L2", "Exhaustion L3", "Any L1-L3", "L2 or L3", "L2 and L3", "Opposing L1 Exhaustion", "Opposing L2 Exhaustion", "Opposing L3 Exhaustion", "BOS", "ChoCh", "BOS or ChoCh"], inline="s_f2", group=G_S_COND)
+s_f2_ind    = input.string("EMA Slope", "", options=["Smart Trail", "EMA Trail", "EMA Slope", "Close", "Open", "High", "Low", "hl2", "hlc3", "ohlc4", "Exhaustion L1", "Exhaustion L2", "Exhaustion L3", "Any L1-L3", "L2 or L3", "L2 and L3", "Opposing L1 Exhaustion", "Opposing L2 Exhaustion", "Opposing L3 Exhaustion", "BOS", "ChoCh", "BOS or ChoCh", "Liquidity Sweep", "Bullish Swing Sweep", "Bearish Swing Sweep"], inline="s_f2", group=G_S_COND)
 s_f2_cond   = input.string("Less Than", "", options=["Is Bullish", "Is Bearish", "Greater Than", "Less Than", "Printed Bullish", "Printed Bearish", "Printed Opposing", "Is Active (Has Not Reset)", "Is Active (Bullish)", "Is Active (Bearish)", "Is Active (Opposing)", "Occurred Within X Bars"], inline="s_f2", group=G_S_COND)
 s_f2_comp   = input.bool(true, "└─ Compare/Lookback:", inline="s_f2b", group=G_S_COND)
 s_f2_targ   = input.string("Custom Value", "", options=["Value/Price", "Custom Value", "Smart Trail", "EMA Trend", "Support", "Resistance"], inline="s_f2b", group=G_S_COND)
 s_f2_val    = input.float(-0.5, "", inline="s_f2b", group=G_S_COND)
 
 s_f3_tf     = input.string("HTF 2", "Trend Filter 3:", options=["None", "Chart", "HTF 1", "HTF 2", "HTF 3", "Any HTF 1-3", "Any Timeframe (Chart+HTFs)", "Advanced Combo"], inline="s_f3", group=G_S_COND)
-s_f3_ind    = input.string("Close", "", options=["Smart Trail", "EMA Trail", "EMA Slope", "Close", "Open", "High", "Low", "hl2", "hlc3", "ohlc4", "Exhaustion L1", "Exhaustion L2", "Exhaustion L3", "Any L1-L3", "L2 or L3", "L2 and L3", "Opposing L1 Exhaustion", "Opposing L2 Exhaustion", "Opposing L3 Exhaustion", "BOS", "ChoCh", "BOS or ChoCh"], inline="s_f3", group=G_S_COND)
+s_f3_ind    = input.string("Close", "", options=["Smart Trail", "EMA Trail", "EMA Slope", "Close", "Open", "High", "Low", "hl2", "hlc3", "ohlc4", "Exhaustion L1", "Exhaustion L2", "Exhaustion L3", "Any L1-L3", "L2 or L3", "L2 and L3", "Opposing L1 Exhaustion", "Opposing L2 Exhaustion", "Opposing L3 Exhaustion", "BOS", "ChoCh", "BOS or ChoCh", "Liquidity Sweep", "Bullish Swing Sweep", "Bearish Swing Sweep"], inline="s_f3", group=G_S_COND)
 s_f3_cond   = input.string("Less Than", "", options=["Is Bullish", "Is Bearish", "Greater Than", "Less Than", "Printed Bullish", "Printed Bearish", "Printed Opposing", "Is Active (Has Not Reset)", "Is Active (Bullish)", "Is Active (Bearish)", "Is Active (Opposing)", "Occurred Within X Bars"], inline="s_f3", group=G_S_COND)
 s_f3_comp   = input.bool(true, "└─ Compare/Lookback:", inline="s_f3b", group=G_S_COND)
 s_f3_targ   = input.string("Smart Trail", "", options=["Value/Price", "Custom Value", "Smart Trail", "EMA Trend", "Support", "Resistance"], inline="s_f3b", group=G_S_COND)
 s_f3_val    = input.float(0.0, "", inline="s_f3b", group=G_S_COND)
 
 s_blk_tf    = input.string("HTF 1", "Invalidation Blocker:", options=["None", "Chart", "HTF 1", "HTF 2", "HTF 3", "Any HTF 1-3", "Any Timeframe (Chart+HTFs)", "Advanced Combo"], inline="s_blk", group=G_S_COND, tooltip="Kills trade if true.")
-s_blk_ind   = input.string("Exhaustion L3", "", options=["Smart Trail", "EMA Trail", "EMA Slope", "Close", "Open", "High", "Low", "hl2", "hlc3", "ohlc4", "Exhaustion L1", "Exhaustion L2", "Exhaustion L3", "Any L1-L3", "L2 or L3", "L2 and L3", "Opposing L1 Exhaustion", "Opposing L2 Exhaustion", "Opposing L3 Exhaustion", "BOS", "ChoCh", "BOS or ChoCh"], inline="s_blk", group=G_S_COND)
+s_blk_ind   = input.string("Exhaustion L3", "", options=["Smart Trail", "EMA Trail", "EMA Slope", "Close", "Open", "High", "Low", "hl2", "hlc3", "ohlc4", "Exhaustion L1", "Exhaustion L2", "Exhaustion L3", "Any L1-L3", "L2 or L3", "L2 and L3", "Opposing L1 Exhaustion", "Opposing L2 Exhaustion", "Opposing L3 Exhaustion", "BOS", "ChoCh", "BOS or ChoCh", "Liquidity Sweep", "Bullish Swing Sweep", "Bearish Swing Sweep"], inline="s_blk", group=G_S_COND)
 s_blk_cond  = input.string("Occurred Within X Bars", "", options=["Is Active (Has Not Reset)", "Is Active (Bullish)", "Is Active (Bearish)", "Is Active (Opposing)", "Occurred Within X Bars", "Printed Bullish", "Printed Bearish", "Printed Opposing"], inline="s_blk", group=G_S_COND)
 s_blk_comp  = input.bool(true, "└─ Compare/Lookback:", inline="s_blkb", group=G_S_COND)
 s_blk_targ  = input.string("Custom Value", "", options=["Custom Value", "Value/Price"], inline="s_blkb", group=G_S_COND)
@@ -269,6 +269,7 @@ trail_offset     = input.int(4, "Trail Offset (Ticks Buffer)", group=G_TRAIL)
 // 10. ⚠️ EXITS & SAFETY OVERRIDES
 // =========================================================================
 var G_SAFE = "10. ⚠️ EXITS & SAFETY OVERRIDES"
+tradeDirectionMode = input.string("Both", "Trade Direction", options=["Both", "Long Only", "Short Only"], group=G_SAFE)
 useMacroKillswitch = input.bool(true, "Enable Exhaustion Killswitch (Blocks New Arms)", group=G_SAFE)
 useSafetyDisarm    = input.bool(true, "Enable Pending Safety Disarm (Kills Pending Trades)", group=G_SAFE)
 useEmaReversal     = input.bool(false, "Enable EMA Slope Reversal Exit", group=G_SAFE)
@@ -350,15 +351,18 @@ st_lineTp  = input.string("Solid",    "",               options=["Solid", "Dotte
 // 🎨 Optional Overlays (Base always on: Chart Smart Trail, EMA, L1-L3, BOS/ChoCH)
 // -------------------------------------------------------------------------
 var G_OVR = "13b. 🎨 Optional Overlays"
+autoVisualFromConfig = input.bool(true, "Auto-Show Visuals Used by Active Rules", group=G_OVR, tooltip="When enabled, BOS/ChoCH and L1-L3 visuals auto-enable on chart/HTFs if those families are selected anywhere in filters, triggers, TP, exits, BE, or trail trigger settings. Manual toggles still work.")
 show_st_h1     = input.bool(false, "HTF 1 Smart Trail",  group=G_OVR)
 show_st_h2     = input.bool(false, "HTF 2 Smart Trail",  group=G_OVR)
 show_st_h3     = input.bool(false, "HTF 3 Smart Trail",  group=G_OVR)
 show_ema_h1    = input.bool(true, "HTF 1 EMA Trend",    group=G_OVR)
 show_ema_h2    = input.bool(true, "HTF 2 EMA Trend",    group=G_OVR)
 show_ema_h3    = input.bool(true, "HTF 3 EMA Trend",    group=G_OVR)
+show_exh_chart = input.bool(false, "Chart Exhaustion (L1-L3)", group=G_OVR)
 show_exh_h1    = input.bool(false, "HTF 1 Exhaustion",   group=G_OVR)
 show_exh_h2    = input.bool(false, "HTF 2 Exhaustion",   group=G_OVR)
 show_exh_h3    = input.bool(false, "HTF 3 Exhaustion",   group=G_OVR)
+show_bos_chart = input.bool(false, "Chart BOS/ChoCH",    group=G_OVR)
 show_bos_h1    = input.bool(false, "HTF 1 BOS/ChoCH",    group=G_OVR)
 show_bos_h2    = input.bool(false, "HTF 2 BOS/ChoCH",    group=G_OVR)
 show_bos_h3    = input.bool(false, "HTF 3 BOS/ChoCH",    group=G_OVR)
@@ -366,6 +370,29 @@ show_swing_chart = input.bool(false, "Chart Swing Levels", group=G_OVR)
 show_swing_h1    = input.bool(false, "HTF 1 Swing Levels", group=G_OVR)
 show_swing_h2    = input.bool(false, "HTF 2 Swing Levels", group=G_OVR)
 show_swing_h3    = input.bool(false, "HTF 3 Swing Levels", group=G_OVR)
+
+var G_VST = "13c. 🎛️ Master Visual Style"
+vis_chart_size = input.string("Tiny", "Chart Marker/Text Size", options=["Tiny", "Small", "Normal", "Large"], group=G_VST)
+vis_h1_size = input.string("Tiny", "HTF 1 Marker/Text Size", options=["Tiny", "Small", "Normal", "Large"], group=G_VST)
+vis_h2_size = input.string("Tiny", "HTF 2 Marker/Text Size", options=["Tiny", "Small", "Normal", "Large"], group=G_VST)
+vis_h3_size = input.string("Tiny", "HTF 3 Marker/Text Size", options=["Tiny", "Small", "Normal", "Large"], group=G_VST)
+vis_chart_bull = input.color(#089981, "Chart Bull Color", inline="vsch", group=G_VST)
+vis_chart_bear = input.color(#f23645, "Chart Bear Color", inline="vsch", group=G_VST)
+vis_chart_opacity = input.int(0, "Chart Opacity", minval=0, maxval=100, inline="vsch", group=G_VST)
+vis_h1_bull = input.color(#089981, "HTF1 Bull Color", inline="vsh1", group=G_VST)
+vis_h1_bear = input.color(#f23645, "HTF1 Bear Color", inline="vsh1", group=G_VST)
+vis_h1_opacity = input.int(40, "HTF1 Opacity", minval=0, maxval=100, inline="vsh1", group=G_VST)
+vis_h2_bull = input.color(#089981, "HTF2 Bull Color", inline="vsh2", group=G_VST)
+vis_h2_bear = input.color(#f23645, "HTF2 Bear Color", inline="vsh2", group=G_VST)
+vis_h2_opacity = input.int(60, "HTF2 Opacity", minval=0, maxval=100, inline="vsh2", group=G_VST)
+vis_h3_bull = input.color(#089981, "HTF3 Bull Color", inline="vsh3", group=G_VST)
+vis_h3_bear = input.color(#f23645, "HTF3 Bear Color", inline="vsh3", group=G_VST)
+vis_h3_opacity = input.int(80, "HTF3 Opacity", minval=0, maxval=100, inline="vsh3", group=G_VST)
+
+sig_size = input.string("Small", "Signal Text Size", options=["Tiny", "Small", "Normal", "Large"], group=G_VST)
+sig_long_color = input.color(#00c853, "Signal Long Color", inline="sigv", group=G_VST)
+sig_short_color = input.color(#ff5252, "Signal Short Color", inline="sigv", group=G_VST)
+sig_opacity = input.int(0, "Signal Opacity", minval=0, maxval=100, inline="sigv", group=G_VST)
 
 // --- Cohesive Color Gradient (const to minimize plot overhead) ---
 c_bull     = #089981
@@ -1457,8 +1484,10 @@ bool longCarryEligible = useOpenCarryLatch and useSession and pendingLongCarry a
 bool shortCarryEligible = useOpenCarryLatch and useSession and pendingShortCarry and withinOpenCarryGrace and shortArmedCore
 bool longTriggerNow = longArmed and l_prim
 bool shortTriggerNow = shortArmed and s_prim
-bool fireLong = longTriggerNow or longCarryEligible
-bool fireShort = shortTriggerNow or shortCarryEligible
+bool longSideEnabled = tradeDirectionMode != "Short Only"
+bool shortSideEnabled = tradeDirectionMode != "Long Only"
+bool fireLong = (longTriggerNow or longCarryEligible) and longSideEnabled
+bool fireShort = (shortTriggerNow or shortCarryEligible) and shortSideEnabled
 bool longFromCarry = longCarryEligible and not longTriggerNow
 bool shortFromCarry = shortCarryEligible and not shortTriggerNow
 bool isBarClose = barstate.isconfirmed
@@ -1611,7 +1640,12 @@ if qtyRem > 0 and activeTpCount > 0
 
 // --- Entry State ---
 var float entrySL     = na
+var float entryInitialSL = na
 var float entryPrice  = na
+var float entryTp1Init = na
+var float entryTp2Init = na
+var float entryTp3Init = na
+var float entryTp4Init = na
 var bool  beHit       = false
 var bool  trailLocked = false
 var float trailStop   = na
@@ -1627,6 +1661,58 @@ var int   _entryShortBar = -1
 
 f_fmt_num(float v) =>
     na(v) ? "na" : str.format("{0,number,#.####}", v)
+
+f_tf_short(string tfRaw) =>
+    string _t = str.trim(tfRaw)
+    string _u = str.upper(_t)
+    bool _hasLetter = str.contains(_u, "S") or str.contains(_u, "H") or str.contains(_u, "D") or str.contains(_u, "W") or str.contains(_u, "M")
+    _hasLetter ? str.lower(_u) : (_u + "m")
+
+f_tf_tag(string tfSel) =>
+    tfSel == "Chart" ? "chart" :
+     tfSel == "HTF 1" ? f_tf_short(tfH1) :
+     tfSel == "HTF 2" ? f_tf_short(tfH2) :
+     tfSel == "HTF 3" ? f_tf_short(tfH3) :
+     str.lower(str.replace_all(str.replace_all(tfSel, " ", ""), "+", ""))
+
+f_ind_tag(string indSel) =>
+    indSel == "Smart Trail" ? "st" :
+     indSel == "EMA Trail" ? "ema" :
+     indSel == "EMA Slope" ? "slope" :
+     indSel == "BOS" ? "bos" :
+     indSel == "ChoCh" ? "choch" :
+     indSel == "BOS or ChoCh" ? "bos" :
+     indSel == "Exhaustion L1" ? "l1" :
+     indSel == "Exhaustion L2" ? "l2" :
+     indSel == "Exhaustion L3" ? "l3" :
+     indSel == "Any L1-L3" ? "l1-3" :
+     indSel == "L2 or L3" ? "l2-3" :
+     indSel == "L2 and L3" ? "l2&l3" :
+     indSel == "Opposing L1 Exhaustion" ? "op-l1" :
+     indSel == "Opposing L2 Exhaustion" ? "op-l2" :
+     indSel == "Opposing L3 Exhaustion" ? "op-l3" :
+     str.lower(str.replace_all(str.replace_all(indSel, " ", "-"), "/", "-"))
+
+f_reason_tag(string tfSel, string indSel, string condSel) =>
+    string _base = f_ind_tag(indSel)
+    bool _opp = str.contains(str.lower(condSel), "opposing")
+    f_tf_tag(tfSel) + "-" + (_opp and not str.contains(_base, "op-") ? "op-" + _base : _base)
+
+f_sl_mode_tag(string modeSel) =>
+    modeSel == "Smart Trail" ? "chart-st" :
+     modeSel == "HTF 1 Smart Trail" ? f_tf_short(tfH1) + "-st" :
+     modeSel == "HTF 2 Smart Trail" ? f_tf_short(tfH2) + "-st" :
+     modeSel == "HTF 3 Smart Trail" ? f_tf_short(tfH3) + "-st" :
+     modeSel == "EMA Trail" ? "chart-ema" :
+     modeSel == "HTF 1 EMA Trail" ? f_tf_short(tfH1) + "-ema" :
+     modeSel == "HTF 2 EMA Trail" ? f_tf_short(tfH2) + "-ema" :
+     modeSel == "HTF 3 EMA Trail" ? f_tf_short(tfH3) + "-ema" :
+     modeSel == "Recent Swing" ? "chart-swing" :
+     modeSel == "Support" ? "chart-sup" :
+     modeSel == "Resistance" ? "chart-res" :
+     modeSel == "ATR" ? "chart-atr" :
+     modeSel == "Fixed Ticks" ? "chart-ticks" :
+     "chart-sl"
 
 f_scale_qty(int reqQty, float posSz, int maxQty) =>
     int _absPos = int(math.abs(posSz))
@@ -1674,14 +1760,14 @@ f_exec_tp_slot(string entryId, string sideLabel, string slotLabel, string slotId
         _done := true
     _done
 
-f_apply_stop_orders(string entryId, string id1, string id2, string id3, string id4, int q1, int q2, int q3, int q4, float stopPx) =>
-    strategy.exit(id1, entryId, qty=q1, stop=stopPx, comment_loss="SL Hit")
+f_apply_stop_orders(string entryId, string id1, string id2, string id3, string id4, int q1, int q2, int q3, int q4, float stopPx, string stopReason) =>
+    strategy.exit(id1, entryId, qty=q1, stop=stopPx, comment_loss=stopReason)
     if q2 > 0
-        strategy.exit(id2, entryId, qty=q2, stop=stopPx, comment_loss="SL Hit")
+        strategy.exit(id2, entryId, qty=q2, stop=stopPx, comment_loss=stopReason)
     if q3 > 0
-        strategy.exit(id3, entryId, qty=q3, stop=stopPx, comment_loss="SL Hit")
+        strategy.exit(id3, entryId, qty=q3, stop=stopPx, comment_loss=stopReason)
     if q4 > 0
-        strategy.exit(id4, entryId, qty=q4, stop=stopPx, comment_loss="SL Hit")
+        strategy.exit(id4, entryId, qty=q4, stop=stopPx, comment_loss=stopReason)
 
 // --- Track previous states to detect actual fills for logging ---
 var float lastPosSize = 0.0
@@ -1703,7 +1789,12 @@ if fireLong and isFlat and isBarClose
         float effectiveMaeTicks = f_effective_mae_ticks(actualMaxContracts)
         if maeTicks <= effectiveMaeTicks
             entrySL     := sl
+            entryInitialSL := sl
             entryPrice  := close
+            entryTp1Init := tp1_tf != "None" ? f_tp_target(close, true, "Chart", tp1_val, h1_st, h2_st, h3_st) : na
+            entryTp2Init := tp2_tf != "None" ? f_tp_target(close, true, tp2_tf, tp2_val, h1_st, h2_st, h3_st) : na
+            entryTp3Init := tp3_tf != "None" ? f_tp_target(close, true, tp3_tf, tp3_val, h1_st, h2_st, h3_st) : na
+            entryTp4Init := tp4_tf != "None" ? f_tp_target(close, true, tp4_tf, tp4_val, h1_st, h2_st, h3_st) : na
             beHit       := false
             trailLocked := false
             trailStop   := na
@@ -1739,7 +1830,12 @@ if fireShort and isFlat and isBarClose
         float effectiveMaeTicks = f_effective_mae_ticks(actualMaxContracts)
         if maeTicks <= effectiveMaeTicks
             entrySL     := sl
+            entryInitialSL := sl
             entryPrice  := close
+            entryTp1Init := tp1_tf != "None" ? f_tp_target(close, false, "Chart", tp1_val, h1_st, h2_st, h3_st) : na
+            entryTp2Init := tp2_tf != "None" ? f_tp_target(close, false, tp2_tf, tp2_val, h1_st, h2_st, h3_st) : na
+            entryTp3Init := tp3_tf != "None" ? f_tp_target(close, false, tp3_tf, tp3_val, h1_st, h2_st, h3_st) : na
+            entryTp4Init := tp4_tf != "None" ? f_tp_target(close, false, tp4_tf, tp4_val, h1_st, h2_st, h3_st) : na
             beHit       := false
             trailLocked := false
             trailStop   := na
@@ -1833,14 +1929,21 @@ if trailLocked and not isFlat
     if isShort and not na(trailStop) and trailStop < entrySL
         entrySL := trailStop
 
+if isFlat
+    entryInitialSL := na
+    entryTp1Init := na
+    entryTp2Init := na
+    entryTp3Init := na
+    entryTp4Init := na
+
 // -------------------------------------------------------------------------
 // 21a. 🎯 TP ENGINE
 // -------------------------------------------------------------------------
 // --- Dynamic TP IDs ---
-string id_tp1 = "TP1-" + str.replace_all(tp1_tf, " ", "") + "-" + str.replace_all(tp1_ind, " ", "")
-string id_tp2 = "TP2-" + str.replace_all(tp2_tf, " ", "") + "-" + str.replace_all(tp2_ind, " ", "")
-string id_tp3 = "TP3-" + str.replace_all(tp3_tf, " ", "") + "-" + str.replace_all(tp3_ind, " ", "")
-string id_tp4 = "TP4-" + str.replace_all(tp4_tf, " ", "") + "-" + str.replace_all(tp4_ind, " ", "")
+string id_tp1 = "TP1-" + f_reason_tag(tp1_tf, tp1_ind, tp1_cond)
+string id_tp2 = "TP2-" + f_reason_tag(tp2_tf, tp2_ind, tp2_cond)
+string id_tp3 = "TP3-" + f_reason_tag(tp3_tf, tp3_ind, tp3_cond)
+string id_tp4 = "TP4-" + f_reason_tag(tp4_tf, tp4_ind, tp4_cond)
 
 // --- TP Trigger Conditions (bar-close only) ---
 int tpDir = isLong ? 1 : -1
@@ -1858,9 +1961,9 @@ bool tp2Trig = tp2TrigRaw and (not tp2_posOnly or netPosNow)
 bool tp3Trig = tp3TrigRaw and (not tp3_posOnly or netPosNow)
 bool tp4Trig = tp4TrigRaw and (not tp4_posOnly or netPosNow)
 
-string id_ex1 = "EX1-" + str.replace_all(ex1_tf, " ", "") + "-" + str.replace_all(ex1_ind, " ", "")
-string id_ex2 = "EX2-" + str.replace_all(ex2_tf, " ", "") + "-" + str.replace_all(ex2_ind, " ", "")
-string id_ex3 = "EX3-" + str.replace_all(ex3_tf, " ", "") + "-" + str.replace_all(ex3_ind, " ", "")
+string id_ex1 = "EX1-" + f_reason_tag(ex1_tf, ex1_ind, ex1_cond)
+string id_ex2 = "EX2-" + f_reason_tag(ex2_tf, ex2_ind, ex2_cond)
+string id_ex3 = "EX3-" + f_reason_tag(ex3_tf, ex3_ind, ex3_cond)
 
 bool ex1Eval = f_eval(ex1_tf, ex1_ind, ex1_cond, ex1_comp, ex1_targ, float(ex1_val), tpDir)
 bool ex2Eval = f_eval(ex2_tf, ex2_ind, ex2_cond, ex2_comp, ex2_targ, float(ex2_val), tpDir)
@@ -1963,10 +2066,10 @@ if isBarClose and isShort
 // -------------------------------------------------------------------------
 // --- Apply SL & Exits ---
 if isLong
-    f_apply_stop_orders(lbl_long_entry, id_tp1, id_tp2, id_tp3, id_tp4, qtyTP1, qtyTP2, qtyTP3, qtyTP4, entrySL)
+    f_apply_stop_orders(lbl_long_entry, id_tp1, id_tp2, id_tp3, id_tp4, qtyTP1, qtyTP2, qtyTP3, qtyTP4, entrySL, "SL-" + f_sl_mode_tag(slMode))
 
 if isShort
-    f_apply_stop_orders(lbl_short_entry, id_tp1, id_tp2, id_tp3, id_tp4, qtyTP1, qtyTP2, qtyTP3, qtyTP4, entrySL)
+    f_apply_stop_orders(lbl_short_entry, id_tp1, id_tp2, id_tp3, id_tp4, qtyTP1, qtyTP2, qtyTP3, qtyTP4, entrySL, "SL-" + f_sl_mode_tag(slMode))
 
 // --- Exit Logging ---
 if closedOut and (logLevel == "Trades Only" or logLevel == "Full (Deep State)")
@@ -2010,15 +2113,373 @@ if dailyPnlLimitHit and not isFlat
 // =========================================================================
 // 22. 🎨 VISUAL RENDERING — Unified Color Gradient + Lux-Style BOS/ChoCH
 // =========================================================================
-plotshape(showNewsBoundarySignals and newsPreAlertNow, "News PRE", style=shape.labeldown, location=location.top, color=color.new(c_l3_bear, 0), text="PRE", textcolor=color.white, size=size.tiny)
-plotshape(showNewsBoundarySignals and newsPostAlertNow, "News POST", style=shape.labelup, location=location.bottom, color=color.new(c_l3_bull, 0), text="POST", textcolor=color.white, size=size.tiny)
+f_is_bos_family(string _ind) =>
+    _ind == "BOS" or _ind == "ChoCh" or _ind == "BOS or ChoCh"
+
+f_is_exh_family(string _ind) =>
+    _ind == "Exhaustion L1" or _ind == "Exhaustion L2" or _ind == "Exhaustion L3" or _ind == "Any L1-L3" or _ind == "L2 or L3" or _ind == "L2 and L3" or _ind == "Opposing L1 Exhaustion" or _ind == "Opposing L2 Exhaustion" or _ind == "Opposing L3 Exhaustion"
+
+f_tf_has_chart(string _tf) =>
+    _tf == "Chart" or _tf == "Any Timeframe (Chart+HTFs)" or _tf == "Chart or HTF 1" or _tf == "Chart or HTF 2" or _tf == "Chart or HTF 3" or _tf == "Chart and HTF 1" or _tf == "Chart and HTF 2" or _tf == "Chart and HTF 3"
+
+f_tf_has_h1(string _tf) =>
+    _tf == "HTF 1" or _tf == "Any HTF 1-3" or _tf == "Any Timeframe (Chart+HTFs)" or _tf == "HTF 1 or HTF 2" or _tf == "HTF 1 or HTF 3" or _tf == "HTF 1 and HTF 2" or _tf == "HTF 1 and HTF 3" or _tf == "Chart or HTF 1" or _tf == "Chart and HTF 1"
+
+f_tf_has_h2(string _tf) =>
+    _tf == "HTF 2" or _tf == "Any HTF 1-3" or _tf == "Any Timeframe (Chart+HTFs)" or _tf == "HTF 1 or HTF 2" or _tf == "HTF 2 or HTF 3" or _tf == "HTF 1 and HTF 2" or _tf == "HTF 2 and HTF 3" or _tf == "Chart or HTF 2" or _tf == "Chart and HTF 2"
+
+f_tf_has_h3(string _tf) =>
+    _tf == "HTF 3" or _tf == "Any HTF 1-3" or _tf == "Any Timeframe (Chart+HTFs)" or _tf == "HTF 1 or HTF 3" or _tf == "HTF 2 or HTF 3" or _tf == "HTF 1 and HTF 3" or _tf == "HTF 2 and HTF 3" or _tf == "Chart or HTF 3" or _tf == "Chart and HTF 3"
+
+f_size_opt(string _s) =>
+    _s == "Tiny" ? size.tiny : _s == "Small" ? size.small : _s == "Large" ? size.large : size.normal
+
+bool _autoBosFamily =
+     f_is_bos_family(l_f1_ind) or f_is_bos_family(l_f2_ind) or f_is_bos_family(l_f3_ind) or f_is_bos_family(l_blk_ind) or f_is_bos_family(l_prim_ind) or
+     f_is_bos_family(s_f1_ind) or f_is_bos_family(s_f2_ind) or f_is_bos_family(s_f3_ind) or f_is_bos_family(s_blk_ind) or f_is_bos_family(s_prim_ind) or
+     f_is_bos_family(tp1_ind) or f_is_bos_family(tp2_ind) or f_is_bos_family(tp3_ind) or f_is_bos_family(tp4_ind) or
+     f_is_bos_family(ex1_ind) or f_is_bos_family(ex2_ind) or f_is_bos_family(ex3_ind) or
+     f_is_bos_family(be_ind) or f_is_bos_family(trail_trig_ind)
+
+bool _autoExhFamily =
+     f_is_exh_family(l_f1_ind) or f_is_exh_family(l_f2_ind) or f_is_exh_family(l_f3_ind) or f_is_exh_family(l_blk_ind) or f_is_exh_family(l_prim_ind) or
+     f_is_exh_family(s_f1_ind) or f_is_exh_family(s_f2_ind) or f_is_exh_family(s_f3_ind) or f_is_exh_family(s_blk_ind) or f_is_exh_family(s_prim_ind) or
+     f_is_exh_family(tp1_ind) or f_is_exh_family(tp2_ind) or f_is_exh_family(tp3_ind) or f_is_exh_family(tp4_ind) or
+     f_is_exh_family(ex1_ind) or f_is_exh_family(ex2_ind) or f_is_exh_family(ex3_ind) or
+     f_is_exh_family(be_ind) or f_is_exh_family(trail_trig_ind)
+
+bool _autoTfChart =
+     f_tf_has_chart(l_f1_tf_eff) or f_tf_has_chart(l_f2_tf_eff) or f_tf_has_chart(l_f3_tf_eff) or f_tf_has_chart(l_blk_tf_eff) or f_tf_has_chart(l_prim_tf_eff) or
+     f_tf_has_chart(s_f1_tf_eff) or f_tf_has_chart(s_f2_tf_eff) or f_tf_has_chart(s_f3_tf_eff) or f_tf_has_chart(s_blk_tf_eff) or f_tf_has_chart(s_prim_tf_eff) or
+     f_tf_has_chart(tp1_tf) or f_tf_has_chart(tp2_tf) or f_tf_has_chart(tp3_tf) or f_tf_has_chart(tp4_tf) or
+     f_tf_has_chart(ex1_tf) or f_tf_has_chart(ex2_tf) or f_tf_has_chart(ex3_tf) or
+     f_tf_has_chart(be_tf) or f_tf_has_chart(trail_trig_tf)
+
+bool _autoTfH1 =
+     f_tf_has_h1(l_f1_tf_eff) or f_tf_has_h1(l_f2_tf_eff) or f_tf_has_h1(l_f3_tf_eff) or f_tf_has_h1(l_blk_tf_eff) or f_tf_has_h1(l_prim_tf_eff) or
+     f_tf_has_h1(s_f1_tf_eff) or f_tf_has_h1(s_f2_tf_eff) or f_tf_has_h1(s_f3_tf_eff) or f_tf_has_h1(s_blk_tf_eff) or f_tf_has_h1(s_prim_tf_eff) or
+     f_tf_has_h1(tp1_tf) or f_tf_has_h1(tp2_tf) or f_tf_has_h1(tp3_tf) or f_tf_has_h1(tp4_tf) or
+     f_tf_has_h1(ex1_tf) or f_tf_has_h1(ex2_tf) or f_tf_has_h1(ex3_tf) or
+     f_tf_has_h1(be_tf) or f_tf_has_h1(trail_trig_tf)
+
+bool _autoTfH2 =
+     f_tf_has_h2(l_f1_tf_eff) or f_tf_has_h2(l_f2_tf_eff) or f_tf_has_h2(l_f3_tf_eff) or f_tf_has_h2(l_blk_tf_eff) or f_tf_has_h2(l_prim_tf_eff) or
+     f_tf_has_h2(s_f1_tf_eff) or f_tf_has_h2(s_f2_tf_eff) or f_tf_has_h2(s_f3_tf_eff) or f_tf_has_h2(s_blk_tf_eff) or f_tf_has_h2(s_prim_tf_eff) or
+     f_tf_has_h2(tp1_tf) or f_tf_has_h2(tp2_tf) or f_tf_has_h2(tp3_tf) or f_tf_has_h2(tp4_tf) or
+     f_tf_has_h2(ex1_tf) or f_tf_has_h2(ex2_tf) or f_tf_has_h2(ex3_tf) or
+     f_tf_has_h2(be_tf) or f_tf_has_h2(trail_trig_tf)
+
+bool _autoTfH3 =
+     f_tf_has_h3(l_f1_tf_eff) or f_tf_has_h3(l_f2_tf_eff) or f_tf_has_h3(l_f3_tf_eff) or f_tf_has_h3(l_blk_tf_eff) or f_tf_has_h3(l_prim_tf_eff) or
+     f_tf_has_h3(s_f1_tf_eff) or f_tf_has_h3(s_f2_tf_eff) or f_tf_has_h3(s_f3_tf_eff) or f_tf_has_h3(s_blk_tf_eff) or f_tf_has_h3(s_prim_tf_eff) or
+     f_tf_has_h3(tp1_tf) or f_tf_has_h3(tp2_tf) or f_tf_has_h3(tp3_tf) or f_tf_has_h3(tp4_tf) or
+     f_tf_has_h3(ex1_tf) or f_tf_has_h3(ex2_tf) or f_tf_has_h3(ex3_tf) or
+     f_tf_has_h3(be_tf) or f_tf_has_h3(trail_trig_tf)
+
+bool show_bos_chart_final = show_bos_chart or (autoVisualFromConfig and _autoBosFamily and _autoTfChart)
+bool show_bos_h1_final = show_bos_h1 or (autoVisualFromConfig and _autoBosFamily and _autoTfH1)
+bool show_bos_h2_final = show_bos_h2 or (autoVisualFromConfig and _autoBosFamily and _autoTfH2)
+bool show_bos_h3_final = show_bos_h3 or (autoVisualFromConfig and _autoBosFamily and _autoTfH3)
+bool show_exh_chart_final = show_exh_chart or (autoVisualFromConfig and _autoExhFamily and _autoTfChart)
+bool show_exh_h1_final = show_exh_h1 or (autoVisualFromConfig and _autoExhFamily and _autoTfH1)
+bool show_exh_h2_final = show_exh_h2 or (autoVisualFromConfig and _autoExhFamily and _autoTfH2)
+bool show_exh_h3_final = show_exh_h3 or (autoVisualFromConfig and _autoExhFamily and _autoTfH3)
+
+color chartBullClr = color.new(vis_chart_bull, vis_chart_opacity)
+color chartBearClr = color.new(vis_chart_bear, vis_chart_opacity)
+color h1BullClr = color.new(vis_h1_bull, vis_h1_opacity)
+color h1BearClr = color.new(vis_h1_bear, vis_h1_opacity)
+color h2BullClr = color.new(vis_h2_bull, vis_h2_opacity)
+color h2BearClr = color.new(vis_h2_bear, vis_h2_opacity)
+color h3BullClr = color.new(vis_h3_bull, vis_h3_opacity)
+color h3BearClr = color.new(vis_h3_bear, vis_h3_opacity)
+color sigLongClr = color.new(sig_long_color, sig_opacity)
+color sigShortClr = color.new(sig_short_color, sig_opacity)
+
+label_size_chart = f_size_opt(vis_chart_size)
+label_size_h1 = f_size_opt(vis_h1_size)
+label_size_h2 = f_size_opt(vis_h2_size)
+label_size_h3 = f_size_opt(vis_h3_size)
+label_size_sig = f_size_opt(sig_size)
+
+// Plot count budget: 10 plots + 26 plotshapes + 2 bgcolor = 38 of 64
+
+// --- SMART TRAIL PLOTS (Chart always on, HTFs toggled) ---
+plot(smartTrail, "Smart Trail (Chart)", color=trailState == 1 ? c_bull_c : c_bear_c, linewidth=2)
+plot(show_st_h1 ? h1_st : na, "Smart Trail (HTF 1)", color=h1_ts == 1.0 ? c_bull_h1 : c_bear_h1, linewidth=1)
+plot(show_st_h2 ? h2_st : na, "Smart Trail (HTF 2)", color=h2_ts == 1.0 ? c_bull_h2 : c_bear_h2, linewidth=1)
+plot(show_st_h3 ? h3_st : na, "Smart Trail (HTF 3)", color=h3_ts == 1.0 ? c_bull_h3 : c_bear_h3, linewidth=1)
+
+// --- EMA TREND PLOTS (Chart grey always on, HTFs toggled) ---
+plot(emaTrend, "EMA Trend (Chart)", color=emaSlope >= 0 ? c_bull_c : c_bear_c, linewidth=1)
+plot(show_ema_h1 ? h1_ema : na, "EMA Trend (HTF 1)", color=nz(h1_slp, 0) >= 0 ? c_bull_h1 : c_bear_h1, linewidth=2)
+plot(show_ema_h2 ? h2_ema : na, "EMA Trend (HTF 2)", color=nz(h2_slp, 0) >= 0 ? c_bull_h2 : c_bear_h2, linewidth=3)
+plot(show_ema_h3 ? h3_ema : na, "EMA Trend (HTF 3)", color=nz(h3_slp, 0) >= 0 ? c_bull_h3 : c_bear_h3, linewidth=4)
+
+// --- SWING LEVEL PLOTS (Chart + HTFs optional) ---
+plot(show_swing_chart ? swingHigh : na, "Swing High (Chart)", color=color.new(c_bear_c, 35), linewidth=1, style=plot.style_linebr)
+plot(show_swing_chart ? swingLow  : na, "Swing Low (Chart)",  color=color.new(c_bull_c, 35), linewidth=1, style=plot.style_linebr)
+plot(show_swing_h1 ? h1_sh : na, "Swing High (HTF 1)", color=color.new(c_bear_h1, 25), linewidth=1, style=plot.style_linebr)
+plot(show_swing_h1 ? h1_sl : na, "Swing Low (HTF 1)",  color=color.new(c_bull_h1, 25), linewidth=1, style=plot.style_linebr)
+plot(show_swing_h2 ? h2_sh : na, "Swing High (HTF 2)", color=color.new(c_bear_h2, 20), linewidth=1, style=plot.style_linebr)
+plot(show_swing_h2 ? h2_sl : na, "Swing Low (HTF 2)",  color=color.new(c_bull_h2, 20), linewidth=1, style=plot.style_linebr)
+plot(show_swing_h3 ? h3_sh : na, "Swing High (HTF 3)", color=color.new(c_bear_h3, 15), linewidth=1, style=plot.style_linebr)
+plot(show_swing_h3 ? h3_sl : na, "Swing Low (HTF 3)",  color=color.new(c_bull_h3, 15), linewidth=1, style=plot.style_linebr)
+
+// --- POLICY MODE LABEL ---
+var label policyModeLabel = na
+if showPolicyModeLabel and barstate.islast
+    string _policyText = "Policy Mode: " + policyMode +
+         "\nFirm=" + propFirm + " | Phase=" + propPhase + " | Type=" + propAccType +
+         "\nNewsRestr=" + str.tostring(firmMffuRestrictedNews) +
+         " | NewsKZ=" + str.tostring(newsKillzoneNow) +
+         " | Expired=" + str.tostring(newsCalendarExpired) +
+         " | Unsafe=" + str.tostring(allowTradingWhenNewsCalendarExpiredUnsafe)
+    color _policyBg = (firmMffuRestrictedNews or newsCalendarBlocksEntries) ? color.new(c_bear_c, 35) : color.new(c_bull_c, 35)
+    if not na(policyModeLabel)
+        label.delete(policyModeLabel)
+    policyModeLabel := label.new(bar_index, high * 1.01, _policyText, style=label.style_label_down, color=_policyBg, textcolor=color.white, size=size.small)
+else if not showPolicyModeLabel and not na(policyModeLabel)
+    label.delete(policyModeLabel)
+    policyModeLabel := na
+
+// --- RED FOLDER ALERT MARKERS (for firms where news trading is allowed) ---
+bool newsPreMarker = newsPreAlertNow and not newsPreAlertNow[1]
+bool newsPostMarker = newsPostAlertNow and not newsPostAlertNow[1]
+if showNewsBoundarySignals and newsPreMarker
+    label.new(bar_index, high, "📰 PRE", yloc=yloc.abovebar, style=label.style_none, textcolor=chartBearClr, size=label_size_sig)
+if showNewsBoundarySignals and newsPostMarker
+    label.new(bar_index, low, "📰 POST", yloc=yloc.belowbar, style=label.style_none, textcolor=chartBullClr, size=label_size_sig)
+
+alertcondition(newsPreAlertNow, "Red Folder PRE Alert", "Red-folder event window has started (pre-event boundary reached).")
+alertcondition(newsPostAlertNow, "Red Folder POST Alert", "Red-folder event window has ended (post-event boundary reached).")
+
+// --- CHART BOS/ChoCH (lux-ms-fractals style: line.new + label.new) ---
+var line chart_sup_line = na
+var bool chart_sup_broken = false
+var line chart_res_line = na
+var bool chart_res_broken = false
+
+if show_bos_chart_final and (isBullBOS or isBullChoCh)
+    int _start = nz(res_loc, bar_index - p_len)
+    line.new(_start, res_val, bar_index, res_val, color=chartBullClr)
+    label.new(int(math.avg(bar_index, _start)), res_val, isBullChoCh ? "ChoCH" : "BOS",
+      color=color(na), textcolor=chartBullClr, style=label.style_none, size=label_size_chart)
+    int _bk = 1
+    float _min = low[1]
+    int _span = math.max(1, bar_index - _start - 1)
+    for i = 2 to _span
+        if low[i] < _min
+            _min := low[i]
+            _bk := i
+    chart_sup_line := line.new(bar_index - _bk, _min, bar_index, _min, color=chartBullClr, style=line.style_dashed)
+    chart_sup_broken := false
+
+if show_bos_chart_final and (isBearBOS or isBearChoCh)
+    int _start = nz(sup_loc, bar_index - p_len)
+    line.new(_start, sup_val, bar_index, sup_val, color=chartBearClr)
+    label.new(int(math.avg(bar_index, _start)), sup_val, isBearChoCh ? "ChoCH" : "BOS",
+      color=color(na), textcolor=chartBearClr, style=label.style_none, size=label_size_chart)
+    int _bk = 1
+    float _max = high[1]
+    int _span = math.max(1, bar_index - _start - 1)
+    for i = 2 to _span
+        if high[i] > _max
+            _max := high[i]
+            _bk := i
+    chart_res_line := line.new(bar_index - _bk, _max, bar_index, _max, color=chartBearClr, style=line.style_dashed)
+    chart_res_broken := false
+
+if not chart_sup_broken and not na(chart_sup_line)
+    chart_sup_line.set_x2(bar_index)
+    if close < chart_sup_line.get_y2()
+        chart_sup_broken := true
+
+if not chart_res_broken and not na(chart_res_line)
+    chart_res_line.set_x2(bar_index)
+    if close > chart_res_line.get_y2()
+        chart_res_broken := true
+
+// --- HTF BOS/ChoCH (lux-style lines, transition-detected to avoid repetition) ---
+bool h1_bbos_new   = h1_bbos   and not h1_bbos[1]
+bool h1_bchoch_new = h1_bchoch and not h1_bchoch[1]
+bool h1_sbos_new   = h1_sbos   and not h1_sbos[1]
+bool h1_schoch_new = h1_schoch and not h1_schoch[1]
+
+if show_bos_h1_final
+    if h1_bbos_new or h1_bchoch_new
+        string _t = f_tf_short(tfH1) + " " + (h1_bchoch_new ? "choch" : "bos")
+        float _lv = nz(h1_res, close)
+        line.new(bar_index - pivotLen, _lv, bar_index, _lv, color=h1BullClr)
+        label.new(bar_index - int(pivotLen/2), _lv, _t, color=color(na), textcolor=h1BullClr, style=label.style_none, size=label_size_h1)
+    if h1_sbos_new or h1_schoch_new
+        string _t = f_tf_short(tfH1) + " " + (h1_schoch_new ? "choch" : "bos")
+        float _lv = nz(h1_sup, close)
+        line.new(bar_index - pivotLen, _lv, bar_index, _lv, color=h1BearClr)
+        label.new(bar_index - int(pivotLen/2), _lv, _t, color=color(na), textcolor=h1BearClr, style=label.style_none, size=label_size_h1)
+
+bool h2_bbos_new   = h2_bbos   and not h2_bbos[1]
+bool h2_bchoch_new = h2_bchoch and not h2_bchoch[1]
+bool h2_sbos_new   = h2_sbos   and not h2_sbos[1]
+bool h2_schoch_new = h2_schoch and not h2_schoch[1]
+
+if show_bos_h2_final
+    if h2_bbos_new or h2_bchoch_new
+        string _t = f_tf_short(tfH2) + " " + (h2_bchoch_new ? "choch" : "bos")
+        float _lv = nz(h2_res, close)
+        line.new(bar_index - pivotLen, _lv, bar_index, _lv, color=h2BullClr)
+        label.new(bar_index - int(pivotLen/2), _lv, _t, color=color(na), textcolor=h2BullClr, style=label.style_none, size=label_size_h2)
+    if h2_sbos_new or h2_schoch_new
+        string _t = f_tf_short(tfH2) + " " + (h2_schoch_new ? "choch" : "bos")
+        float _lv = nz(h2_sup, close)
+        line.new(bar_index - pivotLen, _lv, bar_index, _lv, color=h2BearClr)
+        label.new(bar_index - int(pivotLen/2), _lv, _t, color=color(na), textcolor=h2BearClr, style=label.style_none, size=label_size_h2)
+
+bool h3_bbos_new   = h3_bbos   and not h3_bbos[1]
+bool h3_bchoch_new = h3_bchoch and not h3_bchoch[1]
+bool h3_sbos_new   = h3_sbos   and not h3_sbos[1]
+bool h3_schoch_new = h3_schoch and not h3_schoch[1]
+
+if show_bos_h3_final
+    if h3_bbos_new or h3_bchoch_new
+        string _t = f_tf_short(tfH3) + " " + (h3_bchoch_new ? "choch" : "bos")
+        float _lv = nz(h3_res, close)
+        line.new(bar_index - pivotLen, _lv, bar_index, _lv, color=h3BullClr)
+        label.new(bar_index - int(pivotLen/2), _lv, _t, color=color(na), textcolor=h3BullClr, style=label.style_none, size=label_size_h3)
+    if h3_sbos_new or h3_schoch_new
+        string _t = f_tf_short(tfH3) + " " + (h3_schoch_new ? "choch" : "bos")
+        float _lv = nz(h3_sup, close)
+        line.new(bar_index - pivotLen, _lv, bar_index, _lv, color=h3BearClr)
+        label.new(bar_index - int(pivotLen/2), _lv, _t, color=color(na), textcolor=h3BearClr, style=label.style_none, size=label_size_h3)
+
+// --- EXHAUSTION MARKERS (text+emoji; no bubble boxes) ---
+if show_exh_chart_final and isBullL1
+    label.new(bar_index, low, "♦ L1", yloc=yloc.belowbar, style=label.style_none, textcolor=chartBullClr, size=label_size_chart)
+if show_exh_chart_final and isBearL1
+    label.new(bar_index, high, "♦ L1", yloc=yloc.abovebar, style=label.style_none, textcolor=chartBearClr, size=label_size_chart)
+if show_exh_chart_final and isBullL2
+    label.new(bar_index, low, "✖ L2", yloc=yloc.belowbar, style=label.style_none, textcolor=chartBullClr, size=label_size_chart)
+if show_exh_chart_final and isBearL2
+    label.new(bar_index, high, "✖ L2", yloc=yloc.abovebar, style=label.style_none, textcolor=chartBearClr, size=label_size_chart)
+if show_exh_chart_final and isBullL3
+    label.new(bar_index, low, "⚑ L3", yloc=yloc.belowbar, style=label.style_none, textcolor=chartBullClr, size=label_size_chart)
+if show_exh_chart_final and isBearL3
+    label.new(bar_index, high, "⚑ L3", yloc=yloc.abovebar, style=label.style_none, textcolor=chartBearClr, size=label_size_chart)
+
+if show_exh_h1_final and h1_bu1 and not h1_bu1[1]
+    label.new(bar_index, low, f_tf_short(tfH1) + " ♦", yloc=yloc.belowbar, style=label.style_none, textcolor=h1BullClr, size=label_size_h1)
+if show_exh_h1_final and h1_be1 and not h1_be1[1]
+    label.new(bar_index, high, f_tf_short(tfH1) + " ♦", yloc=yloc.abovebar, style=label.style_none, textcolor=h1BearClr, size=label_size_h1)
+if show_exh_h1_final and h1_bu2 and not h1_bu2[1]
+    label.new(bar_index, low, f_tf_short(tfH1) + " ✖", yloc=yloc.belowbar, style=label.style_none, textcolor=h1BullClr, size=label_size_h1)
+if show_exh_h1_final and h1_be2 and not h1_be2[1]
+    label.new(bar_index, high, f_tf_short(tfH1) + " ✖", yloc=yloc.abovebar, style=label.style_none, textcolor=h1BearClr, size=label_size_h1)
+if show_exh_h1_final and h1_bu3 and not h1_bu3[1]
+    label.new(bar_index, low, f_tf_short(tfH1) + " ⚑", yloc=yloc.belowbar, style=label.style_none, textcolor=h1BullClr, size=label_size_h1)
+if show_exh_h1_final and h1_be3 and not h1_be3[1]
+    label.new(bar_index, high, f_tf_short(tfH1) + " ⚑", yloc=yloc.abovebar, style=label.style_none, textcolor=h1BearClr, size=label_size_h1)
+
+if show_exh_h2_final and h2_bu1 and not h2_bu1[1]
+    label.new(bar_index, low, f_tf_short(tfH2) + " ♦", yloc=yloc.belowbar, style=label.style_none, textcolor=h2BullClr, size=label_size_h2)
+if show_exh_h2_final and h2_be1 and not h2_be1[1]
+    label.new(bar_index, high, f_tf_short(tfH2) + " ♦", yloc=yloc.abovebar, style=label.style_none, textcolor=h2BearClr, size=label_size_h2)
+if show_exh_h2_final and h2_bu2 and not h2_bu2[1]
+    label.new(bar_index, low, f_tf_short(tfH2) + " ✖", yloc=yloc.belowbar, style=label.style_none, textcolor=h2BullClr, size=label_size_h2)
+if show_exh_h2_final and h2_be2 and not h2_be2[1]
+    label.new(bar_index, high, f_tf_short(tfH2) + " ✖", yloc=yloc.abovebar, style=label.style_none, textcolor=h2BearClr, size=label_size_h2)
+if show_exh_h2_final and h2_bu3 and not h2_bu3[1]
+    label.new(bar_index, low, f_tf_short(tfH2) + " ⚑", yloc=yloc.belowbar, style=label.style_none, textcolor=h2BullClr, size=label_size_h2)
+if show_exh_h2_final and h2_be3 and not h2_be3[1]
+    label.new(bar_index, high, f_tf_short(tfH2) + " ⚑", yloc=yloc.abovebar, style=label.style_none, textcolor=h2BearClr, size=label_size_h2)
+
+if show_exh_h3_final and h3_bu1 and not h3_bu1[1]
+    label.new(bar_index, low, f_tf_short(tfH3) + " ♦", yloc=yloc.belowbar, style=label.style_none, textcolor=h3BullClr, size=label_size_h3)
+if show_exh_h3_final and h3_be1 and not h3_be1[1]
+    label.new(bar_index, high, f_tf_short(tfH3) + " ♦", yloc=yloc.abovebar, style=label.style_none, textcolor=h3BearClr, size=label_size_h3)
+if show_exh_h3_final and h3_bu2 and not h3_bu2[1]
+    label.new(bar_index, low, f_tf_short(tfH3) + " ✖", yloc=yloc.belowbar, style=label.style_none, textcolor=h3BullClr, size=label_size_h3)
+if show_exh_h3_final and h3_be2 and not h3_be2[1]
+    label.new(bar_index, high, f_tf_short(tfH3) + " ✖", yloc=yloc.abovebar, style=label.style_none, textcolor=h3BearClr, size=label_size_h3)
+if show_exh_h3_final and h3_bu3 and not h3_bu3[1]
+    label.new(bar_index, low, f_tf_short(tfH3) + " ⚑", yloc=yloc.belowbar, style=label.style_none, textcolor=h3BullClr, size=label_size_h3)
+if show_exh_h3_final and h3_be3 and not h3_be3[1]
+    label.new(bar_index, high, f_tf_short(tfH3) + " ⚑", yloc=yloc.abovebar, style=label.style_none, textcolor=h3BearClr, size=label_size_h3)
 
 // --- ENTRY SIGNAL OVERLAYS ---
-plotshape(showSignals and _entryLongBar  == bar_index, "Long Entry",  style=shape.triangleup,   location=location.belowbar, color=color.new(color.green, 0), size=size.small)
-plotshape(showSignals and _entryShortBar == bar_index, "Short Entry", style=shape.triangledown, location=location.abovebar, color=color.new(color.red,   0), size=size.small)
+if showSignals and _entryLongBar == bar_index
+    label.new(bar_index, low, "🟢 LONG", yloc=yloc.belowbar, style=label.style_none, textcolor=sigLongClr, size=label_size_sig)
+if showSignals and _entryShortBar == bar_index
+    label.new(bar_index, high, "🔴 SHORT", yloc=yloc.abovebar, style=label.style_none, textcolor=sigShortClr, size=label_size_sig)
 
 // --- ACTIVE TRADE LEVELS ---
-plot(not isFlat and not na(entrySL) ? entrySL : na,                            "Active SL",  color=color.new(color.orange,  0), style=plot.style_steplinebr, linewidth=1)
-plot(trailLocked and not isFlat and not na(trailStop) ? trailStop : na, "Trail Stop", color=color.new(color.fuchsia, 0), style=plot.style_steplinebr, linewidth=1)
+plot(drawLines and not isFlat and not na(entryPrice) ? entryPrice : na, "Entry Price", color=color.new(c_lineEnt, 0), style=plot.style_linebr, linewidth=2)
+plot(drawLines and not isFlat and not na(entryInitialSL) ? entryInitialSL : na, "Initial SL", color=color.new(c_lineSl, 10), style=plot.style_steplinebr, linewidth=1)
+plot(drawLines and not isFlat and not na(entrySL) ? entrySL : na, "Managed SL", color=color.new(c_lineSl, 0), style=plot.style_steplinebr, linewidth=2)
+plot(drawLines and trailLocked and not isFlat and not na(trailStop) ? trailStop : na, "Trail Stop", color=color.new(color.fuchsia, 0), style=plot.style_steplinebr, linewidth=1)
+plot(drawLines and not isFlat and tp1_tf != "None" and not tp1Done and not na(entryTp1Init) ? entryTp1Init : na, "TP1 Initial", color=color.new(c_lineTp, 0), style=plot.style_linebr, linewidth=1)
+plot(drawLines and not isFlat and tp2_tf != "None" and not tp2Done and not na(entryTp2Init) ? entryTp2Init : na, "TP2 Initial", color=color.new(c_lineTp, 10), style=plot.style_linebr, linewidth=1)
+plot(drawLines and not isFlat and tp3_tf != "None" and not tp3Done and not na(entryTp3Init) ? entryTp3Init : na, "TP3 Initial", color=color.new(c_lineTp, 20), style=plot.style_linebr, linewidth=1)
+plot(drawLines and not isFlat and tp4_tf != "None" and not tp4Done and not na(entryTp4Init) ? entryTp4Init : na, "TP4 Initial", color=color.new(c_lineTp, 30), style=plot.style_linebr, linewidth=1)
+
+// --- CONDITION BACKGROUND (full duration filters are aligned) ---
+bgcolor(showSignals and longFiltersAligned  and not longInvalidated  ? color.new(color.green, 90) : na)
+bgcolor(showSignals and shortFiltersAligned and not shortInvalidated ? color.new(color.red,   90) : na)
+// --- INVALIDATION BACKGROUND (filters aligned but blocker fired) ---
+bgcolor(showSignals and longFiltersAligned  and longInvalidated  ? color.new(color.orange, 85) : na)
+bgcolor(showSignals and shortFiltersAligned and shortInvalidated ? color.new(color.orange, 85) : na)
+
+// =========================================================================
+// 23. 📊 FILTER STATE DEBUG DASHBOARD
+// =========================================================================
+var table dashTbl = showFilterDashboard ? table.new(position.top_right, 3, 12, border_width=1, border_color=color.gray, bgcolor=color.new(color.black, 20)) : na
+if showFilterDashboard and not na(dashTbl)
+    color _cTrue  = color.new(#089981, 20)
+    color _cFalse = color.new(#f23645, 20)
+    color _cWarn  = color.new(color.orange, 20)
+    color _cHdr   = color.new(color.gray, 60)
+    table.cell(dashTbl, 0, 0, "Filter", text_color=color.white, bgcolor=_cHdr, text_size=size.small)
+    table.cell(dashTbl, 1, 0, "Long", text_color=color.white, bgcolor=_cHdr, text_size=size.small)
+    table.cell(dashTbl, 2, 0, "Short", text_color=color.white, bgcolor=_cHdr, text_size=size.small)
+    string _lf1_lbl = l_f1_tf_eff == "None" ? "—" : l_f1_tf_eff + " " + l_f1_ind
+    string _sf1_lbl = s_f1_tf_eff == "None" ? "—" : s_f1_tf_eff + " " + s_f1_ind
+    table.cell(dashTbl, 0, 1, "Filter 1", text_color=color.white, bgcolor=_cHdr, text_size=size.small)
+    table.cell(dashTbl, 1, 1, str.tostring(l_f1) + "\n" + _lf1_lbl, text_color=color.white, bgcolor=l_f1 ? _cTrue : _cFalse, text_size=size.tiny)
+    table.cell(dashTbl, 2, 1, str.tostring(s_f1) + "\n" + _sf1_lbl, text_color=color.white, bgcolor=s_f1 ? _cTrue : _cFalse, text_size=size.tiny)
+    string _lf2_lbl = l_f2_tf_eff == "None" ? "—" : l_f2_tf_eff + " " + l_f2_ind
+    string _sf2_lbl = s_f2_tf_eff == "None" ? "—" : s_f2_tf_eff + " " + s_f2_ind
+    table.cell(dashTbl, 0, 2, "Filter 2", text_color=color.white, bgcolor=_cHdr, text_size=size.small)
+    table.cell(dashTbl, 1, 2, str.tostring(l_f2) + "\n" + _lf2_lbl, text_color=color.white, bgcolor=l_f2 ? _cTrue : _cFalse, text_size=size.tiny)
+    table.cell(dashTbl, 2, 2, str.tostring(s_f2) + "\n" + _sf2_lbl, text_color=color.white, bgcolor=s_f2 ? _cTrue : _cFalse, text_size=size.tiny)
+    string _lf3_lbl = l_f3_tf_eff == "None" ? "—" : l_f3_tf_eff + " " + l_f3_ind
+    string _sf3_lbl = s_f3_tf_eff == "None" ? "—" : s_f3_tf_eff + " " + s_f3_ind
+    table.cell(dashTbl, 0, 3, "Filter 3", text_color=color.white, bgcolor=_cHdr, text_size=size.small)
+    table.cell(dashTbl, 1, 3, str.tostring(l_f3) + "\n" + _lf3_lbl, text_color=color.white, bgcolor=l_f3 ? _cTrue : _cFalse, text_size=size.tiny)
+    table.cell(dashTbl, 2, 3, str.tostring(s_f3) + "\n" + _sf3_lbl, text_color=color.white, bgcolor=s_f3 ? _cTrue : _cFalse, text_size=size.tiny)
+    string _lblk_lbl = l_blk_tf_eff == "None" ? "—" : l_blk_tf_eff + " " + l_blk_ind
+    string _sblk_lbl = s_blk_tf_eff == "None" ? "—" : s_blk_tf_eff + " " + s_blk_ind
+    table.cell(dashTbl, 0, 4, "Blocker", text_color=color.white, bgcolor=_cHdr, text_size=size.small)
+    table.cell(dashTbl, 1, 4, str.tostring(l_blk) + "\n" + _lblk_lbl, text_color=color.white, bgcolor=l_blk ? _cWarn : _cTrue, text_size=size.tiny)
+    table.cell(dashTbl, 2, 4, str.tostring(s_blk) + "\n" + _sblk_lbl, text_color=color.white, bgcolor=s_blk ? _cWarn : _cTrue, text_size=size.tiny)
+    table.cell(dashTbl, 0, 5, "EMA Rev OK", text_color=color.white, bgcolor=_cHdr, text_size=size.small)
+    table.cell(dashTbl, 1, 5, str.tostring(l_emaOk), text_color=color.white, bgcolor=l_emaOk ? _cTrue : _cFalse, text_size=size.tiny)
+    table.cell(dashTbl, 2, 5, str.tostring(s_emaOk), text_color=color.white, bgcolor=s_emaOk ? _cTrue : _cFalse, text_size=size.tiny)
+    table.cell(dashTbl, 0, 6, "Aligned", text_color=color.white, bgcolor=_cHdr, text_size=size.small)
+    table.cell(dashTbl, 1, 6, str.tostring(longFiltersAligned), text_color=color.white, bgcolor=longFiltersAligned ? _cTrue : _cFalse, text_size=size.small)
+    table.cell(dashTbl, 2, 6, str.tostring(shortFiltersAligned), text_color=color.white, bgcolor=shortFiltersAligned ? _cTrue : _cFalse, text_size=size.small)
+    table.cell(dashTbl, 0, 7, "Armed", text_color=color.white, bgcolor=_cHdr, text_size=size.small)
+    table.cell(dashTbl, 1, 7, str.tostring(longArmed), text_color=color.white, bgcolor=longArmed ? _cTrue : _cFalse, text_size=size.small)
+    table.cell(dashTbl, 2, 7, str.tostring(shortArmed), text_color=color.white, bgcolor=shortArmed ? _cTrue : _cFalse, text_size=size.small)
+    table.cell(dashTbl, 0, 8, "Trigger", text_color=color.white, bgcolor=_cHdr, text_size=size.small)
+    table.cell(dashTbl, 1, 8, str.tostring(l_prim), text_color=color.white, bgcolor=l_prim ? _cTrue : _cFalse, text_size=size.small)
+    table.cell(dashTbl, 2, 8, str.tostring(s_prim), text_color=color.white, bgcolor=s_prim ? _cTrue : _cFalse, text_size=size.small)
+    table.cell(dashTbl, 0, 9, "Sweep", text_color=color.white, bgcolor=_cHdr, text_size=size.small)
+    table.cell(dashTbl, 1, 9, "BAct=" + str.tostring(sweepBullActive) + " bSince=" + str.tostring(sweepBullSince), text_color=color.white, bgcolor=sweepBullActive ? _cTrue : _cFalse, text_size=size.tiny)
+    table.cell(dashTbl, 2, 9, "Act=" + str.tostring(sweepBearActive) + " rSince=" + str.tostring(sweepBearSince), text_color=color.white, bgcolor=sweepBearActive ? _cTrue : _cFalse, text_size=size.tiny)
+    table.cell(dashTbl, 0, 10, "News", text_color=color.white, bgcolor=_cHdr, text_size=size.small)
+    table.cell(dashTbl, 1, 10, "Block=" + str.tostring(newsKillzoneNow) + " Exp=" + str.tostring(newsCalendarExpired) + (newsKillzoneNow ? "\n" + activeNewsKillzone : ""), text_color=color.white, bgcolor=(newsKillzoneNow or newsCalendarBlocksEntries) ? _cWarn : _cTrue, text_size=size.tiny)
+    table.cell(dashTbl, 2, 10, "Act=" + newsKillzoneAction + "\nFirmRestr=" + str.tostring(firmMffuRestrictedNews), text_color=color.white, bgcolor=_cHdr, text_size=size.tiny)
+    table.cell(dashTbl, 0, 11, "Session", text_color=color.white, bgcolor=_cHdr, text_size=size.small)
+    table.cell(dashTbl, 1, 11, "Sess=" + str.tostring(inSession) + " KZ=" + str.tostring(isKillzone) + " NewsOk=" + str.tostring(newsEntryAllowed) + " Lim=" + str.tostring(not dailyLimitHit), text_color=color.white, bgcolor=(inSession and isKillzone and newsEntryAllowed and not dailyLimitHit) ? _cTrue : _cFalse, text_size=size.tiny)
+    table.cell(dashTbl, 2, 11, "Trades=" + str.tostring(todayTradeCount) + "/" + str.tostring(maxDailyTrades) + " | Prop=" + str.tostring(useCompliance) + " MaxC=" + str.tostring(actualMaxContracts), text_color=color.white, bgcolor=_cHdr, text_size=size.tiny)
 
 // — End of NQ Scalper Pro — Prop Firm Engine [GOD MODE] v6.1 —

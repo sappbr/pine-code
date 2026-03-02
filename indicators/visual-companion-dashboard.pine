@@ -1,83 +1,631 @@
 //@version=6
 indicator("NQ Visual Companion Dashboard", "NQ Visual Companion", overlay=true, max_labels_count=500, max_lines_count=500)
 
-var G_STYLE = "Style"
-var G_TREND = "Trend Engine"
-var G_SIGNAL = "Signal Engine"
-var G_VOL = "Volatility"
-var G_SESSION = "Session"
-var G_DASH = "Dashboard"
+var G_TF = "Timeframes"
+useH1 = input.bool(true, "Use HTF 1", inline="h1", group=G_TF)
+tfH1  = input.timeframe("3", "", inline="h1", group=G_TF)
+useH2 = input.bool(true, "Use HTF 2", inline="h2", group=G_TF)
+tfH2  = input.timeframe("5", "", inline="h2", group=G_TF)
+useH3 = input.bool(true, "Use HTF 3", inline="h3", group=G_TF)
+tfH3  = input.timeframe("15", "", inline="h3", group=G_TF)
 
-showEmaFast = input.bool(true, "Show EMA Fast", group=G_TREND, inline="ema1")
-showEmaSlow = input.bool(true, "Show EMA Slow", group=G_TREND, inline="ema1")
-emaFastLen = input.int(21, "Fast", minval=1, group=G_TREND, inline="ema2")
-emaSlowLen = input.int(55, "Slow", minval=1, group=G_TREND, inline="ema2")
-showVwap = input.bool(true, "Show VWAP", group=G_TREND)
+var G_IND = "Indicator Engine"
+emaLen = input.int(20, "EMA Trend Length", minval=1, group=G_IND)
+trailLen = input.int(12, "Smart Trail Lookback", minval=1, group=G_IND)
+atrLen = input.int(14, "ATR Length", minval=1, group=G_IND)
+swingLen = input.int(10, "Swing Lookback", minval=2, group=G_IND)
+pivotLen = input.int(5, "Pivot Lookback", minval=2, group=G_IND)
 
-showSignals = input.bool(true, "Show Signal Markers", group=G_SIGNAL)
-useRsiFilter = input.bool(true, "Use RSI Filter", group=G_SIGNAL, inline="rsi1")
-rsiLen = input.int(14, "RSI Length", minval=2, group=G_SIGNAL, inline="rsi1")
-rsiBullMin = input.int(50, "Bull >=", minval=1, maxval=99, group=G_SIGNAL, inline="rsi2")
-rsiBearMax = input.int(50, "Bear <=", minval=1, maxval=99, group=G_SIGNAL, inline="rsi2")
+var G_VIS = "Visuals"
+showAllVisuals = input.bool(false, "Show All Visuals (Master Override)", group=G_VIS)
+showSignals = input.bool(true, "Show Signal Markers", group=G_VIS)
+showNewsMarkers = input.bool(true, "Show News PRE/POST Markers", group=G_VIS)
+showSessionBg = input.bool(true, "Show Session Background", group=G_VIS)
+sessionStr = input.session("0930-1600", "Session (ET)", group=G_VIS)
+showFilterBg = input.bool(false, "Show Trend/Invalidation BG", group=G_VIS)
+showDashboard = input.bool(true, "Show Dashboard", group=G_VIS)
+dashboardPos = input.string("Top Right", "Position", options=["Top Right", "Top Left", "Bottom Right", "Bottom Left"], group=G_VIS)
+dashboardCompact = input.bool(false, "Compact", group=G_VIS)
 
-showAtrBands = input.bool(true, "Show ATR Bands", group=G_VOL)
-atrLen = input.int(14, "ATR Length", minval=1, group=G_VOL, inline="atr1")
-atrMult = input.float(1.5, "ATR Mult", minval=0.1, step=0.1, group=G_VOL, inline="atr1")
-showTrail = input.bool(true, "Show ATR Trail", group=G_VOL)
+var G_STYLE = "Visual Style"
+visMode = input.string("Minimal Text", "Label Style", options=["Minimal Text", "Soft Tag"], group=G_STYLE)
+chartSize = input.string("Tiny", "Chart Size", options=["Tiny", "Small", "Normal", "Large"], group=G_STYLE)
+h1Size = input.string("Tiny", "HTF1 Size", options=["Tiny", "Small", "Normal", "Large"], group=G_STYLE)
+h2Size = input.string("Tiny", "HTF2 Size", options=["Tiny", "Small", "Normal", "Large"], group=G_STYLE)
+h3Size = input.string("Tiny", "HTF3 Size", options=["Tiny", "Small", "Normal", "Large"], group=G_STYLE)
+signalSize = input.string("Small", "Signal Size", options=["Tiny", "Small", "Normal", "Large"], group=G_STYLE)
 
-showSessionBg = input.bool(true, "Show Session Background", group=G_SESSION)
-sessionStr = input.session("0930-1600", "Session (ET)", group=G_SESSION)
+chartBullColor = input.color(#089981, "Chart Bull", inline="sty0", group=G_STYLE)
+chartBearColor = input.color(#f23645, "Chart Bear", inline="sty0", group=G_STYLE)
+chartOpacity = input.int(15, "Chart Opacity", minval=0, maxval=100, inline="sty0", group=G_STYLE)
 
-bullColor = input.color(color.new(color.lime, 0), "Bull", group=G_STYLE, inline="c1")
-bearColor = input.color(color.new(color.red, 0), "Bear", group=G_STYLE, inline="c1")
-neutralColor = input.color(color.new(color.gray, 0), "Neutral", group=G_STYLE, inline="c1")
-accentColor = input.color(color.new(color.aqua, 0), "Accent", group=G_STYLE, inline="c2")
-bgOpacity = input.int(88, "BG Opacity", minval=0, maxval=100, group=G_STYLE, inline="c2")
+h1BullColor = input.color(#089981, "HTF1 Bull", inline="sty1", group=G_STYLE)
+h1BearColor = input.color(#f23645, "HTF1 Bear", inline="sty1", group=G_STYLE)
+h1Opacity = input.int(35, "HTF1 Opacity", minval=0, maxval=100, inline="sty1", group=G_STYLE)
 
-showDashboard = input.bool(true, "Show Dashboard", group=G_DASH)
-dashboardPos = input.string("Top Right", "Position", options=["Top Right", "Top Left", "Bottom Right", "Bottom Left"], group=G_DASH, inline="d1")
-dashboardCompact = input.bool(false, "Compact", group=G_DASH, inline="d1")
+h2BullColor = input.color(#089981, "HTF2 Bull", inline="sty2", group=G_STYLE)
+h2BearColor = input.color(#f23645, "HTF2 Bear", inline="sty2", group=G_STYLE)
+h2Opacity = input.int(50, "HTF2 Opacity", minval=0, maxval=100, inline="sty2", group=G_STYLE)
 
-emaFast = ta.ema(close, emaFastLen)
-emaSlow = ta.ema(close, emaSlowLen)
-vwapVal = ta.vwap(hlc3)
-rsiVal = ta.rsi(close, rsiLen)
-atrVal = ta.atr(atrLen)
+h3BullColor = input.color(#089981, "HTF3 Bull", inline="sty3", group=G_STYLE)
+h3BearColor = input.color(#f23645, "HTF3 Bear", inline="sty3", group=G_STYLE)
+h3Opacity = input.int(65, "HTF3 Opacity", minval=0, maxval=100, inline="sty3", group=G_STYLE)
 
-trendBull = emaFast > emaSlow
-trendBear = emaFast < emaSlow
-trendState = trendBull ? "Bull" : trendBear ? "Bear" : "Neutral"
-trendColor = trendBull ? bullColor : trendBear ? bearColor : neutralColor
+signalLongColor = input.color(#00c853, "Signal Long", inline="sty4", group=G_STYLE)
+signalShortColor = input.color(#ff5252, "Signal Short", inline="sty4", group=G_STYLE)
+signalOpacity = input.int(10, "Signal Opacity", minval=0, maxval=100, inline="sty4", group=G_STYLE)
 
-sigLongRaw = ta.crossover(emaFast, emaSlow)
-sigShortRaw = ta.crossunder(emaFast, emaSlow)
-sigLong = sigLongRaw and (not useRsiFilter or rsiVal >= rsiBullMin)
-sigShort = sigShortRaw and (not useRsiFilter or rsiVal <= rsiBearMax)
+labelGapBars = input.int(6, "Min Bars Between Labels", minval=0, group=G_STYLE)
+labelOffsetATR = input.float(0.18, "Label Vertical Offset (ATR)", minval=0.0, step=0.01, group=G_STYLE)
+showSimExitReason = input.bool(true, "Show Sim Exit Reason Text", group=G_STYLE)
 
-atrUpper = close + atrVal * atrMult
-atrLower = close - atrVal * atrMult
-var float trail = na
-if barstate.isfirst
-    trail := close
-if showTrail
-    if trendBull
-        trail := na(trail) ? atrLower : math.max(trail, atrLower)
-    else if trendBear
-        trail := na(trail) ? atrUpper : math.min(trail, atrUpper)
+var G_OVR = "Optional Overlays"
+show_st_h1 = input.bool(false, "HTF 1 Smart Trail", group=G_OVR)
+show_st_h2 = input.bool(false, "HTF 2 Smart Trail", group=G_OVR)
+show_st_h3 = input.bool(false, "HTF 3 Smart Trail", group=G_OVR)
+show_ema_h1 = input.bool(true, "HTF 1 EMA Trend", group=G_OVR)
+show_ema_h2 = input.bool(true, "HTF 2 EMA Trend", group=G_OVR)
+show_ema_h3 = input.bool(true, "HTF 3 EMA Trend", group=G_OVR)
+show_exh_chart = input.bool(false, "Chart Exhaustion", group=G_OVR)
+show_exh_h1 = input.bool(false, "HTF 1 Exhaustion", group=G_OVR)
+show_exh_h2 = input.bool(false, "HTF 2 Exhaustion", group=G_OVR)
+show_exh_h3 = input.bool(false, "HTF 3 Exhaustion", group=G_OVR)
+show_bos_chart = input.bool(false, "Chart BOS/ChoCH", group=G_OVR)
+show_bos_h1 = input.bool(false, "HTF 1 BOS/ChoCH", group=G_OVR)
+show_bos_h2 = input.bool(false, "HTF 2 BOS/ChoCH", group=G_OVR)
+show_bos_h3 = input.bool(false, "HTF 3 BOS/ChoCH", group=G_OVR)
+show_swing_chart = input.bool(false, "Chart Swing Levels", group=G_OVR)
+show_swing_h1 = input.bool(false, "HTF 1 Swing Levels", group=G_OVR)
+show_swing_h2 = input.bool(false, "HTF 2 Swing Levels", group=G_OVR)
+show_swing_h3 = input.bool(false, "HTF 3 Swing Levels", group=G_OVR)
+showSweepMarkers = input.bool(false, "Liquidity Sweep Markers", group=G_OVR)
+
+var G_SIM = "Trade Simulator"
+simEnabled = input.bool(true, "Enable Simulation", group=G_SIM)
+simDirection = input.string("Both", "Direction", options=["Both", "Long Only", "Short Only"], group=G_SIM)
+simQty = input.int(1, "Contracts", minval=1, group=G_SIM, inline="sim1")
+simTickValue = input.float(2.0, "$/Tick", minval=0.01, step=0.01, group=G_SIM, inline="sim1")
+simSLTicks = input.int(40, "SL Ticks", minval=1, group=G_SIM, inline="sim2")
+simTPTicks = input.int(60, "TP Ticks", minval=1, group=G_SIM, inline="sim2")
+simMaxBars = input.int(30, "Max Hold Bars", minval=1, group=G_SIM)
+
+c_bull = #089981
+c_bear = #f23645
+c_bull_c = color.new(c_bull, 0)
+c_bear_c = color.new(c_bear, 0)
+c_bull_h1 = color.new(c_bull, 40)
+c_bear_h1 = color.new(c_bear, 40)
+c_bull_h2 = color.new(c_bull, 60)
+c_bear_h2 = color.new(c_bear, 60)
+c_bull_h3 = color.new(c_bull, 80)
+c_bear_h3 = color.new(c_bear, 80)
+c_l3_bull = #00e5ff
+c_l3_bear = #ff6d00
+
+f_tf_short(string tfRaw) =>
+    string _t = str.trim(tfRaw)
+    string _u = str.upper(_t)
+    bool _hasLetter = str.contains(_u, "S") or str.contains(_u, "H") or str.contains(_u, "D") or str.contains(_u, "W") or str.contains(_u, "M")
+    _hasLetter ? str.lower(_u) : (_u + "m")
+
+f_text_size(string _s) =>
+    _s == "Tiny" ? size.tiny : _s == "Small" ? size.small : _s == "Large" ? size.large : size.normal
+
+f_shape_size(string _s) =>
+    _s == "Tiny" ? size.tiny : _s == "Small" ? size.small : _s == "Large" ? size.large : size.normal
+
+f_label_style() =>
+    visMode == "Minimal Text" ? label.style_none : label.style_label_down
+
+f_exh() =>
+    var int _cy = 0
+    var int _bc = 0
+    var int _sc = 0
+    bool _h4 = bar_index >= 4 and not na(close[4])
+    bool _h3 = bar_index >= 3 and not na(close[3])
+    bool _h2 = bar_index >= 2 and not na(close[2])
+    int _pb = _bc
+    int _ps = _sc
+    int _pc = _cy
+    if not _h4
+        _bc := 0
+        _sc := 0
+        _cy := 0
+    else
+        if _pc < 9
+            if close < close[4]
+                _bc := _pb + 1
+                _sc := 0
+                _cy := _bc
+            else if close > close[4]
+                _sc := _ps + 1
+                _bc := 0
+                _cy := _sc
+            else
+                _bc := 0
+                _sc := 0
+                _cy := 0
+        else
+            bool _did = false
+            if _pb > 0
+                bool _ok = _pb < 12 ? (_h3 and close < close[3]) : (_h2 and close < close[2])
+                if _ok
+                    _bc := _pb + 1
+                    _sc := 0
+                    _cy := _bc
+                    _did := true
+            if not _did and _ps > 0
+                bool _ok = _ps < 12 ? (_h3 and close > close[3]) : (_h2 and close > close[2])
+                if _ok
+                    _sc := _ps + 1
+                    _bc := 0
+                    _cy := _sc
+                    _did := true
+            if not _did
+                if close < close[4]
+                    _bc := 1
+                    _sc := 0
+                    _cy := 1
+                else if close > close[4]
+                    _sc := 1
+                    _bc := 0
+                    _cy := 1
+                else
+                    _bc := 0
+                    _sc := 0
+                    _cy := 0
+    int _outB = _bc
+    int _outS = _sc
+    if _bc >= 14 or _sc >= 14
+        _bc := 0
+        _sc := 0
+        _cy := 0
+    [_outB, _outS]
+
+atrValue = ta.atr(atrLen)
+emaTrend = ta.ema(close, emaLen)
+emaSlope = (emaTrend - nz(emaTrend[1], emaTrend)) / syminfo.mintick
+upperTrail = ta.highest(high, trailLen)
+lowerTrail = ta.lowest(low, trailLen)
+var float smartTrail = na
+smartTrail := close > smartTrail[1] ? lowerTrail : close < smartTrail[1] ? upperTrail : nz(smartTrail[1], close)
+var int trailState = 1
+if close > smartTrail
+    trailState := 1
+else if close < smartTrail
+    trailState := -1
+
+[bullCnt, bearCnt] = f_exh()
+isBullL1 = bullCnt == 9
+isBullL2 = bullCnt == 12
+isBullL3 = bullCnt == 14
+isBearL1 = bearCnt == 9
+isBearL2 = bearCnt == 12
+isBearL3 = bearCnt == 14
+
+swingHigh = ta.highest(high[1], swingLen)
+swingLow = ta.lowest(low[1], swingLen)
+isBullSweep = not na(swingLow) and low < swingLow and close > swingLow
+isBearSweep = not na(swingHigh) and high > swingHigh and close < swingHigh
+
+int p_len = math.max(1, int(pivotLen / 2))
+float dh = math.sum(math.sign(high - nz(high[1])), p_len)
+float dl = math.sum(math.sign(low - nz(low[1])), p_len)
+float _pivotHigh = ta.highest(high, pivotLen)
+float _pivotLow = ta.lowest(low, pivotLen)
+bullf = dh == -p_len and dh[p_len] == p_len and high[p_len] == _pivotHigh
+bearf = dl == p_len and dl[p_len] == -p_len and low[p_len] == _pivotLow
+var float res_val = na
+var float sup_val = na
+var bool res_crossed = true
+var bool sup_crossed = true
+var int os = 0
+if bullf
+    res_val := high[p_len]
+    res_crossed := false
+if bearf
+    sup_val := low[p_len]
+    sup_crossed := false
+ms_cross_up = ta.crossover(close, res_val) and not res_crossed
+ms_cross_dn = ta.crossunder(close, sup_val) and not sup_crossed
+isBullChoCh = ms_cross_up and os == -1
+isBullBOS = ms_cross_up and os == 1
+isBearChoCh = ms_cross_dn and os == 1
+isBearBOS = ms_cross_dn and os == -1
+if ms_cross_up
+    res_crossed := true
+    os := 1
+if ms_cross_dn
+    sup_crossed := true
+    os := -1
+
+f_htf_data() =>
+    [smartTrail[1], float(trailState[1]), emaTrend[1], emaSlope[1],
+     isBullL1[1], isBullL2[1], isBullL3[1], isBearL1[1], isBearL2[1], isBearL3[1],
+     swingHigh[1], swingLow[1],
+     isBullBOS[1], isBullChoCh[1], isBearBOS[1], isBearChoCh[1],
+     res_val[1], sup_val[1], isBullSweep[1], isBearSweep[1]]
+
+[h1_st, h1_ts, h1_ema, h1_slp, h1_bu1, h1_bu2, h1_bu3, h1_be1, h1_be2, h1_be3, h1_sh, h1_sl, h1_bbos, h1_bchoch, h1_sbos, h1_schoch, h1_res, h1_sup, h1_bsw, h1_rsw] = request.security(syminfo.tickerid, tfH1, f_htf_data(), lookahead=barmerge.lookahead_on)
+[h2_st, h2_ts, h2_ema, h2_slp, h2_bu1, h2_bu2, h2_bu3, h2_be1, h2_be2, h2_be3, h2_sh, h2_sl, h2_bbos, h2_bchoch, h2_sbos, h2_schoch, h2_res, h2_sup, h2_bsw, h2_rsw] = request.security(syminfo.tickerid, tfH2, f_htf_data(), lookahead=barmerge.lookahead_on)
+[h3_st, h3_ts, h3_ema, h3_slp, h3_bu1, h3_bu2, h3_bu3, h3_be1, h3_be2, h3_be3, h3_sh, h3_sl, h3_bbos, h3_bchoch, h3_sbos, h3_schoch, h3_res, h3_sup, h3_bsw, h3_rsw] = request.security(syminfo.tickerid, tfH3, f_htf_data(), lookahead=barmerge.lookahead_on)
 
 inSession = not na(time(timeframe.period, sessionStr, "America/New_York"))
 
-plot(showEmaFast ? emaFast : na, "EMA Fast", color=color.new(accentColor, 0), linewidth=2)
-plot(showEmaSlow ? emaSlow : na, "EMA Slow", color=color.new(trendColor, 0), linewidth=2)
-plot(showVwap ? vwapVal : na, "VWAP", color=color.new(neutralColor, 15), linewidth=2)
-plot(showAtrBands ? atrUpper : na, "ATR Upper", color=color.new(bearColor, 55), linewidth=1, style=plot.style_line)
-plot(showAtrBands ? atrLower : na, "ATR Lower", color=color.new(bullColor, 55), linewidth=1, style=plot.style_line)
-plot(showTrail ? trail : na, "ATR Trail", color=color.new(color.fuchsia, 0), linewidth=2, style=plot.style_stepline)
+bool _showSignals = showAllVisuals or showSignals
+bool _showNewsMarkers = showAllVisuals or showNewsMarkers
+bool _showSessionBg = showAllVisuals or showSessionBg
+bool _showFilterBg = showAllVisuals or showFilterBg
+bool _showDashboard = showAllVisuals or showDashboard
+bool _show_st_h1 = showAllVisuals or show_st_h1
+bool _show_st_h2 = showAllVisuals or show_st_h2
+bool _show_st_h3 = showAllVisuals or show_st_h3
+bool _show_ema_h1 = showAllVisuals or show_ema_h1
+bool _show_ema_h2 = showAllVisuals or show_ema_h2
+bool _show_ema_h3 = showAllVisuals or show_ema_h3
+bool _show_exh_chart = showAllVisuals or show_exh_chart
+bool _show_exh_h1 = showAllVisuals or show_exh_h1
+bool _show_exh_h2 = showAllVisuals or show_exh_h2
+bool _show_exh_h3 = showAllVisuals or show_exh_h3
+bool _show_bos_chart = showAllVisuals or show_bos_chart
+bool _show_bos_h1 = showAllVisuals or show_bos_h1
+bool _show_bos_h2 = showAllVisuals or show_bos_h2
+bool _show_bos_h3 = showAllVisuals or show_bos_h3
+bool _show_swing_chart = showAllVisuals or show_swing_chart
+bool _show_swing_h1 = showAllVisuals or show_swing_h1
+bool _show_swing_h2 = showAllVisuals or show_swing_h2
+bool _show_swing_h3 = showAllVisuals or show_swing_h3
+bool _showSweepMarkers = showAllVisuals or showSweepMarkers
 
-plotshape(showSignals and sigLong, "Long Signal", style=shape.triangleup, location=location.belowbar, color=bullColor, size=size.small, text="L")
-plotshape(showSignals and sigShort, "Short Signal", style=shape.triangledown, location=location.abovebar, color=bearColor, size=size.small, text="S")
+color chartBull = color.new(chartBullColor, chartOpacity)
+color chartBear = color.new(chartBearColor, chartOpacity)
+color h1Bull = color.new(h1BullColor, h1Opacity)
+color h1Bear = color.new(h1BearColor, h1Opacity)
+color h2Bull = color.new(h2BullColor, h2Opacity)
+color h2Bear = color.new(h2BearColor, h2Opacity)
+color h3Bull = color.new(h3BullColor, h3Opacity)
+color h3Bear = color.new(h3BearColor, h3Opacity)
+color sigLongClr = color.new(signalLongColor, signalOpacity)
+color sigShortClr = color.new(signalShortColor, signalOpacity)
 
-bgcolor(showSessionBg and inSession ? color.new(trendColor, bgOpacity) : na)
+label_size_chart = f_text_size(chartSize)
+label_size_h1 = f_text_size(h1Size)
+label_size_h2 = f_text_size(h2Size)
+label_size_h3 = f_text_size(h3Size)
+label_size_sig = f_text_size(signalSize)
+shape_size_chart = f_shape_size(chartSize)
+shape_size_h1 = f_shape_size(h1Size)
+shape_size_h2 = f_shape_size(h2Size)
+shape_size_h3 = f_shape_size(h3Size)
+shape_size_sig = f_shape_size(signalSize)
+
+float yAbove = high + atrValue * labelOffsetATR
+float yBelow = low - atrValue * labelOffsetATR
+var int lastBosChartLabelBar = na
+var int lastBosH1LabelBar = na
+var int lastBosH2LabelBar = na
+var int lastBosH3LabelBar = na
+var int lastNewsLabelBar = na
+var int lastSimReasonBar = na
+var int lastExhChartLabelBar = na
+var int lastExhH1LabelBar = na
+var int lastExhH2LabelBar = na
+var int lastExhH3LabelBar = na
+var int lastSignalLabelBar = na
+
+plot(smartTrail, "Smart Trail (Chart)", color=trailState == 1 ? c_bull_c : c_bear_c, linewidth=2)
+plot(_show_st_h1 and useH1 ? h1_st : na, "Smart Trail (HTF 1)", color=h1_ts == 1.0 ? c_bull_h1 : c_bear_h1, linewidth=1)
+plot(_show_st_h2 and useH2 ? h2_st : na, "Smart Trail (HTF 2)", color=h2_ts == 1.0 ? c_bull_h2 : c_bear_h2, linewidth=1)
+plot(_show_st_h3 and useH3 ? h3_st : na, "Smart Trail (HTF 3)", color=h3_ts == 1.0 ? c_bull_h3 : c_bear_h3, linewidth=1)
+
+plot(emaTrend, "EMA Trend (Chart)", color=emaSlope >= 0 ? c_bull_c : c_bear_c, linewidth=1)
+plot(_show_ema_h1 and useH1 ? h1_ema : na, "EMA Trend (HTF 1)", color=nz(h1_slp, 0) >= 0 ? c_bull_h1 : c_bear_h1, linewidth=2)
+plot(_show_ema_h2 and useH2 ? h2_ema : na, "EMA Trend (HTF 2)", color=nz(h2_slp, 0) >= 0 ? c_bull_h2 : c_bear_h2, linewidth=3)
+plot(_show_ema_h3 and useH3 ? h3_ema : na, "EMA Trend (HTF 3)", color=nz(h3_slp, 0) >= 0 ? c_bull_h3 : c_bear_h3, linewidth=4)
+
+plot(_show_swing_chart ? swingHigh : na, "Swing High (Chart)", color=color.new(c_bear_c, 35), linewidth=1, style=plot.style_linebr)
+plot(_show_swing_chart ? swingLow : na, "Swing Low (Chart)", color=color.new(c_bull_c, 35), linewidth=1, style=plot.style_linebr)
+plot(_show_swing_h1 and useH1 ? h1_sh : na, "Swing High (HTF 1)", color=color.new(c_bear_h1, 25), linewidth=1, style=plot.style_linebr)
+plot(_show_swing_h1 and useH1 ? h1_sl : na, "Swing Low (HTF 1)", color=color.new(c_bull_h1, 25), linewidth=1, style=plot.style_linebr)
+plot(_show_swing_h2 and useH2 ? h2_sh : na, "Swing High (HTF 2)", color=color.new(c_bear_h2, 20), linewidth=1, style=plot.style_linebr)
+plot(_show_swing_h2 and useH2 ? h2_sl : na, "Swing Low (HTF 2)", color=color.new(c_bull_h2, 20), linewidth=1, style=plot.style_linebr)
+plot(_show_swing_h3 and useH3 ? h3_sh : na, "Swing High (HTF 3)", color=color.new(c_bear_h3, 15), linewidth=1, style=plot.style_linebr)
+plot(_show_swing_h3 and useH3 ? h3_sl : na, "Swing Low (HTF 3)", color=color.new(c_bull_h3, 15), linewidth=1, style=plot.style_linebr)
+
+plotshape(_showSweepMarkers and isBullSweep, "Bull Sweep", style=shape.circle, location=location.belowbar, color=c_bull_c, size=size.tiny)
+plotshape(_showSweepMarkers and isBearSweep, "Bear Sweep", style=shape.circle, location=location.abovebar, color=c_bear_c, size=size.tiny)
+
+h1_bbos_new = h1_bbos and not h1_bbos[1]
+h1_bchoch_new = h1_bchoch and not h1_bchoch[1]
+h1_sbos_new = h1_sbos and not h1_sbos[1]
+h1_schoch_new = h1_schoch and not h1_schoch[1]
+h2_bbos_new = h2_bbos and not h2_bbos[1]
+h2_bchoch_new = h2_bchoch and not h2_bchoch[1]
+h2_sbos_new = h2_sbos and not h2_sbos[1]
+h2_schoch_new = h2_schoch and not h2_schoch[1]
+h3_bbos_new = h3_bbos and not h3_bbos[1]
+h3_bchoch_new = h3_bchoch and not h3_bchoch[1]
+h3_sbos_new = h3_sbos and not h3_sbos[1]
+h3_schoch_new = h3_schoch and not h3_schoch[1]
+
+if _show_bos_chart and (isBullBOS or isBullChoCh)
+    int _sx = bar_index - pivotLen
+    float _lv = nz(res_val, close)
+    line.new(_sx, _lv, bar_index, _lv, color=c_bull_c)
+    if na(lastBosChartLabelBar) or bar_index - lastBosChartLabelBar >= labelGapBars
+        label.new(int(math.avg(_sx, bar_index)), _lv + atrValue * (labelOffsetATR * 0.6), isBullChoCh ? "choch" : "bos", color=color.new(chartBull, 80), textcolor=chartBull, style=f_label_style(), size=label_size_chart)
+        lastBosChartLabelBar := bar_index
+if _show_bos_chart and (isBearBOS or isBearChoCh)
+    int _sx = bar_index - pivotLen
+    float _lv = nz(sup_val, close)
+    line.new(_sx, _lv, bar_index, _lv, color=c_bear_c)
+    if na(lastBosChartLabelBar) or bar_index - lastBosChartLabelBar >= labelGapBars
+        label.new(int(math.avg(_sx, bar_index)), _lv - atrValue * (labelOffsetATR * 0.6), isBearChoCh ? "choch" : "bos", color=color.new(chartBear, 80), textcolor=chartBear, style=f_label_style(), size=label_size_chart)
+        lastBosChartLabelBar := bar_index
+if _show_bos_h1 and (h1_bbos_new or h1_bchoch_new)
+    float _lv = nz(h1_res, close)
+    int _sx = bar_index - pivotLen
+    line.new(_sx, _lv, bar_index, _lv, color=c_bull_h1)
+    if na(lastBosH1LabelBar) or bar_index - lastBosH1LabelBar >= labelGapBars
+        label.new(int(math.avg(_sx, bar_index)), _lv + atrValue * (labelOffsetATR * 0.75), f_tf_short(tfH1) + " " + (h1_bchoch_new ? "choch" : "bos"), color=color.new(h1Bull, 80), textcolor=h1Bull, style=f_label_style(), size=label_size_h1)
+        lastBosH1LabelBar := bar_index
+if _show_bos_h1 and (h1_sbos_new or h1_schoch_new)
+    float _lv = nz(h1_sup, close)
+    int _sx = bar_index - pivotLen
+    line.new(_sx, _lv, bar_index, _lv, color=c_bear_h1)
+    if na(lastBosH1LabelBar) or bar_index - lastBosH1LabelBar >= labelGapBars
+        label.new(int(math.avg(_sx, bar_index)), _lv - atrValue * (labelOffsetATR * 0.75), f_tf_short(tfH1) + " " + (h1_schoch_new ? "choch" : "bos"), color=color.new(h1Bear, 80), textcolor=h1Bear, style=f_label_style(), size=label_size_h1)
+        lastBosH1LabelBar := bar_index
+if _show_bos_h2 and (h2_bbos_new or h2_bchoch_new)
+    float _lv = nz(h2_res, close)
+    int _sx = bar_index - pivotLen
+    line.new(_sx, _lv, bar_index, _lv, color=c_bull_h2)
+    if na(lastBosH2LabelBar) or bar_index - lastBosH2LabelBar >= labelGapBars
+        label.new(int(math.avg(_sx, bar_index)), _lv + atrValue * (labelOffsetATR * 0.9), f_tf_short(tfH2) + " " + (h2_bchoch_new ? "choch" : "bos"), color=color.new(h2Bull, 80), textcolor=h2Bull, style=f_label_style(), size=label_size_h2)
+        lastBosH2LabelBar := bar_index
+if _show_bos_h2 and (h2_sbos_new or h2_schoch_new)
+    float _lv = nz(h2_sup, close)
+    int _sx = bar_index - pivotLen
+    line.new(_sx, _lv, bar_index, _lv, color=c_bear_h2)
+    if na(lastBosH2LabelBar) or bar_index - lastBosH2LabelBar >= labelGapBars
+        label.new(int(math.avg(_sx, bar_index)), _lv - atrValue * (labelOffsetATR * 0.9), f_tf_short(tfH2) + " " + (h2_schoch_new ? "choch" : "bos"), color=color.new(h2Bear, 80), textcolor=h2Bear, style=f_label_style(), size=label_size_h2)
+        lastBosH2LabelBar := bar_index
+if _show_bos_h3 and (h3_bbos_new or h3_bchoch_new)
+    float _lv = nz(h3_res, close)
+    int _sx = bar_index - pivotLen
+    line.new(_sx, _lv, bar_index, _lv, color=c_bull_h3)
+    if na(lastBosH3LabelBar) or bar_index - lastBosH3LabelBar >= labelGapBars
+        label.new(int(math.avg(_sx, bar_index)), _lv + atrValue * (labelOffsetATR * 1.05), f_tf_short(tfH3) + " " + (h3_bchoch_new ? "choch" : "bos"), color=color.new(h3Bull, 80), textcolor=h3Bull, style=f_label_style(), size=label_size_h3)
+        lastBosH3LabelBar := bar_index
+if _show_bos_h3 and (h3_sbos_new or h3_schoch_new)
+    float _lv = nz(h3_sup, close)
+    int _sx = bar_index - pivotLen
+    line.new(_sx, _lv, bar_index, _lv, color=c_bear_h3)
+    if na(lastBosH3LabelBar) or bar_index - lastBosH3LabelBar >= labelGapBars
+        label.new(int(math.avg(_sx, bar_index)), _lv - atrValue * (labelOffsetATR * 1.05), f_tf_short(tfH3) + " " + (h3_schoch_new ? "choch" : "bos"), color=color.new(h3Bear, 80), textcolor=h3Bear, style=f_label_style(), size=label_size_h3)
+        lastBosH3LabelBar := bar_index
+
+if _show_exh_chart and (isBullL1 or isBullL2 or isBullL3 or isBearL1 or isBearL2 or isBearL3) and (na(lastExhChartLabelBar) or bar_index - lastExhChartLabelBar >= labelGapBars)
+    if isBullL1
+        label.new(bar_index, yBelow, "♦ L1", yloc=yloc.price, style=f_label_style(), color=color.new(chartBull, 80), textcolor=chartBull, size=label_size_chart)
+    if isBullL2
+        label.new(bar_index, yBelow, "✖ L2", yloc=yloc.price, style=f_label_style(), color=color.new(chartBull, 80), textcolor=chartBull, size=label_size_chart)
+    if isBullL3
+        label.new(bar_index, yBelow, "⚑ L3", yloc=yloc.price, style=f_label_style(), color=color.new(chartBull, 80), textcolor=chartBull, size=label_size_chart)
+    if isBearL1
+        label.new(bar_index, yAbove, "♦ L1", yloc=yloc.price, style=f_label_style(), color=color.new(chartBear, 80), textcolor=chartBear, size=label_size_chart)
+    if isBearL2
+        label.new(bar_index, yAbove, "✖ L2", yloc=yloc.price, style=f_label_style(), color=color.new(chartBear, 80), textcolor=chartBear, size=label_size_chart)
+    if isBearL3
+        label.new(bar_index, yAbove, "⚑ L3", yloc=yloc.price, style=f_label_style(), color=color.new(chartBear, 80), textcolor=chartBear, size=label_size_chart)
+    lastExhChartLabelBar := bar_index
+
+if _show_exh_h1 and (h1_bu1 and not h1_bu1[1] or h1_bu2 and not h1_bu2[1] or h1_bu3 and not h1_bu3[1] or h1_be1 and not h1_be1[1] or h1_be2 and not h1_be2[1] or h1_be3 and not h1_be3[1]) and (na(lastExhH1LabelBar) or bar_index - lastExhH1LabelBar >= labelGapBars)
+    string _h1 = f_tf_short(tfH1)
+    if h1_bu1 and not h1_bu1[1]
+        label.new(bar_index, yBelow - atrValue * 0.04, _h1 + " ♦", yloc=yloc.price, style=f_label_style(), color=color.new(h1Bull, 80), textcolor=h1Bull, size=label_size_h1)
+    if h1_bu2 and not h1_bu2[1]
+        label.new(bar_index, yBelow - atrValue * 0.04, _h1 + " ✖", yloc=yloc.price, style=f_label_style(), color=color.new(h1Bull, 80), textcolor=h1Bull, size=label_size_h1)
+    if h1_bu3 and not h1_bu3[1]
+        label.new(bar_index, yBelow - atrValue * 0.04, _h1 + " ⚑", yloc=yloc.price, style=f_label_style(), color=color.new(h1Bull, 80), textcolor=h1Bull, size=label_size_h1)
+    if h1_be1 and not h1_be1[1]
+        label.new(bar_index, yAbove + atrValue * 0.04, _h1 + " ♦", yloc=yloc.price, style=f_label_style(), color=color.new(h1Bear, 80), textcolor=h1Bear, size=label_size_h1)
+    if h1_be2 and not h1_be2[1]
+        label.new(bar_index, yAbove + atrValue * 0.04, _h1 + " ✖", yloc=yloc.price, style=f_label_style(), color=color.new(h1Bear, 80), textcolor=h1Bear, size=label_size_h1)
+    if h1_be3 and not h1_be3[1]
+        label.new(bar_index, yAbove + atrValue * 0.04, _h1 + " ⚑", yloc=yloc.price, style=f_label_style(), color=color.new(h1Bear, 80), textcolor=h1Bear, size=label_size_h1)
+    lastExhH1LabelBar := bar_index
+
+if _show_exh_h2 and (h2_bu1 and not h2_bu1[1] or h2_bu2 and not h2_bu2[1] or h2_bu3 and not h2_bu3[1] or h2_be1 and not h2_be1[1] or h2_be2 and not h2_be2[1] or h2_be3 and not h2_be3[1]) and (na(lastExhH2LabelBar) or bar_index - lastExhH2LabelBar >= labelGapBars)
+    string _h2 = f_tf_short(tfH2)
+    if h2_bu1 and not h2_bu1[1]
+        label.new(bar_index, yBelow - atrValue * 0.08, _h2 + " ♦", yloc=yloc.price, style=f_label_style(), color=color.new(h2Bull, 80), textcolor=h2Bull, size=label_size_h2)
+    if h2_bu2 and not h2_bu2[1]
+        label.new(bar_index, yBelow - atrValue * 0.08, _h2 + " ✖", yloc=yloc.price, style=f_label_style(), color=color.new(h2Bull, 80), textcolor=h2Bull, size=label_size_h2)
+    if h2_bu3 and not h2_bu3[1]
+        label.new(bar_index, yBelow - atrValue * 0.08, _h2 + " ⚑", yloc=yloc.price, style=f_label_style(), color=color.new(h2Bull, 80), textcolor=h2Bull, size=label_size_h2)
+    if h2_be1 and not h2_be1[1]
+        label.new(bar_index, yAbove + atrValue * 0.08, _h2 + " ♦", yloc=yloc.price, style=f_label_style(), color=color.new(h2Bear, 80), textcolor=h2Bear, size=label_size_h2)
+    if h2_be2 and not h2_be2[1]
+        label.new(bar_index, yAbove + atrValue * 0.08, _h2 + " ✖", yloc=yloc.price, style=f_label_style(), color=color.new(h2Bear, 80), textcolor=h2Bear, size=label_size_h2)
+    if h2_be3 and not h2_be3[1]
+        label.new(bar_index, yAbove + atrValue * 0.08, _h2 + " ⚑", yloc=yloc.price, style=f_label_style(), color=color.new(h2Bear, 80), textcolor=h2Bear, size=label_size_h2)
+    lastExhH2LabelBar := bar_index
+
+if _show_exh_h3 and (h3_bu1 and not h3_bu1[1] or h3_bu2 and not h3_bu2[1] or h3_bu3 and not h3_bu3[1] or h3_be1 and not h3_be1[1] or h3_be2 and not h3_be2[1] or h3_be3 and not h3_be3[1]) and (na(lastExhH3LabelBar) or bar_index - lastExhH3LabelBar >= labelGapBars)
+    string _h3 = f_tf_short(tfH3)
+    if h3_bu1 and not h3_bu1[1]
+        label.new(bar_index, yBelow - atrValue * 0.12, _h3 + " ♦", yloc=yloc.price, style=f_label_style(), color=color.new(h3Bull, 80), textcolor=h3Bull, size=label_size_h3)
+    if h3_bu2 and not h3_bu2[1]
+        label.new(bar_index, yBelow - atrValue * 0.12, _h3 + " ✖", yloc=yloc.price, style=f_label_style(), color=color.new(h3Bull, 80), textcolor=h3Bull, size=label_size_h3)
+    if h3_bu3 and not h3_bu3[1]
+        label.new(bar_index, yBelow - atrValue * 0.12, _h3 + " ⚑", yloc=yloc.price, style=f_label_style(), color=color.new(h3Bull, 80), textcolor=h3Bull, size=label_size_h3)
+    if h3_be1 and not h3_be1[1]
+        label.new(bar_index, yAbove + atrValue * 0.12, _h3 + " ♦", yloc=yloc.price, style=f_label_style(), color=color.new(h3Bear, 80), textcolor=h3Bear, size=label_size_h3)
+    if h3_be2 and not h3_be2[1]
+        label.new(bar_index, yAbove + atrValue * 0.12, _h3 + " ✖", yloc=yloc.price, style=f_label_style(), color=color.new(h3Bear, 80), textcolor=h3Bear, size=label_size_h3)
+    if h3_be3 and not h3_be3[1]
+        label.new(bar_index, yAbove + atrValue * 0.12, _h3 + " ⚑", yloc=yloc.price, style=f_label_style(), color=color.new(h3Bear, 80), textcolor=h3Bear, size=label_size_h3)
+    lastExhH3LabelBar := bar_index
+
+sigLong = ta.crossover(close, emaTrend)
+sigShort = ta.crossunder(close, emaTrend)
+if _showSignals and sigLong and (na(lastSignalLabelBar) or bar_index - lastSignalLabelBar >= labelGapBars)
+    label.new(bar_index, yBelow - atrValue * 0.03, "▲ long", yloc=yloc.price, style=f_label_style(), color=color.new(sigLongClr, 80), textcolor=sigLongClr, size=label_size_sig)
+    lastSignalLabelBar := bar_index
+if _showSignals and sigShort and (na(lastSignalLabelBar) or bar_index - lastSignalLabelBar >= labelGapBars)
+    label.new(bar_index, yAbove + atrValue * 0.03, "▼ short", yloc=yloc.price, style=f_label_style(), color=color.new(sigShortClr, 80), textcolor=sigShortClr, size=label_size_sig)
+    lastSignalLabelBar := bar_index
+
+bgcolor(_showSessionBg and inSession ? color.new(trailState == 1 ? c_bull : c_bear, 92) : na)
+bgcolor(_showFilterBg and trailState == 1 and emaSlope >= 0 ? color.new(color.green, 90) : na)
+bgcolor(_showFilterBg and trailState == -1 and emaSlope < 0 ? color.new(color.red, 90) : na)
+
+var array<int> newsStartTs = array.new_int()
+var array<int> newsEndTs = array.new_int()
+string NEWS_WINDOWS_PACKED = "1741353900000,1741354500000;1741782300000,1741782900000;1742406900000,1742409600000;1743078300000,1743078900000;1743769500000,1743770100000"
+
+if barstate.isfirst
+    array.clear(newsStartTs)
+    array.clear(newsEndTs)
+    array<string> _windows = str.split(NEWS_WINDOWS_PACKED, ";")
+    for i = 0 to array.size(_windows) - 1
+        string _w = array.get(_windows, i)
+        array<string> _parts = str.split(_w, ",")
+        if array.size(_parts) == 2
+            int _s = int(str.tonumber(array.get(_parts, 0)))
+            int _e = int(str.tonumber(array.get(_parts, 1)))
+            if _e > _s
+                array.push(newsStartTs, _s)
+                array.push(newsEndTs, _e)
+
+int _tfSec = timeframe.in_seconds()
+int _barMs = (na(_tfSec) or _tfSec <= 0) ? 60000 : _tfSec * 1000
+int _barCloseTs = na(time_close) ? (time + _barMs) : int(time_close)
+bool newsPreNow = false
+bool newsPostNow = false
+for i = 0 to array.size(newsStartTs) - 1
+    int _s = array.get(newsStartTs, i)
+    int _e = array.get(newsEndTs, i)
+    newsPreNow := newsPreNow or (time <= _s and _barCloseTs >= _s)
+    newsPostNow := newsPostNow or (time <= _e and _barCloseTs >= _e)
+
+bool newsPreMarker = newsPreNow and not newsPreNow[1]
+bool newsPostMarker = newsPostNow and not newsPostNow[1]
+if _showNewsMarkers and newsPreMarker and (na(lastNewsLabelBar) or bar_index - lastNewsLabelBar >= labelGapBars)
+    label.new(bar_index, yAbove, "📰 PRE", yloc=yloc.price, style=f_label_style(), color=color.new(chartBear, 80), textcolor=chartBear, size=label_size_sig)
+    lastNewsLabelBar := bar_index
+if _showNewsMarkers and newsPostMarker and (na(lastNewsLabelBar) or bar_index - lastNewsLabelBar >= labelGapBars)
+    label.new(bar_index, yBelow, "📰 POST", yloc=yloc.price, style=f_label_style(), color=color.new(chartBull, 80), textcolor=chartBull, size=label_size_sig)
+    lastNewsLabelBar := bar_index
+
+var int simPos = 0
+var float simEntry = na
+var int simEntryBar = na
+var int simTrades = 0
+var int simWins = 0
+var int simLosses = 0
+var float simNetTicks = 0.0
+var float simGrossWinTicks = 0.0
+var float simGrossLossTicks = 0.0
+var int simStopLossCount = 0
+var int simReverseLossCount = 0
+var int simTimeoutLossCount = 0
+var float simStopLossTicks = 0.0
+var float simReverseLossTicks = 0.0
+var float simTimeoutLossTicks = 0.0
+var int simLastExitBar = na
+var string simLastExitReason = ""
+
+float _tickSize = syminfo.mintick
+bool _simLongEnabled = simDirection != "Short Only"
+bool _simShortEnabled = simDirection != "Long Only"
+
+if simEnabled
+    if simPos == 0
+        if _simLongEnabled and sigLong
+            simPos := 1
+            simEntry := close
+            simEntryBar := bar_index
+        else if _simShortEnabled and sigShort
+            simPos := -1
+            simEntry := close
+            simEntryBar := bar_index
+    else
+        float _slPx = simPos == 1 ? simEntry - simSLTicks * _tickSize : simEntry + simSLTicks * _tickSize
+        float _tpPx = simPos == 1 ? simEntry + simTPTicks * _tickSize : simEntry - simTPTicks * _tickSize
+        bool _hitStop = simPos == 1 ? low <= _slPx : high >= _slPx
+        bool _hitTp = simPos == 1 ? high >= _tpPx : low <= _tpPx
+        bool _reverse = (simPos == 1 and sigShort and _simShortEnabled) or (simPos == -1 and sigLong and _simLongEnabled)
+        bool _timeout = not na(simEntryBar) and (bar_index - simEntryBar >= simMaxBars)
+
+        if _hitStop
+            float _pnlTicks = -simSLTicks
+            simTrades += 1
+            simNetTicks += _pnlTicks
+            simLosses += 1
+            float _lossAbs = math.abs(_pnlTicks)
+            simGrossLossTicks += _lossAbs
+            simStopLossCount += 1
+            simStopLossTicks += _lossAbs
+            simLastExitBar := bar_index
+            simLastExitReason := "SL-sim-ticks"
+            simPos := 0
+            simEntry := na
+            simEntryBar := na
+        else if _hitTp
+            float _pnlTicks = simTPTicks
+            simTrades += 1
+            simNetTicks += _pnlTicks
+            simWins += 1
+            simGrossWinTicks += _pnlTicks
+            simLastExitBar := bar_index
+            simLastExitReason := "TP-chart-ema"
+            simPos := 0
+            simEntry := na
+            simEntryBar := na
+        else if _reverse
+            float _pnlTicks = simPos == 1 ? (close - simEntry) / _tickSize : (simEntry - close) / _tickSize
+            simTrades += 1
+            simNetTicks += _pnlTicks
+            if _pnlTicks >= 0
+                simWins += 1
+                simGrossWinTicks += _pnlTicks
+            else
+                simLosses += 1
+                float _lossAbs = math.abs(_pnlTicks)
+                simGrossLossTicks += _lossAbs
+                simReverseLossCount += 1
+                simReverseLossTicks += _lossAbs
+            simLastExitBar := bar_index
+            simLastExitReason := "chart-op-ema"
+            simPos := 0
+            simEntry := na
+            simEntryBar := na
+        else if _timeout
+            float _pnlTicks = simPos == 1 ? (close - simEntry) / _tickSize : (simEntry - close) / _tickSize
+            simTrades += 1
+            simNetTicks += _pnlTicks
+            if _pnlTicks >= 0
+                simWins += 1
+                simGrossWinTicks += _pnlTicks
+            else
+                simLosses += 1
+                float _lossAbs = math.abs(_pnlTicks)
+                simGrossLossTicks += _lossAbs
+                simTimeoutLossCount += 1
+                simTimeoutLossTicks += _lossAbs
+            simLastExitBar := bar_index
+            simLastExitReason := "timeout-maxbars"
+            simPos := 0
+            simEntry := na
+            simEntryBar := na
+
+if _showSignals and simEnabled and simLastExitBar == bar_index
+    label.new(bar_index, yAbove + atrValue * 0.02, "✖ exit", yloc=yloc.price, style=f_label_style(), color=color.new(sigShortClr, 80), textcolor=sigShortClr, size=label_size_sig)
+if _showSignals and simEnabled and showSimExitReason and simLastExitBar == bar_index and (na(lastSimReasonBar) or bar_index - lastSimReasonBar >= labelGapBars)
+    label.new(bar_index, yAbove + atrValue * 0.05, simLastExitReason, yloc=yloc.price, style=f_label_style(), color=color.new(chartBear, 80), textcolor=chartBear, size=label_size_sig)
+    lastSimReasonBar := bar_index
 
 f_pos(string p) =>
     p == "Top Left" ? position.top_left : p == "Bottom Right" ? position.bottom_right : p == "Bottom Left" ? position.bottom_left : position.top_right
@@ -86,40 +634,80 @@ f_cellbg(bool ok, color okColor, color badColor) =>
     ok ? color.new(okColor, 70) : color.new(badColor, 70)
 
 var table dash = na
-if showDashboard and na(dash)
-    dash := table.new(f_pos(dashboardPos), 2, dashboardCompact ? 6 : 8, border_width=1, border_color=color.new(color.white, 70), bgcolor=color.new(color.black, 20))
-if not showDashboard and not na(dash)
+if _showDashboard and na(dash)
+    dash := table.new(f_pos(dashboardPos), 2, dashboardCompact ? 6 : 13, border_width=1, border_color=color.new(color.white, 70), bgcolor=color.new(color.black, 20))
+if not _showDashboard and not na(dash)
     table.delete(dash)
     dash := na
 
-if showDashboard and not na(dash)
+if _showDashboard and not na(dash)
+    string trendState = trailState == 1 ? "Bull" : trailState == -1 ? "Bear" : "Neutral"
+    color trendColor = trailState == 1 ? c_bull_c : trailState == -1 ? c_bear_c : color.gray
     string signalState = sigLong ? "Long Trigger" : sigShort ? "Short Trigger" : "Idle"
-    color signalColor = sigLong ? bullColor : sigShort ? bearColor : neutralColor
-    string momentumState = rsiVal > rsiBullMin ? "Bull Bias" : rsiVal < rsiBearMax ? "Bear Bias" : "Neutral"
-    bool priceAboveVwap = close > vwapVal
+    color signalColor = sigLong ? c_bull_c : sigShort ? c_bear_c : color.gray
+    bool aboveEma = close > emaTrend
 
     table.cell(dash, 0, 0, "Metric", text_color=color.white, bgcolor=color.new(color.silver, 75), text_size=size.small)
     table.cell(dash, 1, 0, "State", text_color=color.white, bgcolor=color.new(color.silver, 75), text_size=size.small)
-
     table.cell(dash, 0, 1, "Trend", text_color=color.white, bgcolor=color.new(color.gray, 80), text_size=size.small)
-    table.cell(dash, 1, 1, trendState + "  (" + str.tostring(emaFastLen) + "/" + str.tostring(emaSlowLen) + ")", text_color=color.white, bgcolor=color.new(trendColor, 65), text_size=size.small)
-
+    table.cell(dash, 1, 1, trendState, text_color=color.white, bgcolor=color.new(trendColor, 65), text_size=size.small)
     table.cell(dash, 0, 2, "Signal", text_color=color.white, bgcolor=color.new(color.gray, 80), text_size=size.small)
     table.cell(dash, 1, 2, signalState, text_color=color.white, bgcolor=color.new(signalColor, 65), text_size=size.small)
-
-    table.cell(dash, 0, 3, "Momentum", text_color=color.white, bgcolor=color.new(color.gray, 80), text_size=size.small)
-    table.cell(dash, 1, 3, momentumState + "  RSI=" + str.tostring(math.round(rsiVal)), text_color=color.white, bgcolor=f_cellbg(rsiVal >= rsiBullMin, bullColor, bearColor), text_size=size.small)
-
-    table.cell(dash, 0, 4, "Volatility", text_color=color.white, bgcolor=color.new(color.gray, 80), text_size=size.small)
-    table.cell(dash, 1, 4, "ATR=" + str.tostring(atrVal, format.mintick) + "  x" + str.tostring(atrMult), text_color=color.white, bgcolor=color.new(accentColor, 75), text_size=size.small)
-
-    table.cell(dash, 0, 5, "VWAP", text_color=color.white, bgcolor=color.new(color.gray, 80), text_size=size.small)
-    table.cell(dash, 1, 5, priceAboveVwap ? "Price Above" : "Price Below", text_color=color.white, bgcolor=f_cellbg(priceAboveVwap, bullColor, bearColor), text_size=size.small)
+    table.cell(dash, 0, 3, "EMA Slope", text_color=color.white, bgcolor=color.new(color.gray, 80), text_size=size.small)
+    table.cell(dash, 1, 3, str.tostring(emaSlope, format.mintick), text_color=color.white, bgcolor=f_cellbg(emaSlope >= 0, c_bull_c, c_bear_c), text_size=size.small)
+    table.cell(dash, 0, 4, "ATR", text_color=color.white, bgcolor=color.new(color.gray, 80), text_size=size.small)
+    table.cell(dash, 1, 4, str.tostring(atrValue, format.mintick), text_color=color.white, bgcolor=color.new(color.aqua, 75), text_size=size.small)
+    table.cell(dash, 0, 5, "Price vs EMA", text_color=color.white, bgcolor=color.new(color.gray, 80), text_size=size.small)
+    table.cell(dash, 1, 5, aboveEma ? "Above" : "Below", text_color=color.white, bgcolor=f_cellbg(aboveEma, c_bull_c, c_bear_c), text_size=size.small)
 
     if not dashboardCompact
         table.cell(dash, 0, 6, "Session", text_color=color.white, bgcolor=color.new(color.gray, 80), text_size=size.small)
-        table.cell(dash, 1, 6, inSession ? "Active" : "Outside", text_color=color.white, bgcolor=f_cellbg(inSession, accentColor, neutralColor), text_size=size.small)
-
-        string px = "O:" + str.tostring(open, format.mintick) + "  H:" + str.tostring(high, format.mintick) + "  L:" + str.tostring(low, format.mintick) + "  C:" + str.tostring(close, format.mintick)
+        table.cell(dash, 1, 6, inSession ? "Active" : "Outside", text_color=color.white, bgcolor=f_cellbg(inSession, color.aqua, color.gray), text_size=size.small)
+        string px = "O:" + str.tostring(open, format.mintick) + " H:" + str.tostring(high, format.mintick) + " L:" + str.tostring(low, format.mintick) + " C:" + str.tostring(close, format.mintick)
         table.cell(dash, 0, 7, "Price", text_color=color.white, bgcolor=color.new(color.gray, 80), text_size=size.small)
         table.cell(dash, 1, 7, px, text_color=color.white, bgcolor=color.new(color.black, 0), text_size=size.tiny)
+
+        float simNetUsd = simNetTicks * simTickValue * simQty
+        float winRate = simTrades > 0 ? (simWins * 100.0 / simTrades) : 0.0
+        table.cell(dash, 0, 8, "Sim Trades", text_color=color.white, bgcolor=color.new(color.gray, 80), text_size=size.small)
+        table.cell(dash, 1, 8, str.tostring(simTrades) + " | W:" + str.tostring(simWins) + " L:" + str.tostring(simLosses), text_color=color.white, bgcolor=color.new(color.silver, 70), text_size=size.tiny)
+        table.cell(dash, 0, 9, "Sim Net", text_color=color.white, bgcolor=color.new(color.gray, 80), text_size=size.small)
+        table.cell(dash, 1, 9, str.tostring(simNetTicks, format.mintick) + " ticks | $" + str.tostring(simNetUsd, format.mintick) + " | WR " + str.tostring(winRate, format.percent), text_color=color.white, bgcolor=simNetTicks >= 0 ? color.new(c_bull_c, 70) : color.new(c_bear_c, 70), text_size=size.tiny)
+
+        float avgStop = simStopLossCount > 0 ? simStopLossTicks / simStopLossCount : 0.0
+        float avgRev = simReverseLossCount > 0 ? simReverseLossTicks / simReverseLossCount : 0.0
+        float avgTime = simTimeoutLossCount > 0 ? simTimeoutLossTicks / simTimeoutLossCount : 0.0
+        string rank1 = "STOP"
+        float val1 = avgStop
+        string rank2 = "REVERSE"
+        float val2 = avgRev
+        string rank3 = "TIMEOUT"
+        float val3 = avgTime
+        if val2 > val1
+            string _rt = rank1
+            float _rv = val1
+            rank1 := rank2
+            val1 := val2
+            rank2 := _rt
+            val2 := _rv
+        if val3 > val1
+            string _rt = rank1
+            float _rv = val1
+            rank1 := rank3
+            val1 := val3
+            rank3 := _rt
+            val3 := _rv
+        if val3 > val2
+            string _rt = rank2
+            float _rv = val2
+            rank2 := rank3
+            val2 := val3
+            rank3 := _rt
+            val3 := _rv
+
+        table.cell(dash, 0, 10, "Loss Cause #1", text_color=color.white, bgcolor=color.new(color.gray, 80), text_size=size.small)
+        table.cell(dash, 1, 10, rank1 + " avg=" + str.tostring(val1, format.mintick), text_color=color.white, bgcolor=color.new(c_bear_c, 70), text_size=size.tiny)
+        table.cell(dash, 0, 11, "Loss Cause #2", text_color=color.white, bgcolor=color.new(color.gray, 80), text_size=size.small)
+        table.cell(dash, 1, 11, rank2 + " avg=" + str.tostring(val2, format.mintick), text_color=color.white, bgcolor=color.new(c_bear_c, 80), text_size=size.tiny)
+        table.cell(dash, 0, 12, "Loss Cause #3", text_color=color.white, bgcolor=color.new(color.gray, 80), text_size=size.small)
+        table.cell(dash, 1, 12, rank3 + " avg=" + str.tostring(val3, format.mintick), text_color=color.white, bgcolor=color.new(c_bear_c, 85), text_size=size.tiny)
