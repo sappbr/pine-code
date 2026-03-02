@@ -829,17 +829,49 @@ var int h3_c_bchoch = 9999
 var int h3_c_sbos   = 9999
 var int h3_c_schoch = 9999
 
-[st_bullL1_act, st_bullL2_act, st_bullL3_act, st_bearL1_act, st_bearL2_act, st_bearL3_act, st_bbos_act, st_bchoch_act, st_sbos_act, st_schoch_act, c_bu1, c_bu2, c_bu3, c_be1, c_be2, c_be3, c_bbos, c_bchoch, c_sbos, c_schoch] :=
-    f_update_state_memory(isBullL1, isBullL2, isBullL3, isBearL1, isBearL2, isBearL3, isBullBOS, isBullChoCh, isBearBOS, isBearChoCh, st_bullL1_act, st_bullL2_act, st_bullL3_act, st_bearL1_act, st_bearL2_act, st_bearL3_act, st_bbos_act, st_bchoch_act, st_sbos_act, st_schoch_act, c_bu1, c_bu2, c_bu3, c_be1, c_be2, c_be3, c_bbos, c_bchoch, c_sbos, c_schoch)
+c_bu1 := isBullL1 ? 0 : c_bu1 + 1
+c_bu2 := isBullL2 ? 0 : c_bu2 + 1
+c_bu3 := isBullL3 ? 0 : c_bu3 + 1
+c_be1 := isBearL1 ? 0 : c_be1 + 1
+c_be2 := isBearL2 ? 0 : c_be2 + 1
+c_be3 := isBearL3 ? 0 : c_be3 + 1
+c_bbos   := isBullBOS   ? 0 : c_bbos + 1
+c_bchoch := isBullChoCh ? 0 : c_bchoch + 1
+c_sbos   := isBearBOS   ? 0 : c_sbos + 1
+c_schoch := isBearChoCh ? 0 : c_schoch + 1
 
-[h1_bu1_act, h1_bu2_act, h1_bu3_act, h1_be1_act, h1_be2_act, h1_be3_act, h1_bbos_act, h1_bchoch_act, h1_sbos_act, h1_schoch_act, h1_c_bu1, h1_c_bu2, h1_c_bu3, h1_c_be1, h1_c_be2, h1_c_be3, h1_c_bbos, h1_c_bchoch, h1_c_sbos, h1_c_schoch] :=
-    f_update_state_memory(h1_bu1, h1_bu2, h1_bu3, h1_be1, h1_be2, h1_be3, h1_bbos, h1_bchoch, h1_sbos, h1_schoch, h1_bu1_act, h1_bu2_act, h1_bu3_act, h1_be1_act, h1_be2_act, h1_be3_act, h1_bbos_act, h1_bchoch_act, h1_sbos_act, h1_schoch_act, h1_c_bu1, h1_c_bu2, h1_c_bu3, h1_c_be1, h1_c_be2, h1_c_be3, h1_c_bbos, h1_c_bchoch, h1_c_sbos, h1_c_schoch)
+h1_c_bu1 := h1_bu1 ? 0 : h1_c_bu1 + 1
+h1_c_bu2 := h1_bu2 ? 0 : h1_c_bu2 + 1
+h1_c_bu3 := h1_bu3 ? 0 : h1_c_bu3 + 1
+h1_c_be1 := h1_be1 ? 0 : h1_c_be1 + 1
+h1_c_be2 := h1_be2 ? 0 : h1_c_be2 + 1
+h1_c_be3 := h1_be3 ? 0 : h1_c_be3 + 1
+h1_c_bbos   := h1_bbos   ? 0 : h1_c_bbos + 1
+h1_c_bchoch := h1_bchoch ? 0 : h1_c_bchoch + 1
+h1_c_sbos   := h1_sbos   ? 0 : h1_c_sbos + 1
+h1_c_schoch := h1_schoch ? 0 : h1_c_schoch + 1
 
-[h2_bu1_act, h2_bu2_act, h2_bu3_act, h2_be1_act, h2_be2_act, h2_be3_act, h2_bbos_act, h2_bchoch_act, h2_sbos_act, h2_schoch_act, h2_c_bu1, h2_c_bu2, h2_c_bu3, h2_c_be1, h2_c_be2, h2_c_be3, h2_c_bbos, h2_c_bchoch, h2_c_sbos, h2_c_schoch] :=
-    f_update_state_memory(h2_bu1, h2_bu2, h2_bu3, h2_be1, h2_be2, h2_be3, h2_bbos, h2_bchoch, h2_sbos, h2_schoch, h2_bu1_act, h2_bu2_act, h2_bu3_act, h2_be1_act, h2_be2_act, h2_be3_act, h2_bbos_act, h2_bchoch_act, h2_sbos_act, h2_schoch_act, h2_c_bu1, h2_c_bu2, h2_c_bu3, h2_c_be1, h2_c_be2, h2_c_be3, h2_c_bbos, h2_c_bchoch, h2_c_sbos, h2_c_schoch)
+h2_c_bu1 := h2_bu1 ? 0 : h2_c_bu1 + 1
+h2_c_bu2 := h2_bu2 ? 0 : h2_c_bu2 + 1
+h2_c_bu3 := h2_bu3 ? 0 : h2_c_bu3 + 1
+h2_c_be1 := h2_be1 ? 0 : h2_c_be1 + 1
+h2_c_be2 := h2_be2 ? 0 : h2_c_be2 + 1
+h2_c_be3 := h2_be3 ? 0 : h2_c_be3 + 1
+h2_c_bbos   := h2_bbos   ? 0 : h2_c_bbos + 1
+h2_c_bchoch := h2_bchoch ? 0 : h2_c_bchoch + 1
+h2_c_sbos   := h2_sbos   ? 0 : h2_c_sbos + 1
+h2_c_schoch := h2_schoch ? 0 : h2_c_schoch + 1
 
-[h3_bu1_act, h3_bu2_act, h3_bu3_act, h3_be1_act, h3_be2_act, h3_be3_act, h3_bbos_act, h3_bchoch_act, h3_sbos_act, h3_schoch_act, h3_c_bu1, h3_c_bu2, h3_c_bu3, h3_c_be1, h3_c_be2, h3_c_be3, h3_c_bbos, h3_c_bchoch, h3_c_sbos, h3_c_schoch] :=
-    f_update_state_memory(h3_bu1, h3_bu2, h3_bu3, h3_be1, h3_be2, h3_be3, h3_bbos, h3_bchoch, h3_sbos, h3_schoch, h3_bu1_act, h3_bu2_act, h3_bu3_act, h3_be1_act, h3_be2_act, h3_be3_act, h3_bbos_act, h3_bchoch_act, h3_sbos_act, h3_schoch_act, h3_c_bu1, h3_c_bu2, h3_c_bu3, h3_c_be1, h3_c_be2, h3_c_be3, h3_c_bbos, h3_c_bchoch, h3_c_sbos, h3_c_schoch)
+h3_c_bu1 := h3_bu1 ? 0 : h3_c_bu1 + 1
+h3_c_bu2 := h3_bu2 ? 0 : h3_c_bu2 + 1
+h3_c_bu3 := h3_bu3 ? 0 : h3_c_bu3 + 1
+h3_c_be1 := h3_be1 ? 0 : h3_c_be1 + 1
+h3_c_be2 := h3_be2 ? 0 : h3_c_be2 + 1
+h3_c_be3 := h3_be3 ? 0 : h3_c_be3 + 1
+h3_c_bbos   := h3_bbos   ? 0 : h3_c_bbos + 1
+h3_c_bchoch := h3_bchoch ? 0 : h3_c_bchoch + 1
+h3_c_sbos   := h3_sbos   ? 0 : h3_c_sbos + 1
+h3_c_schoch := h3_schoch ? 0 : h3_c_schoch + 1
 
 // =========================================================================
 // 17a. 📡 SESSION DETECTION
@@ -1809,9 +1841,6 @@ f_effective_mae_ticks(int contracts) =>
          math.min(maeMaxTicks, math.min(_riskTicks, _dynUsdTicks))
     _eff
 
-f_reset_trade_state() =>
-    [false, false, na, false, false, false, false, false, false, false]
-
 f_tp_target(float base, bool isLongDir, string tf, float ticks, float h1st, float h2st, float h3st) =>
     float _fallback = isLongDir ? base + ticks * syminfo.mintick : base - ticks * syminfo.mintick
     if tf == "Chart"
@@ -1886,7 +1915,16 @@ if fireLong and isFlat and isBarClose
         if maeTicks <= effectiveMaeTicks
             entrySL     := sl
             entryPrice  := close
-            [beHit, trailLocked, trailStop, tp1Done, tp2Done, tp3Done, tp4Done, ex1Done, ex2Done, ex3Done] := f_reset_trade_state()
+            beHit       := false
+            trailLocked := false
+            trailStop   := na
+            tp1Done     := false
+            tp2Done     := false
+            tp3Done     := false
+            tp4Done     := false
+            ex1Done     := false
+            ex2Done     := false
+            ex3Done     := false
             int _longCarryBars = bar_index - nz(pendingLongCarryBar, bar_index)
             pendingLongCarry := false
             pendingLongCarryBar := na
@@ -1913,7 +1951,16 @@ if fireShort and isFlat and isBarClose
         if maeTicks <= effectiveMaeTicks
             entrySL     := sl
             entryPrice  := close
-            [beHit, trailLocked, trailStop, tp1Done, tp2Done, tp3Done, tp4Done, ex1Done, ex2Done, ex3Done] := f_reset_trade_state()
+            beHit       := false
+            trailLocked := false
+            trailStop   := na
+            tp1Done     := false
+            tp2Done     := false
+            tp3Done     := false
+            tp4Done     := false
+            ex1Done     := false
+            ex2Done     := false
+            ex3Done     := false
             int _shortCarryBars = bar_index - nz(pendingShortCarryBar, bar_index)
             pendingShortCarry := false
             pendingShortCarryBar := na
@@ -2061,44 +2108,80 @@ if isBarClose and not isFlat
 // 21b. 🚪 OVERRIDE EXITS
 // -------------------------------------------------------------------------
 if isBarClose and isLong
-    bool _ex1CloseAllLong = false
-    bool _ex2CloseAllLong = false
-    bool _ex3CloseAllLong = false
-    [ex1Done, _ex1CloseAllLong] := f_exec_override_slot(lbl_long_entry, "LONG", "EXIT1", id_ex1, ex1Trig, ex1Done, ex1_qty, strategy.position_size, actualMaxContracts, ex1Meta)
-    if _ex1CloseAllLong
-        ex1Done := true
-        ex2Done := true
-        ex3Done := true
-    [ex2Done, _ex2CloseAllLong] := f_exec_override_slot(lbl_long_entry, "LONG", "EXIT2", id_ex2, ex2Trig, ex2Done, ex2_qty, strategy.position_size, actualMaxContracts, ex2Meta)
-    if _ex2CloseAllLong
-        ex1Done := true
-        ex2Done := true
-        ex3Done := true
-    [ex3Done, _ex3CloseAllLong] := f_exec_override_slot(lbl_long_entry, "LONG", "EXIT3", id_ex3, ex3Trig, ex3Done, ex3_qty, strategy.position_size, actualMaxContracts, ex3Meta)
-    if _ex3CloseAllLong
-        ex1Done := true
-        ex2Done := true
-        ex3Done := true
+    if not ex1Done and ex1Trig
+        int ex1Qty = f_scale_qty(ex1_qty, strategy.position_size, actualMaxContracts)
+        if ex1_qty == 0
+            strategy.close(lbl_long_entry, comment=id_ex1)
+            ex1Done := true
+            ex2Done := true
+            ex3Done := true
+        else if ex1Qty > 0
+            strategy.close(lbl_long_entry, qty=ex1Qty, comment=id_ex1)
+            ex1Done := true
+        if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
+            log.info(str.format("🚪 EXIT1 HIT @{0}: side=LONG qty={1} id={2} | {3}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(ex1Qty), id_ex1, ex1Meta))
+    if not ex2Done and ex2Trig
+        int ex2Qty = f_scale_qty(ex2_qty, strategy.position_size, actualMaxContracts)
+        if ex2_qty == 0
+            strategy.close(lbl_long_entry, comment=id_ex2)
+            ex1Done := true
+            ex2Done := true
+            ex3Done := true
+        else if ex2Qty > 0
+            strategy.close(lbl_long_entry, qty=ex2Qty, comment=id_ex2)
+            ex2Done := true
+        if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
+            log.info(str.format("🚪 EXIT2 HIT @{0}: side=LONG qty={1} id={2} | {3}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(ex2Qty), id_ex2, ex2Meta))
+    if not ex3Done and ex3Trig
+        int ex3Qty = f_scale_qty(ex3_qty, strategy.position_size, actualMaxContracts)
+        if ex3_qty == 0
+            strategy.close(lbl_long_entry, comment=id_ex3)
+            ex1Done := true
+            ex2Done := true
+            ex3Done := true
+        else if ex3Qty > 0
+            strategy.close(lbl_long_entry, qty=ex3Qty, comment=id_ex3)
+            ex3Done := true
+        if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
+            log.info(str.format("🚪 EXIT3 HIT @{0}: side=LONG qty={1} id={2} | {3}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(ex3Qty), id_ex3, ex3Meta))
 
 if isBarClose and isShort
-    bool _ex1CloseAllShort = false
-    bool _ex2CloseAllShort = false
-    bool _ex3CloseAllShort = false
-    [ex1Done, _ex1CloseAllShort] := f_exec_override_slot(lbl_short_entry, "SHORT", "EXIT1", id_ex1, ex1Trig, ex1Done, ex1_qty, strategy.position_size, actualMaxContracts, ex1Meta)
-    if _ex1CloseAllShort
-        ex1Done := true
-        ex2Done := true
-        ex3Done := true
-    [ex2Done, _ex2CloseAllShort] := f_exec_override_slot(lbl_short_entry, "SHORT", "EXIT2", id_ex2, ex2Trig, ex2Done, ex2_qty, strategy.position_size, actualMaxContracts, ex2Meta)
-    if _ex2CloseAllShort
-        ex1Done := true
-        ex2Done := true
-        ex3Done := true
-    [ex3Done, _ex3CloseAllShort] := f_exec_override_slot(lbl_short_entry, "SHORT", "EXIT3", id_ex3, ex3Trig, ex3Done, ex3_qty, strategy.position_size, actualMaxContracts, ex3Meta)
-    if _ex3CloseAllShort
-        ex1Done := true
-        ex2Done := true
-        ex3Done := true
+    if not ex1Done and ex1Trig
+        int ex1Qty = f_scale_qty(ex1_qty, strategy.position_size, actualMaxContracts)
+        if ex1_qty == 0
+            strategy.close(lbl_short_entry, comment=id_ex1)
+            ex1Done := true
+            ex2Done := true
+            ex3Done := true
+        else if ex1Qty > 0
+            strategy.close(lbl_short_entry, qty=ex1Qty, comment=id_ex1)
+            ex1Done := true
+        if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
+            log.info(str.format("🚪 EXIT1 HIT @{0}: side=SHORT qty={1} id={2} | {3}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(ex1Qty), id_ex1, ex1Meta))
+    if not ex2Done and ex2Trig
+        int ex2Qty = f_scale_qty(ex2_qty, strategy.position_size, actualMaxContracts)
+        if ex2_qty == 0
+            strategy.close(lbl_short_entry, comment=id_ex2)
+            ex1Done := true
+            ex2Done := true
+            ex3Done := true
+        else if ex2Qty > 0
+            strategy.close(lbl_short_entry, qty=ex2Qty, comment=id_ex2)
+            ex2Done := true
+        if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
+            log.info(str.format("🚪 EXIT2 HIT @{0}: side=SHORT qty={1} id={2} | {3}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(ex2Qty), id_ex2, ex2Meta))
+    if not ex3Done and ex3Trig
+        int ex3Qty = f_scale_qty(ex3_qty, strategy.position_size, actualMaxContracts)
+        if ex3_qty == 0
+            strategy.close(lbl_short_entry, comment=id_ex3)
+            ex1Done := true
+            ex2Done := true
+            ex3Done := true
+        else if ex3Qty > 0
+            strategy.close(lbl_short_entry, qty=ex3Qty, comment=id_ex3)
+            ex3Done := true
+        if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
+            log.info(str.format("🚪 EXIT3 HIT @{0}: side=SHORT qty={1} id={2} | {3}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(ex3Qty), id_ex3, ex3Meta))
 
 // -------------------------------------------------------------------------
 // 21c. 🎯 STANDARD TP EXECUTION
