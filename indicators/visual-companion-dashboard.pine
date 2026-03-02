@@ -1,0 +1,125 @@
+//@version=6
+indicator("NQ Visual Companion Dashboard", "NQ Visual Companion", overlay=true, max_labels_count=500, max_lines_count=500)
+
+var G_STYLE = "Style"
+var G_TREND = "Trend Engine"
+var G_SIGNAL = "Signal Engine"
+var G_VOL = "Volatility"
+var G_SESSION = "Session"
+var G_DASH = "Dashboard"
+
+showEmaFast = input.bool(true, "Show EMA Fast", group=G_TREND, inline="ema1")
+showEmaSlow = input.bool(true, "Show EMA Slow", group=G_TREND, inline="ema1")
+emaFastLen = input.int(21, "Fast", minval=1, group=G_TREND, inline="ema2")
+emaSlowLen = input.int(55, "Slow", minval=1, group=G_TREND, inline="ema2")
+showVwap = input.bool(true, "Show VWAP", group=G_TREND)
+
+showSignals = input.bool(true, "Show Signal Markers", group=G_SIGNAL)
+useRsiFilter = input.bool(true, "Use RSI Filter", group=G_SIGNAL, inline="rsi1")
+rsiLen = input.int(14, "RSI Length", minval=2, group=G_SIGNAL, inline="rsi1")
+rsiBullMin = input.int(50, "Bull >=", minval=1, maxval=99, group=G_SIGNAL, inline="rsi2")
+rsiBearMax = input.int(50, "Bear <=", minval=1, maxval=99, group=G_SIGNAL, inline="rsi2")
+
+showAtrBands = input.bool(true, "Show ATR Bands", group=G_VOL)
+atrLen = input.int(14, "ATR Length", minval=1, group=G_VOL, inline="atr1")
+atrMult = input.float(1.5, "ATR Mult", minval=0.1, step=0.1, group=G_VOL, inline="atr1")
+showTrail = input.bool(true, "Show ATR Trail", group=G_VOL)
+
+showSessionBg = input.bool(true, "Show Session Background", group=G_SESSION)
+sessionStr = input.session("0930-1600", "Session (ET)", group=G_SESSION)
+
+bullColor = input.color(color.new(color.lime, 0), "Bull", group=G_STYLE, inline="c1")
+bearColor = input.color(color.new(color.red, 0), "Bear", group=G_STYLE, inline="c1")
+neutralColor = input.color(color.new(color.gray, 0), "Neutral", group=G_STYLE, inline="c1")
+accentColor = input.color(color.new(color.aqua, 0), "Accent", group=G_STYLE, inline="c2")
+bgOpacity = input.int(88, "BG Opacity", minval=0, maxval=100, group=G_STYLE, inline="c2")
+
+showDashboard = input.bool(true, "Show Dashboard", group=G_DASH)
+dashboardPos = input.string("Top Right", "Position", options=["Top Right", "Top Left", "Bottom Right", "Bottom Left"], group=G_DASH, inline="d1")
+dashboardCompact = input.bool(false, "Compact", group=G_DASH, inline="d1")
+
+emaFast = ta.ema(close, emaFastLen)
+emaSlow = ta.ema(close, emaSlowLen)
+vwapVal = ta.vwap(hlc3)
+rsiVal = ta.rsi(close, rsiLen)
+atrVal = ta.atr(atrLen)
+
+trendBull = emaFast > emaSlow
+trendBear = emaFast < emaSlow
+trendState = trendBull ? "Bull" : trendBear ? "Bear" : "Neutral"
+trendColor = trendBull ? bullColor : trendBear ? bearColor : neutralColor
+
+sigLongRaw = ta.crossover(emaFast, emaSlow)
+sigShortRaw = ta.crossunder(emaFast, emaSlow)
+sigLong = sigLongRaw and (not useRsiFilter or rsiVal >= rsiBullMin)
+sigShort = sigShortRaw and (not useRsiFilter or rsiVal <= rsiBearMax)
+
+atrUpper = close + atrVal * atrMult
+atrLower = close - atrVal * atrMult
+var float trail = na
+if barstate.isfirst
+    trail := close
+if showTrail
+    if trendBull
+        trail := na(trail) ? atrLower : math.max(trail, atrLower)
+    else if trendBear
+        trail := na(trail) ? atrUpper : math.min(trail, atrUpper)
+
+inSession = not na(time(timeframe.period, sessionStr, "America/New_York"))
+
+plot(showEmaFast ? emaFast : na, "EMA Fast", color=color.new(accentColor, 0), linewidth=2)
+plot(showEmaSlow ? emaSlow : na, "EMA Slow", color=color.new(trendColor, 0), linewidth=2)
+plot(showVwap ? vwapVal : na, "VWAP", color=color.new(neutralColor, 15), linewidth=2)
+plot(showAtrBands ? atrUpper : na, "ATR Upper", color=color.new(bearColor, 55), linewidth=1, style=plot.style_line)
+plot(showAtrBands ? atrLower : na, "ATR Lower", color=color.new(bullColor, 55), linewidth=1, style=plot.style_line)
+plot(showTrail ? trail : na, "ATR Trail", color=color.new(color.fuchsia, 0), linewidth=2, style=plot.style_stepline)
+
+plotshape(showSignals and sigLong, "Long Signal", style=shape.triangleup, location=location.belowbar, color=bullColor, size=size.small, text="L")
+plotshape(showSignals and sigShort, "Short Signal", style=shape.triangledown, location=location.abovebar, color=bearColor, size=size.small, text="S")
+
+bgcolor(showSessionBg and inSession ? color.new(trendColor, bgOpacity) : na)
+
+f_pos(string p) =>
+    p == "Top Left" ? position.top_left : p == "Bottom Right" ? position.bottom_right : p == "Bottom Left" ? position.bottom_left : position.top_right
+
+f_cellbg(bool ok, color okColor, color badColor) =>
+    ok ? color.new(okColor, 70) : color.new(badColor, 70)
+
+var table dash = na
+if showDashboard and na(dash)
+    dash := table.new(f_pos(dashboardPos), 2, dashboardCompact ? 6 : 8, border_width=1, border_color=color.new(color.white, 70), bgcolor=color.new(color.black, 20))
+if not showDashboard and not na(dash)
+    table.delete(dash)
+    dash := na
+
+if showDashboard and not na(dash)
+    string signalState = sigLong ? "Long Trigger" : sigShort ? "Short Trigger" : "Idle"
+    color signalColor = sigLong ? bullColor : sigShort ? bearColor : neutralColor
+    string momentumState = rsiVal > rsiBullMin ? "Bull Bias" : rsiVal < rsiBearMax ? "Bear Bias" : "Neutral"
+    bool priceAboveVwap = close > vwapVal
+
+    table.cell(dash, 0, 0, "Metric", text_color=color.white, bgcolor=color.new(color.silver, 75), text_size=size.small)
+    table.cell(dash, 1, 0, "State", text_color=color.white, bgcolor=color.new(color.silver, 75), text_size=size.small)
+
+    table.cell(dash, 0, 1, "Trend", text_color=color.white, bgcolor=color.new(color.gray, 80), text_size=size.small)
+    table.cell(dash, 1, 1, trendState + "  (" + str.tostring(emaFastLen) + "/" + str.tostring(emaSlowLen) + ")", text_color=color.white, bgcolor=color.new(trendColor, 65), text_size=size.small)
+
+    table.cell(dash, 0, 2, "Signal", text_color=color.white, bgcolor=color.new(color.gray, 80), text_size=size.small)
+    table.cell(dash, 1, 2, signalState, text_color=color.white, bgcolor=color.new(signalColor, 65), text_size=size.small)
+
+    table.cell(dash, 0, 3, "Momentum", text_color=color.white, bgcolor=color.new(color.gray, 80), text_size=size.small)
+    table.cell(dash, 1, 3, momentumState + "  RSI=" + str.tostring(math.round(rsiVal)), text_color=color.white, bgcolor=f_cellbg(rsiVal >= rsiBullMin, bullColor, bearColor), text_size=size.small)
+
+    table.cell(dash, 0, 4, "Volatility", text_color=color.white, bgcolor=color.new(color.gray, 80), text_size=size.small)
+    table.cell(dash, 1, 4, "ATR=" + str.tostring(atrVal, format.mintick) + "  x" + str.tostring(atrMult), text_color=color.white, bgcolor=color.new(accentColor, 75), text_size=size.small)
+
+    table.cell(dash, 0, 5, "VWAP", text_color=color.white, bgcolor=color.new(color.gray, 80), text_size=size.small)
+    table.cell(dash, 1, 5, priceAboveVwap ? "Price Above" : "Price Below", text_color=color.white, bgcolor=f_cellbg(priceAboveVwap, bullColor, bearColor), text_size=size.small)
+
+    if not dashboardCompact
+        table.cell(dash, 0, 6, "Session", text_color=color.white, bgcolor=color.new(color.gray, 80), text_size=size.small)
+        table.cell(dash, 1, 6, inSession ? "Active" : "Outside", text_color=color.white, bgcolor=f_cellbg(inSession, accentColor, neutralColor), text_size=size.small)
+
+        string px = "O:" + str.tostring(open, format.mintick) + "  H:" + str.tostring(high, format.mintick) + "  L:" + str.tostring(low, format.mintick) + "  C:" + str.tostring(close, format.mintick)
+        table.cell(dash, 0, 7, "Price", text_color=color.white, bgcolor=color.new(color.gray, 80), text_size=size.small)
+        table.cell(dash, 1, 7, px, text_color=color.white, bgcolor=color.new(color.black, 0), text_size=size.tiny)
