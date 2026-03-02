@@ -334,6 +334,7 @@ pivotLen    = input.int(5, "Pivot Lookback", group=G_IND)
 var G_VIS = "13. 🎨 VISUALS"
 showSignals    = input.bool(true,  "Show Entry Arm Signals", group=G_VIS)
 showDebugLog   = input.bool(false, "Show On-Chart Debug Label (Last Bar)", group=G_VIS)
+showPolicyModeLabel = input.bool(true, "Show Policy Mode Label", group=G_VIS, tooltip="Displays current prop-firm news compliance mode and safety state on chart.")
 logLevel = input.string("Trades Only", "Pine Script Logging Level", options=["None", "Trades Only", "Full (Deep State)"], group=G_VIS)
 showFilterDashboard = input.bool(false, "📊 Show Filter State Dashboard", group=G_VIS, tooltip="Displays a real-time table showing the true/false status of every filter and blocker.")
 drawLines      = input.bool(true, "Draw Dynamic Trade Lines", group=G_VIS)
@@ -1380,6 +1381,7 @@ bool newsEntryAllowed = not newsKillzoneNow and not newsCalendarBlocksEntries
 bool newsForceFlattenNow = newsKillzoneNow and newsKillzoneAction == "Block Entries + Force Flatten"
 bool newsPreAlertNow = enableNewsPolicyAlerts and firmAllowsNewsTrading and redFolderPreBoundaryNow
 bool newsPostAlertNow = enableNewsPolicyAlerts and firmAllowsNewsTrading and redFolderPostBoundaryNow
+string policyMode = firmMffuRestrictedNews ? "MFFU Funded Restricted" : "News Allowed + Alerts"
 
 // =========================================================================
 // 19. 🧠 GOD MODE LOGIC EVALUATION & ARMING
@@ -2230,6 +2232,23 @@ plotshape(isBearSweep, "Bearish Sweep (Chart)", style=shape.circle, location=loc
 
 // --- NEWS CALENDAR EXPIRY WARNING ---
 plotshape(newsCalendarExpired and barstate.islast, "News Calendar Expired", style=shape.triangledown, location=location.top, color=color.new(c_bear_c, 0), size=size.small, text="NEWS CAL EXPIRED")
+
+// --- POLICY MODE LABEL ---
+var label policyModeLabel = na
+if showPolicyModeLabel and barstate.islast
+    string _policyText = "Policy Mode: " + policyMode +
+         "\nFirm=" + propFirm + " | Phase=" + propPhase + " | Type=" + propAccType +
+         "\nNewsRestr=" + str.tostring(firmMffuRestrictedNews) +
+         " | NewsKZ=" + str.tostring(newsKillzoneNow) +
+         " | Expired=" + str.tostring(newsCalendarExpired) +
+         " | Unsafe=" + str.tostring(allowTradingWhenNewsCalendarExpiredUnsafe)
+    color _policyBg = (firmMffuRestrictedNews or newsCalendarBlocksEntries) ? color.new(c_bear_c, 35) : color.new(c_bull_c, 35)
+    if not na(policyModeLabel)
+        label.delete(policyModeLabel)
+    policyModeLabel := label.new(bar_index, high * 1.01, _policyText, style=label.style_label_down, color=_policyBg, textcolor=color.white, size=size.small)
+else if not showPolicyModeLabel and not na(policyModeLabel)
+    label.delete(policyModeLabel)
+    policyModeLabel := na
 
 // --- RED FOLDER ALERT MARKERS (for firms where news trading is allowed) ---
 plotshape(newsPreAlertNow, "Red Folder Pre-Event", style=shape.flag, location=location.top, color=color.new(color.orange, 0), size=size.tiny, text="RED PRE")
