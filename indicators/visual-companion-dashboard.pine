@@ -39,17 +39,17 @@ chartBullColor = input.color(#089981, "Chart Bull", inline="sty0", group=G_STYLE
 chartBearColor = input.color(#f23645, "Chart Bear", inline="sty0", group=G_STYLE)
 chartOpacity = input.int(15, "Chart Opacity", minval=0, maxval=100, inline="sty0", group=G_STYLE)
 
-h1BullColor = input.color(#089981, "HTF1 Bull", inline="sty1", group=G_STYLE)
-h1BearColor = input.color(#f23645, "HTF1 Bear", inline="sty1", group=G_STYLE)
-h1Opacity = input.int(35, "HTF1 Opacity", minval=0, maxval=100, inline="sty1", group=G_STYLE)
+h1BullColor = input.color(#00A2FF, "HTF1 Bull", inline="sty1", group=G_STYLE)
+h1BearColor = input.color(#FF9800, "HTF1 Bear", inline="sty1", group=G_STYLE)
+h1Opacity = input.int(0, "HTF1 Opacity", minval=0, maxval=100, inline="sty1", group=G_STYLE)
 
-h2BullColor = input.color(#089981, "HTF2 Bull", inline="sty2", group=G_STYLE)
-h2BearColor = input.color(#f23645, "HTF2 Bear", inline="sty2", group=G_STYLE)
-h2Opacity = input.int(50, "HTF2 Opacity", minval=0, maxval=100, inline="sty2", group=G_STYLE)
+h2BullColor = input.color(#A64DFF, "HTF2 Bull", inline="sty2", group=G_STYLE)
+h2BearColor = input.color(#FFFF00, "HTF2 Bear", inline="sty2", group=G_STYLE)
+h2Opacity = input.int(0, "HTF2 Opacity", minval=0, maxval=100, inline="sty2", group=G_STYLE)
 
-h3BullColor = input.color(#089981, "HTF3 Bull", inline="sty3", group=G_STYLE)
-h3BearColor = input.color(#f23645, "HTF3 Bear", inline="sty3", group=G_STYLE)
-h3Opacity = input.int(65, "HTF3 Opacity", minval=0, maxval=100, inline="sty3", group=G_STYLE)
+h3BullColor = input.color(#FFFFFF, "HTF3 Bull", inline="sty3", group=G_STYLE)
+h3BearColor = input.color(#808080, "HTF3 Bear", inline="sty3", group=G_STYLE)
+h3Opacity = input.int(0, "HTF3 Opacity", minval=0, maxval=100, inline="sty3", group=G_STYLE)
 
 signalLongColor = input.color(#00c853, "Signal Long", inline="sty4", group=G_STYLE)
 signalShortColor = input.color(#ff5252, "Signal Short", inline="sty4", group=G_STYLE)
@@ -58,6 +58,10 @@ signalOpacity = input.int(10, "Signal Opacity", minval=0, maxval=100, inline="st
 labelGapBars = input.int(6, "Min Bars Between Labels", minval=0, group=G_STYLE)
 labelOffsetATR = input.float(0.18, "Label Vertical Offset (ATR)", minval=0.0, step=0.01, group=G_STYLE)
 showSimExitReason = input.bool(true, "Show Sim Exit Reason Text", group=G_STYLE)
+useH3MacroBg = input.bool(false, "Use HTF3 Macro Background (Hide HTF3 Lines)", group=G_STYLE)
+h3MacroBullBg = input.color(color.blue, "HTF3 Macro Bull BG", inline="bg3", group=G_STYLE)
+h3MacroBearBg = input.color(color.orange, "HTF3 Macro Bear BG", inline="bg3", group=G_STYLE)
+h3MacroBgOpacity = input.int(90, "BG Opacity", minval=0, maxval=100, inline="bg3", group=G_STYLE)
 
 var G_OVR = "Optional Overlays"
 show_st_h1 = input.bool(false, "HTF 1 Smart Trail", group=G_OVR)
@@ -88,6 +92,21 @@ simTickValue = input.float(2.0, "$/Tick", minval=0.01, step=0.01, group=G_SIM, i
 simSLTicks = input.int(40, "SL Ticks", minval=1, group=G_SIM, inline="sim2")
 simTPTicks = input.int(60, "TP Ticks", minval=1, group=G_SIM, inline="sim2")
 simMaxBars = input.int(30, "Max Hold Bars", minval=1, group=G_SIM)
+
+var G_SIG = "Signal Engine"
+sigLongTf = input.string("Chart", "Long Signal TF", options=["Chart", "HTF 1", "HTF 2", "HTF 3"], inline="sigl1", group=G_SIG)
+sigLongInd = input.string("Close", "", options=["Close", "Open", "High", "Low", "hl2", "hlc3", "ohlc4", "Smart Trail", "EMA Trail", "EMA Slope"], inline="sigl1", group=G_SIG)
+sigLongCond = input.string("Crosses Over", "", options=["Crosses Over", "Crosses Under", "Greater Than", "Less Than", "Is Bullish", "Is Bearish"], inline="sigl1", group=G_SIG)
+sigLongTarg = input.string("EMA Trend", "", options=["Value/Price", "Custom Value", "Smart Trail", "EMA Trend", "Support", "Resistance"], inline="sigl2", group=G_SIG)
+sigLongCmpTf = input.string("Same TF", "Cmp TF", options=["Same TF", "Chart", "HTF 1", "HTF 2", "HTF 3"], inline="sigl2", group=G_SIG)
+sigLongVal = input.float(0.0, "", inline="sigl2", group=G_SIG)
+
+sigShortTf = input.string("Chart", "Short Signal TF", options=["Chart", "HTF 1", "HTF 2", "HTF 3"], inline="sigs1", group=G_SIG)
+sigShortInd = input.string("Close", "", options=["Close", "Open", "High", "Low", "hl2", "hlc3", "ohlc4", "Smart Trail", "EMA Trail", "EMA Slope"], inline="sigs1", group=G_SIG)
+sigShortCond = input.string("Crosses Under", "", options=["Crosses Over", "Crosses Under", "Greater Than", "Less Than", "Is Bullish", "Is Bearish"], inline="sigs1", group=G_SIG)
+sigShortTarg = input.string("EMA Trend", "", options=["Value/Price", "Custom Value", "Smart Trail", "EMA Trend", "Support", "Resistance"], inline="sigs2", group=G_SIG)
+sigShortCmpTf = input.string("Same TF", "Cmp TF", options=["Same TF", "Chart", "HTF 1", "HTF 2", "HTF 3"], inline="sigs2", group=G_SIG)
+sigShortVal = input.float(0.0, "", inline="sigs2", group=G_SIG)
 
 c_bull = #089981
 c_bear = #f23645
@@ -244,11 +263,60 @@ f_htf_data() =>
      isBullL1[1], isBullL2[1], isBullL3[1], isBearL1[1], isBearL2[1], isBearL3[1],
      swingHigh[1], swingLow[1],
      isBullBOS[1], isBullChoCh[1], isBearBOS[1], isBearChoCh[1],
-     res_val[1], sup_val[1], isBullSweep[1], isBearSweep[1]]
+     res_val[1], sup_val[1], isBullSweep[1], isBearSweep[1],
+     close[1], open[1], high[1], low[1], hl2[1], hlc3[1], ohlc4[1]]
 
-[h1_st, h1_ts, h1_ema, h1_slp, h1_bu1, h1_bu2, h1_bu3, h1_be1, h1_be2, h1_be3, h1_sh, h1_sl, h1_bbos, h1_bchoch, h1_sbos, h1_schoch, h1_res, h1_sup, h1_bsw, h1_rsw] = request.security(syminfo.tickerid, tfH1, f_htf_data(), lookahead=barmerge.lookahead_on)
-[h2_st, h2_ts, h2_ema, h2_slp, h2_bu1, h2_bu2, h2_bu3, h2_be1, h2_be2, h2_be3, h2_sh, h2_sl, h2_bbos, h2_bchoch, h2_sbos, h2_schoch, h2_res, h2_sup, h2_bsw, h2_rsw] = request.security(syminfo.tickerid, tfH2, f_htf_data(), lookahead=barmerge.lookahead_on)
-[h3_st, h3_ts, h3_ema, h3_slp, h3_bu1, h3_bu2, h3_bu3, h3_be1, h3_be2, h3_be3, h3_sh, h3_sl, h3_bbos, h3_bchoch, h3_sbos, h3_schoch, h3_res, h3_sup, h3_bsw, h3_rsw] = request.security(syminfo.tickerid, tfH3, f_htf_data(), lookahead=barmerge.lookahead_on)
+[h1_st, h1_ts, h1_ema, h1_slp, h1_bu1, h1_bu2, h1_bu3, h1_be1, h1_be2, h1_be3, h1_sh, h1_sl, h1_bbos, h1_bchoch, h1_sbos, h1_schoch, h1_res, h1_sup, h1_bsw, h1_rsw, h1_c, h1_o, h1_h, h1_l, h1_hl2, h1_hlc3, h1_ohlc4] = request.security(syminfo.tickerid, tfH1, f_htf_data(), lookahead=barmerge.lookahead_on)
+[h2_st, h2_ts, h2_ema, h2_slp, h2_bu1, h2_bu2, h2_bu3, h2_be1, h2_be2, h2_be3, h2_sh, h2_sl, h2_bbos, h2_bchoch, h2_sbos, h2_schoch, h2_res, h2_sup, h2_bsw, h2_rsw, h2_c, h2_o, h2_h, h2_l, h2_hl2, h2_hlc3, h2_ohlc4] = request.security(syminfo.tickerid, tfH2, f_htf_data(), lookahead=barmerge.lookahead_on)
+[h3_st, h3_ts, h3_ema, h3_slp, h3_bu1, h3_bu2, h3_bu3, h3_be1, h3_be2, h3_be3, h3_sh, h3_sl, h3_bbos, h3_bchoch, h3_sbos, h3_schoch, h3_res, h3_sup, h3_bsw, h3_rsw, h3_c, h3_o, h3_h, h3_l, h3_hl2, h3_hlc3, h3_ohlc4] = request.security(syminfo.tickerid, tfH3, f_htf_data(), lookahead=barmerge.lookahead_on)
+
+array<float> a_close = array.from(close, nz(h1_c, close), nz(h2_c, close), nz(h3_c, close))
+array<float> a_open = array.from(open, nz(h1_o, open), nz(h2_o, open), nz(h3_o, open))
+array<float> a_high = array.from(high, nz(h1_h, high), nz(h2_h, high), nz(h3_h, high))
+array<float> a_low = array.from(low, nz(h1_l, low), nz(h2_l, low), nz(h3_l, low))
+array<float> a_hl2 = array.from(hl2, nz(h1_hl2, hl2), nz(h2_hl2, hl2), nz(h3_hl2, hl2))
+array<float> a_hlc3 = array.from(hlc3, nz(h1_hlc3, hlc3), nz(h2_hlc3, hlc3), nz(h3_hlc3, hlc3))
+array<float> a_ohlc4 = array.from(ohlc4, nz(h1_ohlc4, ohlc4), nz(h2_ohlc4, ohlc4), nz(h3_ohlc4, ohlc4))
+array<float> a_st = array.from(smartTrail, nz(h1_st, smartTrail), nz(h2_st, smartTrail), nz(h3_st, smartTrail))
+array<float> a_ema = array.from(emaTrend, nz(h1_ema, emaTrend), nz(h2_ema, emaTrend), nz(h3_ema, emaTrend))
+array<float> a_slp = array.from(emaSlope, nz(h1_slp, emaSlope), nz(h2_slp, emaSlope), nz(h3_slp, emaSlope))
+array<float> a_sup = array.from(sup_val, nz(h1_sup, sup_val), nz(h2_sup, sup_val), nz(h3_sup, sup_val))
+array<float> a_res = array.from(res_val, nz(h1_res, res_val), nz(h2_res, res_val), nz(h3_res, res_val))
+
+f_tf_idx(string tfSel) =>
+    tfSel == "HTF 1" ? 1 : tfSel == "HTF 2" ? 2 : tfSel == "HTF 3" ? 3 : 0
+
+f_src_val(int srcIdx, string indSel) =>
+    indSel == "Close" ? array.get(a_close, srcIdx) :
+     indSel == "Open" ? array.get(a_open, srcIdx) :
+     indSel == "High" ? array.get(a_high, srcIdx) :
+     indSel == "Low" ? array.get(a_low, srcIdx) :
+     indSel == "hl2" ? array.get(a_hl2, srcIdx) :
+     indSel == "hlc3" ? array.get(a_hlc3, srcIdx) :
+     indSel == "ohlc4" ? array.get(a_ohlc4, srcIdx) :
+     indSel == "Smart Trail" ? array.get(a_st, srcIdx) :
+     indSel == "EMA Trail" ? array.get(a_ema, srcIdx) :
+     indSel == "EMA Slope" ? array.get(a_slp, srcIdx) : na
+
+f_targ_val(int srcIdx, int cmpIdx, string targSel, float rawVal) =>
+    targSel == "Value/Price" ? array.get(a_close, srcIdx) :
+     targSel == "Custom Value" ? rawVal :
+     targSel == "Smart Trail" ? array.get(a_st, cmpIdx) :
+     targSel == "EMA Trend" ? array.get(a_ema, cmpIdx) :
+     targSel == "Support" ? array.get(a_sup, cmpIdx) :
+     targSel == "Resistance" ? array.get(a_res, cmpIdx) : rawVal
+
+f_eval_sig(string srcTf, string indSel, string condSel, string targSel, string cmpTfSel, float rawVal) =>
+    int srcIdx = f_tf_idx(srcTf)
+    int cmpIdx = cmpTfSel == "Same TF" ? srcIdx : f_tf_idx(cmpTfSel)
+    float iv = f_src_val(srcIdx, indSel)
+    float tv = f_targ_val(srcIdx, cmpIdx, targSel, rawVal)
+    condSel == "Crosses Over" ? ta.crossover(iv, tv) :
+     condSel == "Crosses Under" ? ta.crossunder(iv, tv) :
+     condSel == "Greater Than" ? (not na(iv) and not na(tv) and iv > tv) :
+     condSel == "Less Than" ? (not na(iv) and not na(tv) and iv < tv) :
+     condSel == "Is Bullish" ? (not na(iv) and not na(tv) and iv > tv) :
+     condSel == "Is Bearish" ? (not na(iv) and not na(tv) and iv < tv) : false
 
 inSession = not na(time(timeframe.period, sessionStr, "America/New_York"))
 
@@ -314,14 +382,14 @@ var int lastExhH3LabelBar = na
 var int lastSignalLabelBar = na
 
 plot(smartTrail, "Smart Trail (Chart)", color=trailState == 1 ? c_bull_c : c_bear_c, linewidth=2)
-plot(_show_st_h1 and useH1 ? h1_st : na, "Smart Trail (HTF 1)", color=h1_ts == 1.0 ? c_bull_h1 : c_bear_h1, linewidth=1)
-plot(_show_st_h2 and useH2 ? h2_st : na, "Smart Trail (HTF 2)", color=h2_ts == 1.0 ? c_bull_h2 : c_bear_h2, linewidth=1)
-plot(_show_st_h3 and useH3 ? h3_st : na, "Smart Trail (HTF 3)", color=h3_ts == 1.0 ? c_bull_h3 : c_bear_h3, linewidth=1)
+plot(_show_st_h1 and useH1 ? h1_st : na, "Smart Trail (HTF 1)", color=h1_ts == 1.0 ? h1Bull : h1Bear, linewidth=2, style=plot.style_stepline)
+plot(_show_st_h2 and useH2 ? h2_st : na, "Smart Trail (HTF 2)", color=h2_ts == 1.0 ? h2Bull : h2Bear, linewidth=3, style=plot.style_stepline)
+plot(_show_st_h3 and useH3 and not useH3MacroBg ? h3_st : na, "Smart Trail (HTF 3)", color=h3_ts == 1.0 ? h3Bull : h3Bear, linewidth=4, style=plot.style_stepline)
 
 plot(emaTrend, "EMA Trend (Chart)", color=emaSlope >= 0 ? c_bull_c : c_bear_c, linewidth=1)
-plot(_show_ema_h1 and useH1 ? h1_ema : na, "EMA Trend (HTF 1)", color=nz(h1_slp, 0) >= 0 ? c_bull_h1 : c_bear_h1, linewidth=2)
-plot(_show_ema_h2 and useH2 ? h2_ema : na, "EMA Trend (HTF 2)", color=nz(h2_slp, 0) >= 0 ? c_bull_h2 : c_bear_h2, linewidth=3)
-plot(_show_ema_h3 and useH3 ? h3_ema : na, "EMA Trend (HTF 3)", color=nz(h3_slp, 0) >= 0 ? c_bull_h3 : c_bear_h3, linewidth=4)
+plot(_show_ema_h1 and useH1 ? h1_ema : na, "EMA Trend (HTF 1)", color=nz(h1_slp, 0) >= 0 ? h1Bull : h1Bear, linewidth=2, style=plot.style_stepline)
+plot(_show_ema_h2 and useH2 ? h2_ema : na, "EMA Trend (HTF 2)", color=nz(h2_slp, 0) >= 0 ? h2Bull : h2Bear, linewidth=3, style=plot.style_stepline)
+plot(_show_ema_h3 and useH3 and not useH3MacroBg ? h3_ema : na, "EMA Trend (HTF 3)", color=nz(h3_slp, 0) >= 0 ? h3Bull : h3Bear, linewidth=4, style=plot.style_stepline)
 
 plot(_show_swing_chart ? swingHigh : na, "Swing High (Chart)", color=color.new(c_bear_c, 35), linewidth=1, style=plot.style_linebr)
 plot(_show_swing_chart ? swingLow : na, "Swing Low (Chart)", color=color.new(c_bull_c, 35), linewidth=1, style=plot.style_linebr)
@@ -468,8 +536,8 @@ if _show_exh_h3 and (h3_bu1 and not h3_bu1[1] or h3_bu2 and not h3_bu2[1] or h3_
         label.new(bar_index, yAbove + atrValue * 0.12, _h3 + " ⚑", yloc=yloc.price, style=f_label_style(), color=color.new(h3Bear, 80), textcolor=h3Bear, size=label_size_h3)
     lastExhH3LabelBar := bar_index
 
-sigLong = ta.crossover(close, emaTrend)
-sigShort = ta.crossunder(close, emaTrend)
+sigLong = f_eval_sig(sigLongTf, sigLongInd, sigLongCond, sigLongTarg, sigLongCmpTf, sigLongVal)
+sigShort = f_eval_sig(sigShortTf, sigShortInd, sigShortCond, sigShortTarg, sigShortCmpTf, sigShortVal)
 if _showSignals and sigLong and (na(lastSignalLabelBar) or bar_index - lastSignalLabelBar >= labelGapBars)
     label.new(bar_index, yBelow - atrValue * 0.03, "▲ long", yloc=yloc.price, style=f_label_style(), color=color.new(sigLongClr, 80), textcolor=sigLongClr, size=label_size_sig)
     lastSignalLabelBar := bar_index
@@ -480,6 +548,7 @@ if _showSignals and sigShort and (na(lastSignalLabelBar) or bar_index - lastSign
 bgcolor(_showSessionBg and inSession ? color.new(trailState == 1 ? c_bull : c_bear, 92) : na)
 bgcolor(_showFilterBg and trailState == 1 and emaSlope >= 0 ? color.new(color.green, 90) : na)
 bgcolor(_showFilterBg and trailState == -1 and emaSlope < 0 ? color.new(color.red, 90) : na)
+bgcolor(useH3MacroBg and useH3 ? (h3_ts == 1.0 ? color.new(h3MacroBullBg, h3MacroBgOpacity) : color.new(h3MacroBearBg, h3MacroBgOpacity)) : na)
 
 var array<int> newsStartTs = array.new_int()
 var array<int> newsEndTs = array.new_int()

@@ -63,6 +63,7 @@ l_f1_ind    = input.string("Smart Trail", "", options=["Smart Trail", "EMA Trail
 l_f1_cond   = input.string("Is Bullish", "", options=["Is Bullish", "Is Bearish", "Greater Than", "Less Than", "Printed Bullish", "Printed Bearish", "Printed Opposing", "Is Active (Has Not Reset)", "Is Active (Bullish)", "Is Active (Bearish)", "Is Active (Opposing)", "Occurred Within X Bars"], inline="l_f1", group=G_L_COND)
 l_f1_comp   = input.bool(false, "└─ Compare/Lookback:", inline="l_f1b", group=G_L_COND)
 l_f1_targ   = input.string("Value/Price", "", options=["Value/Price", "Custom Value", "Smart Trail", "EMA Trend", "Support", "Resistance"], inline="l_f1b", group=G_L_COND)
+l_f1_cmp_tf = input.string("Same TF", "Cmp TF", options=["Same TF", "Chart", "HTF 1", "HTF 2", "HTF 3"], inline="l_f1b", group=G_L_COND)
 l_f1_val    = input.float(0.0, "", inline="l_f1b", group=G_L_COND)
 
 l_f2_tf     = input.string("HTF 1", "Trend Filter 2:", options=["None", "Chart", "HTF 1", "HTF 2", "HTF 3", "Any HTF 1-3", "Any Timeframe (Chart+HTFs)", "Advanced Combo"], inline="l_f2", group=G_L_COND)
@@ -70,6 +71,7 @@ l_f2_ind    = input.string("EMA Slope", "", options=["Smart Trail", "EMA Trail",
 l_f2_cond   = input.string("Greater Than", "", options=["Is Bullish", "Is Bearish", "Greater Than", "Less Than", "Printed Bullish", "Printed Bearish", "Printed Opposing", "Is Active (Has Not Reset)", "Is Active (Bullish)", "Is Active (Bearish)", "Is Active (Opposing)", "Occurred Within X Bars"], inline="l_f2", group=G_L_COND)
 l_f2_comp   = input.bool(false, "└─ Compare/Lookback:", inline="l_f2b", group=G_L_COND)
 l_f2_targ   = input.string("Custom Value", "", options=["Value/Price", "Custom Value", "Smart Trail", "EMA Trend", "Support", "Resistance"], inline="l_f2b", group=G_L_COND)
+l_f2_cmp_tf = input.string("Same TF", "Cmp TF", options=["Same TF", "Chart", "HTF 1", "HTF 2", "HTF 3"], inline="l_f2b", group=G_L_COND)
 l_f2_val    = input.float(0.5, "", inline="l_f2b", group=G_L_COND)
 
 l_f3_tf     = input.string("HTF 2", "Trend Filter 3:", options=["None", "Chart", "HTF 1", "HTF 2", "HTF 3", "Any HTF 1-3", "Any Timeframe (Chart+HTFs)", "Advanced Combo"], inline="l_f3", group=G_L_COND)
@@ -77,6 +79,7 @@ l_f3_ind    = input.string("Close", "", options=["Smart Trail", "EMA Trail", "EM
 l_f3_cond   = input.string("Greater Than", "", options=["Is Bullish", "Is Bearish", "Greater Than", "Less Than", "Printed Bullish", "Printed Bearish", "Printed Opposing", "Is Active (Has Not Reset)", "Is Active (Bullish)", "Is Active (Bearish)", "Is Active (Opposing)", "Occurred Within X Bars"], inline="l_f3", group=G_L_COND)
 l_f3_comp   = input.bool(true, "└─ Compare/Lookback:", inline="l_f3b", group=G_L_COND)
 l_f3_targ   = input.string("Smart Trail", "", options=["Value/Price", "Custom Value", "Smart Trail", "EMA Trend", "Support", "Resistance"], inline="l_f3b", group=G_L_COND)
+l_f3_cmp_tf = input.string("Same TF", "Cmp TF", options=["Same TF", "Chart", "HTF 1", "HTF 2", "HTF 3"], inline="l_f3b", group=G_L_COND)
 l_f3_val    = input.float(0.0, "", inline="l_f3b", group=G_L_COND)
 
 l_blk_tf    = input.string("HTF 3", "Invalidation Blocker:", options=["None", "Chart", "HTF 1", "HTF 2", "HTF 3", "Any HTF 1-3", "Any Timeframe (Chart+HTFs)", "Advanced Combo"], inline="l_blk", group=G_L_COND, tooltip="Kills trade if true.")
@@ -84,6 +87,7 @@ l_blk_ind   = input.string("Exhaustion L3", "", options=["Smart Trail", "EMA Tra
 l_blk_cond  = input.string("Occurred Within X Bars", "", options=["Is Active (Has Not Reset)", "Is Active (Bullish)", "Is Active (Bearish)", "Is Active (Opposing)", "Occurred Within X Bars", "Printed Bullish", "Printed Bearish", "Printed Opposing"], inline="l_blk", group=G_L_COND)
 l_blk_comp  = input.bool(true, "└─ Compare/Lookback:", inline="l_blkb", group=G_L_COND)
 l_blk_targ  = input.string("Custom Value", "", options=["Custom Value", "Value/Price"], inline="l_blkb", group=G_L_COND)
+l_blk_cmp_tf = input.string("Same TF", "Cmp TF", options=["Same TF", "Chart", "HTF 1", "HTF 2", "HTF 3"], inline="l_blkb", group=G_L_COND)
 l_blk_val   = input.int(20, "", inline="l_blkb", group=G_L_COND)
 
 // =========================================================================
@@ -95,6 +99,7 @@ l_prim_ind  = input.string("Close", "", options=["Smart Trail", "EMA Trail", "EM
 l_prim_cond = input.string("Crosses Over", "", options=["Printed Bullish", "Printed Bearish", "Printed Opposing", "Crosses Over", "Crosses Under", "Greater Than", "Less Than", "Is Bullish", "Is Bearish", "Is Active (Has Not Reset)", "Is Active (Bullish)", "Is Active (Bearish)", "Is Active (Opposing)", "Occurred Within X Bars"], inline="l_prim", group=G_L_ENT)
 l_prim_comp = input.bool(true, "└─ Compare/Lookback:", inline="l_primb", group=G_L_ENT)
 l_prim_targ = input.string("Smart Trail", "", options=["Value/Price", "Custom Value", "Smart Trail", "EMA Trend", "Support", "Resistance"], inline="l_primb", group=G_L_ENT)
+l_prim_cmp_tf = input.string("Same TF", "Cmp TF", options=["Same TF", "Chart", "HTF 1", "HTF 2", "HTF 3"], inline="l_primb", group=G_L_ENT)
 l_prim_val  = input.float(0.0, "", inline="l_primb", group=G_L_ENT)
 
 // =========================================================================
@@ -106,6 +111,7 @@ s_f1_ind    = input.string("Smart Trail", "", options=["Smart Trail", "EMA Trail
 s_f1_cond   = input.string("Is Bearish", "", options=["Is Bullish", "Is Bearish", "Greater Than", "Less Than", "Printed Bullish", "Printed Bearish", "Printed Opposing", "Is Active (Has Not Reset)", "Is Active (Bullish)", "Is Active (Bearish)", "Is Active (Opposing)", "Occurred Within X Bars"], inline="s_f1", group=G_S_COND)
 s_f1_comp   = input.bool(false, "└─ Compare/Lookback:", inline="s_f1b", group=G_S_COND)
 s_f1_targ   = input.string("Value/Price", "", options=["Value/Price", "Custom Value", "Smart Trail", "EMA Trend", "Support", "Resistance"], inline="s_f1b", group=G_S_COND)
+s_f1_cmp_tf = input.string("Same TF", "Cmp TF", options=["Same TF", "Chart", "HTF 1", "HTF 2", "HTF 3"], inline="s_f1b", group=G_S_COND)
 s_f1_val    = input.float(0.0, "", inline="s_f1b", group=G_S_COND)
 
 s_f2_tf     = input.string("HTF 1", "Trend Filter 2:", options=["None", "Chart", "HTF 1", "HTF 2", "HTF 3", "Any HTF 1-3", "Any Timeframe (Chart+HTFs)", "Advanced Combo"], inline="s_f2", group=G_S_COND)
@@ -113,6 +119,7 @@ s_f2_ind    = input.string("EMA Slope", "", options=["Smart Trail", "EMA Trail",
 s_f2_cond   = input.string("Less Than", "", options=["Is Bullish", "Is Bearish", "Greater Than", "Less Than", "Printed Bullish", "Printed Bearish", "Printed Opposing", "Is Active (Has Not Reset)", "Is Active (Bullish)", "Is Active (Bearish)", "Is Active (Opposing)", "Occurred Within X Bars"], inline="s_f2", group=G_S_COND)
 s_f2_comp   = input.bool(true, "└─ Compare/Lookback:", inline="s_f2b", group=G_S_COND)
 s_f2_targ   = input.string("Custom Value", "", options=["Value/Price", "Custom Value", "Smart Trail", "EMA Trend", "Support", "Resistance"], inline="s_f2b", group=G_S_COND)
+s_f2_cmp_tf = input.string("Same TF", "Cmp TF", options=["Same TF", "Chart", "HTF 1", "HTF 2", "HTF 3"], inline="s_f2b", group=G_S_COND)
 s_f2_val    = input.float(-0.5, "", inline="s_f2b", group=G_S_COND)
 
 s_f3_tf     = input.string("HTF 2", "Trend Filter 3:", options=["None", "Chart", "HTF 1", "HTF 2", "HTF 3", "Any HTF 1-3", "Any Timeframe (Chart+HTFs)", "Advanced Combo"], inline="s_f3", group=G_S_COND)
@@ -120,6 +127,7 @@ s_f3_ind    = input.string("Close", "", options=["Smart Trail", "EMA Trail", "EM
 s_f3_cond   = input.string("Less Than", "", options=["Is Bullish", "Is Bearish", "Greater Than", "Less Than", "Printed Bullish", "Printed Bearish", "Printed Opposing", "Is Active (Has Not Reset)", "Is Active (Bullish)", "Is Active (Bearish)", "Is Active (Opposing)", "Occurred Within X Bars"], inline="s_f3", group=G_S_COND)
 s_f3_comp   = input.bool(true, "└─ Compare/Lookback:", inline="s_f3b", group=G_S_COND)
 s_f3_targ   = input.string("Smart Trail", "", options=["Value/Price", "Custom Value", "Smart Trail", "EMA Trend", "Support", "Resistance"], inline="s_f3b", group=G_S_COND)
+s_f3_cmp_tf = input.string("Same TF", "Cmp TF", options=["Same TF", "Chart", "HTF 1", "HTF 2", "HTF 3"], inline="s_f3b", group=G_S_COND)
 s_f3_val    = input.float(0.0, "", inline="s_f3b", group=G_S_COND)
 
 s_blk_tf    = input.string("HTF 1", "Invalidation Blocker:", options=["None", "Chart", "HTF 1", "HTF 2", "HTF 3", "Any HTF 1-3", "Any Timeframe (Chart+HTFs)", "Advanced Combo"], inline="s_blk", group=G_S_COND, tooltip="Kills trade if true.")
@@ -127,6 +135,7 @@ s_blk_ind   = input.string("Exhaustion L3", "", options=["Smart Trail", "EMA Tra
 s_blk_cond  = input.string("Occurred Within X Bars", "", options=["Is Active (Has Not Reset)", "Is Active (Bullish)", "Is Active (Bearish)", "Is Active (Opposing)", "Occurred Within X Bars", "Printed Bullish", "Printed Bearish", "Printed Opposing"], inline="s_blk", group=G_S_COND)
 s_blk_comp  = input.bool(true, "└─ Compare/Lookback:", inline="s_blkb", group=G_S_COND)
 s_blk_targ  = input.string("Custom Value", "", options=["Custom Value", "Value/Price"], inline="s_blkb", group=G_S_COND)
+s_blk_cmp_tf = input.string("Same TF", "Cmp TF", options=["Same TF", "Chart", "HTF 1", "HTF 2", "HTF 3"], inline="s_blkb", group=G_S_COND)
 s_blk_val   = input.int(20, "", inline="s_blkb", group=G_S_COND)
 
 // =========================================================================
@@ -138,6 +147,7 @@ s_prim_ind  = input.string("Close", "", options=["Smart Trail", "EMA Trail", "EM
 s_prim_cond = input.string("Crosses Under", "", options=["Printed Bullish", "Printed Bearish", "Printed Opposing", "Crosses Over", "Crosses Under", "Greater Than", "Less Than", "Is Bullish", "Is Bearish", "Is Active (Has Not Reset)", "Is Active (Bullish)", "Is Active (Bearish)", "Is Active (Opposing)", "Occurred Within X Bars"], inline="s_prim", group=G_S_ENT)
 s_prim_comp = input.bool(true, "└─ Compare/Lookback:", inline="s_primb", group=G_S_ENT)
 s_prim_targ = input.string("Smart Trail", "", options=["Value/Price", "Custom Value", "Smart Trail", "EMA Trend", "Support", "Resistance"], inline="s_primb", group=G_S_ENT)
+s_prim_cmp_tf = input.string("Same TF", "Cmp TF", options=["Same TF", "Chart", "HTF 1", "HTF 2", "HTF 3"], inline="s_primb", group=G_S_ENT)
 s_prim_val  = input.float(0.0, "", inline="s_primb", group=G_S_ENT)
 
 // =========================================================================
@@ -379,20 +389,24 @@ vis_h3_size = input.string("Tiny", "HTF 3 Marker/Text Size", options=["Tiny", "S
 vis_chart_bull = input.color(#089981, "Chart Bull Color", inline="vsch", group=G_VST)
 vis_chart_bear = input.color(#f23645, "Chart Bear Color", inline="vsch", group=G_VST)
 vis_chart_opacity = input.int(0, "Chart Opacity", minval=0, maxval=100, inline="vsch", group=G_VST)
-vis_h1_bull = input.color(#089981, "HTF1 Bull Color", inline="vsh1", group=G_VST)
-vis_h1_bear = input.color(#f23645, "HTF1 Bear Color", inline="vsh1", group=G_VST)
-vis_h1_opacity = input.int(40, "HTF1 Opacity", minval=0, maxval=100, inline="vsh1", group=G_VST)
-vis_h2_bull = input.color(#089981, "HTF2 Bull Color", inline="vsh2", group=G_VST)
-vis_h2_bear = input.color(#f23645, "HTF2 Bear Color", inline="vsh2", group=G_VST)
-vis_h2_opacity = input.int(60, "HTF2 Opacity", minval=0, maxval=100, inline="vsh2", group=G_VST)
-vis_h3_bull = input.color(#089981, "HTF3 Bull Color", inline="vsh3", group=G_VST)
-vis_h3_bear = input.color(#f23645, "HTF3 Bear Color", inline="vsh3", group=G_VST)
-vis_h3_opacity = input.int(80, "HTF3 Opacity", minval=0, maxval=100, inline="vsh3", group=G_VST)
+vis_h1_bull = input.color(#00A2FF, "HTF1 Bull Color", inline="vsh1", group=G_VST)
+vis_h1_bear = input.color(#FF9800, "HTF1 Bear Color", inline="vsh1", group=G_VST)
+vis_h1_opacity = input.int(0, "HTF1 Opacity", minval=0, maxval=100, inline="vsh1", group=G_VST)
+vis_h2_bull = input.color(#A64DFF, "HTF2 Bull Color", inline="vsh2", group=G_VST)
+vis_h2_bear = input.color(#FFFF00, "HTF2 Bear Color", inline="vsh2", group=G_VST)
+vis_h2_opacity = input.int(0, "HTF2 Opacity", minval=0, maxval=100, inline="vsh2", group=G_VST)
+vis_h3_bull = input.color(#FFFFFF, "HTF3 Bull Color", inline="vsh3", group=G_VST)
+vis_h3_bear = input.color(#808080, "HTF3 Bear Color", inline="vsh3", group=G_VST)
+vis_h3_opacity = input.int(0, "HTF3 Opacity", minval=0, maxval=100, inline="vsh3", group=G_VST)
 
 sig_size = input.string("Small", "Signal Text Size", options=["Tiny", "Small", "Normal", "Large"], group=G_VST)
 sig_long_color = input.color(#00c853, "Signal Long Color", inline="sigv", group=G_VST)
 sig_short_color = input.color(#ff5252, "Signal Short Color", inline="sigv", group=G_VST)
 sig_opacity = input.int(0, "Signal Opacity", minval=0, maxval=100, inline="sigv", group=G_VST)
+use_h3_macro_bg = input.bool(false, "Use HTF3 Macro Background (Hide HTF3 Lines)", group=G_VST)
+h3_macro_bg_bull = input.color(color.blue, "HTF3 Macro Bull BG", inline="h3bg", group=G_VST)
+h3_macro_bg_bear = input.color(color.orange, "HTF3 Macro Bear BG", inline="h3bg", group=G_VST)
+h3_macro_bg_opacity = input.int(90, "BG Opacity", minval=0, maxval=100, inline="h3bg", group=G_VST)
 
 // --- Cohesive Color Gradient (const to minimize plot overhead) ---
 c_bull     = #089981
@@ -1055,7 +1069,7 @@ array<int> a_c_schoch = array.from(c_schoch, h1_c_schoch, h2_c_schoch, h3_c_scho
 // =========================================================================
 // 17c. ⚙️ GOD MODE UNIVERSAL EVALUATOR (f_eval) — Phase 4
 // =========================================================================
-f_eval_idx(int _i, string ind, string cond, bool useComp, string targ, float val, int dir) =>
+f_eval_idx(int _i, string ind, string cond, bool useComp, string targ, string cmpTf, float val, int dir) =>
 
     // --- Timeframe Data (from packed arrays) ---
     float _close  = array.get(a_close, _i)
@@ -1145,10 +1159,16 @@ f_eval_idx(int _i, string ind, string cond, bool useComp, string targ, float val
     int  _dir_c_bos   = dir == 1 ? _c_bbos   : _c_sbos
     int  _dir_c_choch = dir == 1 ? _c_bchoch : _c_schoch
 
+    int _cmp_i = cmpTf == "Chart" ? 0 : cmpTf == "HTF 1" ? 1 : cmpTf == "HTF 2" ? 2 : cmpTf == "HTF 3" ? 3 : _i
+    float _cmp_st = array.get(a_st, _cmp_i)
+    float _cmp_ema = array.get(a_ema, _cmp_i)
+    float _cmp_res = array.get(a_res, _cmp_i)
+    float _cmp_sup = array.get(a_sup, _cmp_i)
+
     // --- Indicator Value ---
     float _iv = ind == "Smart Trail" ? _st : ind == "EMA Trail" ? _ema : ind == "EMA Slope" ? _slope : ind == "Close" ? _close : ind == "Open" ? _open_v : ind == "High" ? _high_v : ind == "Low" ? _low_v : ind == "hl2" ? _hl2_v : ind == "hlc3" ? _hlc3_v : ind == "ohlc4" ? _ohlc4v : na
     // --- Target Value ---
-    float _tv = targ == "Smart Trail" ? _st : targ == "EMA Trend" ? _ema : targ == "Support" ? _sup : targ == "Resistance" ? _res : val
+    float _tv = targ == "Smart Trail" ? _cmp_st : targ == "EMA Trend" ? _cmp_ema : targ == "Support" ? _cmp_sup : targ == "Resistance" ? _cmp_res : val
 
     // Pre-compute crosses
     bool _co_iv_tv  = ta.crossover(_iv, _tv)
@@ -1341,11 +1361,11 @@ f_eval_idx(int _i, string ind, string cond, bool useComp, string targ, float val
             result := not na(_p_since) and _p_since <= int(val)
     result
 
-f_eval(string tf, string ind, string cond, bool useComp, string targ, float val, int dir) =>
-    bool _r0 = f_eval_idx(0, ind, cond, useComp, targ, val, dir)
-    bool _r1 = f_eval_idx(1, ind, cond, useComp, targ, val, dir)
-    bool _r2 = f_eval_idx(2, ind, cond, useComp, targ, val, dir)
-    bool _r3 = f_eval_idx(3, ind, cond, useComp, targ, val, dir)
+f_eval_x(string tf, string ind, string cond, bool useComp, string targ, string cmpTf, float val, int dir) =>
+    bool _r0 = f_eval_idx(0, ind, cond, useComp, targ, cmpTf, val, dir)
+    bool _r1 = f_eval_idx(1, ind, cond, useComp, targ, cmpTf, val, dir)
+    bool _r2 = f_eval_idx(2, ind, cond, useComp, targ, cmpTf, val, dir)
+    bool _r3 = f_eval_idx(3, ind, cond, useComp, targ, cmpTf, val, dir)
     bool _r = false
     if tf == "Any Timeframe (Chart+HTFs)"
         _r := _r0 or _r1 or _r2 or _r3
@@ -1378,6 +1398,9 @@ f_eval(string tf, string ind, string cond, bool useComp, string targ, float val,
     else
         _r := tf == "HTF 1" ? _r1 : tf == "HTF 2" ? _r2 : tf == "HTF 3" ? _r3 : _r0
     _r
+
+f_eval(string tf, string ind, string cond, bool useComp, string targ, float val, int dir) =>
+    f_eval_x(tf, ind, cond, useComp, targ, "Same TF", val, dir)
 
 // =========================================================================
 // 18. 🛡️ COMPLIANCE ENGINE — Daily Limits / Killzones / MFFU
@@ -1431,10 +1454,10 @@ string s_f3_tf_eff = s_f3_tf == "Advanced Combo" ? s_f3_tf_adv : s_f3_tf
 string s_blk_tf_eff = s_blk_tf == "Advanced Combo" ? s_blk_tf_adv : s_blk_tf
 string s_prim_tf_eff = s_prim_tf == "Advanced Combo" ? s_prim_tf_adv : s_prim_tf
 
-bool l_f1 = l_f1_tf_eff == "None" ? true : f_eval(l_f1_tf_eff, l_f1_ind, l_f1_cond, l_f1_comp, l_f1_targ, l_f1_val, 1)
-bool l_f2 = l_f2_tf_eff == "None" ? true : f_eval(l_f2_tf_eff, l_f2_ind, l_f2_cond, l_f2_comp, l_f2_targ, l_f2_val, 1)
-bool l_f3 = l_f3_tf_eff == "None" ? true : f_eval(l_f3_tf_eff, l_f3_ind, l_f3_cond, l_f3_comp, l_f3_targ, l_f3_val, 1)
-bool l_blk = (l_blk_tf_eff == "None" or l_blk_ind == "—") ? false : f_eval(l_blk_tf_eff, l_blk_ind, l_blk_cond, l_blk_comp, l_blk_targ, float(l_blk_val), 1)
+bool l_f1 = l_f1_tf_eff == "None" ? true : f_eval_x(l_f1_tf_eff, l_f1_ind, l_f1_cond, l_f1_comp, l_f1_targ, l_f1_cmp_tf, l_f1_val, 1)
+bool l_f2 = l_f2_tf_eff == "None" ? true : f_eval_x(l_f2_tf_eff, l_f2_ind, l_f2_cond, l_f2_comp, l_f2_targ, l_f2_cmp_tf, l_f2_val, 1)
+bool l_f3 = l_f3_tf_eff == "None" ? true : f_eval_x(l_f3_tf_eff, l_f3_ind, l_f3_cond, l_f3_comp, l_f3_targ, l_f3_cmp_tf, l_f3_val, 1)
+bool l_blk = (l_blk_tf_eff == "None" or l_blk_ind == "—") ? false : f_eval_x(l_blk_tf_eff, l_blk_ind, l_blk_cond, l_blk_comp, l_blk_targ, l_blk_cmp_tf, float(l_blk_val), 1)
 bool l_emaOk = useEmaReversal ? (emaTrend > emaTrend[1]) : true
 float atrBaseline = ta.sma(atrValue, atrVolLookback)
 bool atrVolOk = not useAtrVolFilter or (not na(atrBaseline) and atrValue <= atrBaseline * atrVolMult)
@@ -1442,18 +1465,18 @@ bool longFiltersAligned = l_f1 and l_f2 and l_f3 and l_emaOk
 bool longInvalidated    = l_blk
 bool longArmedCore = longFiltersAligned and not longInvalidated and isKillzone and newsEntryAllowed and not dailyLimitHit and atrVolOk
 bool longArmed = longArmedCore and inSession
-bool l_prim = f_eval(l_prim_tf_eff, l_prim_ind, l_prim_cond, l_prim_comp, l_prim_targ, l_prim_val, 1)
+bool l_prim = f_eval_x(l_prim_tf_eff, l_prim_ind, l_prim_cond, l_prim_comp, l_prim_targ, l_prim_cmp_tf, l_prim_val, 1)
 
-bool s_f1 = s_f1_tf_eff == "None" ? true : f_eval(s_f1_tf_eff, s_f1_ind, s_f1_cond, s_f1_comp, s_f1_targ, s_f1_val, -1)
-bool s_f2 = s_f2_tf_eff == "None" ? true : f_eval(s_f2_tf_eff, s_f2_ind, s_f2_cond, s_f2_comp, s_f2_targ, s_f2_val, -1)
-bool s_f3 = s_f3_tf_eff == "None" ? true : f_eval(s_f3_tf_eff, s_f3_ind, s_f3_cond, s_f3_comp, s_f3_targ, s_f3_val, -1)
-bool s_blk = (s_blk_tf_eff == "None" or s_blk_ind == "—") ? false : f_eval(s_blk_tf_eff, s_blk_ind, s_blk_cond, s_blk_comp, s_blk_targ, float(s_blk_val), -1)
+bool s_f1 = s_f1_tf_eff == "None" ? true : f_eval_x(s_f1_tf_eff, s_f1_ind, s_f1_cond, s_f1_comp, s_f1_targ, s_f1_cmp_tf, s_f1_val, -1)
+bool s_f2 = s_f2_tf_eff == "None" ? true : f_eval_x(s_f2_tf_eff, s_f2_ind, s_f2_cond, s_f2_comp, s_f2_targ, s_f2_cmp_tf, s_f2_val, -1)
+bool s_f3 = s_f3_tf_eff == "None" ? true : f_eval_x(s_f3_tf_eff, s_f3_ind, s_f3_cond, s_f3_comp, s_f3_targ, s_f3_cmp_tf, s_f3_val, -1)
+bool s_blk = (s_blk_tf_eff == "None" or s_blk_ind == "—") ? false : f_eval_x(s_blk_tf_eff, s_blk_ind, s_blk_cond, s_blk_comp, s_blk_targ, s_blk_cmp_tf, float(s_blk_val), -1)
 bool s_emaOk = useEmaReversal ? (emaTrend < emaTrend[1]) : true
 bool shortFiltersAligned = s_f1 and s_f2 and s_f3 and s_emaOk
 bool shortInvalidated    = s_blk
 bool shortArmedCore = shortFiltersAligned and not shortInvalidated and isKillzone and newsEntryAllowed and not dailyLimitHit and atrVolOk
 bool shortArmed = shortArmedCore and inSession
-bool s_prim = f_eval(s_prim_tf_eff, s_prim_ind, s_prim_cond, s_prim_comp, s_prim_targ, s_prim_val, -1)
+bool s_prim = f_eval_x(s_prim_tf_eff, s_prim_ind, s_prim_cond, s_prim_comp, s_prim_targ, s_prim_cmp_tf, s_prim_val, -1)
 
 var bool pendingLongCarry = false
 var bool pendingShortCarry = false
@@ -2206,15 +2229,16 @@ label_size_sig = f_size_opt(sig_size)
 
 // --- SMART TRAIL PLOTS (Chart always on, HTFs toggled) ---
 plot(smartTrail, "Smart Trail (Chart)", color=trailState == 1 ? c_bull_c : c_bear_c, linewidth=2)
-plot(show_st_h1 ? h1_st : na, "Smart Trail (HTF 1)", color=h1_ts == 1.0 ? c_bull_h1 : c_bear_h1, linewidth=1)
-plot(show_st_h2 ? h2_st : na, "Smart Trail (HTF 2)", color=h2_ts == 1.0 ? c_bull_h2 : c_bear_h2, linewidth=1)
-plot(show_st_h3 ? h3_st : na, "Smart Trail (HTF 3)", color=h3_ts == 1.0 ? c_bull_h3 : c_bear_h3, linewidth=1)
+plot(show_st_h1 ? h1_st : na, "Smart Trail (HTF 1)", color=h1_ts == 1.0 ? h1BullClr : h1BearClr, linewidth=2, style=plot.style_stepline)
+plot(show_st_h2 ? h2_st : na, "Smart Trail (HTF 2)", color=h2_ts == 1.0 ? h2BullClr : h2BearClr, linewidth=3, style=plot.style_stepline)
+plot(show_st_h3 and not use_h3_macro_bg ? h3_st : na, "Smart Trail (HTF 3)", color=h3_ts == 1.0 ? h3BullClr : h3BearClr, linewidth=4, style=plot.style_stepline)
 
 // --- EMA TREND PLOTS (Chart grey always on, HTFs toggled) ---
 plot(emaTrend, "EMA Trend (Chart)", color=emaSlope >= 0 ? c_bull_c : c_bear_c, linewidth=1)
-plot(show_ema_h1 ? h1_ema : na, "EMA Trend (HTF 1)", color=nz(h1_slp, 0) >= 0 ? c_bull_h1 : c_bear_h1, linewidth=2)
-plot(show_ema_h2 ? h2_ema : na, "EMA Trend (HTF 2)", color=nz(h2_slp, 0) >= 0 ? c_bull_h2 : c_bear_h2, linewidth=3)
-plot(show_ema_h3 ? h3_ema : na, "EMA Trend (HTF 3)", color=nz(h3_slp, 0) >= 0 ? c_bull_h3 : c_bear_h3, linewidth=4)
+plot(show_ema_h1 ? h1_ema : na, "EMA Trend (HTF 1)", color=nz(h1_slp, 0) >= 0 ? h1BullClr : h1BearClr, linewidth=2, style=plot.style_stepline)
+plot(show_ema_h2 ? h2_ema : na, "EMA Trend (HTF 2)", color=nz(h2_slp, 0) >= 0 ? h2BullClr : h2BearClr, linewidth=3, style=plot.style_stepline)
+plot(show_ema_h3 and not use_h3_macro_bg ? h3_ema : na, "EMA Trend (HTF 3)", color=nz(h3_slp, 0) >= 0 ? h3BullClr : h3BearClr, linewidth=4, style=plot.style_stepline)
+bgcolor(use_h3_macro_bg and useH3 ? (h3_ts == 1.0 ? color.new(h3_macro_bg_bull, h3_macro_bg_opacity) : color.new(h3_macro_bg_bear, h3_macro_bg_opacity)) : na)
 
 // --- SWING LEVEL PLOTS (Chart + HTFs optional) ---
 plot(show_swing_chart ? swingHigh : na, "Swing High (Chart)", color=color.new(c_bear_c, 35), linewidth=1, style=plot.style_linebr)
