@@ -120,6 +120,15 @@ s_prim_val  = input.float(0.0, "", inline="s_primb", group=G_S_ENT)
 // =========================================================================
 // 6. 🎯 DYNAMIC EXITS & SCALING
 // =========================================================================
+// Inputs Map (Section 6–11b → Runtime)
+// • Section 6 (TP/Exit qty + % + triggers) -> 20a Sizing, 21a TP Engine, 21b Override Exits, 21c Standard TP Execution.
+// • Section 7 (SL + MAE + risk caps) -> 20b Entry validation (MAE dual-cap), 21d Stop/Exit Orders.
+// • Section 8 (Break Even inputs) -> 21 Exit Management (BE manager).
+// • Section 9 (Trail inputs) -> 21 Exit Management (trail lock/advance + SL tightening).
+// • Section 10 (Safety/ATR filter) -> 19 Arming gates, 20b Entry allowance.
+// • Section 11 (daily/session/killzone) -> 18 Compliance gates, 21e Compliance Closes.
+// • Section 11b (Prop mode firm rules) -> 19a Core (`actualMaxContracts`), 20a/20b/21b MAE+sizing+entry+override caps.
+
 var G_EX = "6. 🎯 DYNAMIC EXITS & SCALING"
 qtyInput   = input.int(3, "Max Order Size Contracts", minval=1, maxval=200, group=G_EX)
 tp1Pct     = input.float(34.0, "TP1 Lot % of Total", group=G_EX)
@@ -1127,6 +1136,22 @@ bool be_trigger = be_mode == "Off" ? false : f_eval(be_tf, be_ind, be_cond, be_c
 bool trail_act_trigger = trail_act == "Off" ? false : f_eval(trail_trig_tf, trail_trig_ind, trail_trig_cond, trail_trig_comp, trail_trig_targ, trail_trig_val, strategy.position_size > 0 ? 1 : -1)
 
 // =========================================================================
+// 19a. 🧩 ORDER / RISK / TRADE MANAGEMENT CORE
+// =========================================================================
+// Shared contract-cap context consumed by execution, MAE risk math, TP sizing, and override exits.
+// Keeps current behavior when Prop Mode is OFF, and enforces firm caps when Prop Mode is ON.
+
+// --- Prop Mode Contract Caps ---
+int propMiniMax = propFirm == "Tradeify" ? (propAccSize == "50k" ? 4 : propAccSize == "100k" ? 8 : 12) :
+                  propFirm == "MyFundedFutures" ? (propAccSize == "50k" ? 5 : propAccSize == "100k" ? 10 : 15) :
+                  (propAccSize == "50k" ? 4 : propAccSize == "100k" ? 6 : 10)
+int propFirmMaxContracts = propContractType == "Micros (MNQ)" ? propMiniMax * 10 : propMiniMax
+int actualMaxContracts = useCompliance ? math.min(qtyInput, propFirmMaxContracts) : qtyInput
+
+// --- Tick-Value Context (used in MAE $↔tick conversions) ---
+float selectedTickValue = propContractType == "Micros (MNQ)" ? 0.5 : 5.0
+
+// =========================================================================
 // 19b. 🐞 DEBUG LOGS
 // =========================================================================
 // --- Pine Script Logs: logs to Strategy Tester → Pine Logs tab every bar ---
@@ -1201,24 +1226,17 @@ if showDebugLog and barstate.islast
 // =========================================================================
 // 20. 🚀 EXECUTION ENGINE — Phase 6 Tradovate Integer Math
 // =========================================================================
+// Flow Map (Execution Order)
+// 1) Build shared context: prop cap (`actualMaxContracts`), daily/session/killzone/compliance gates, ATR volatility gate.
+// 2) Compute size model: TP1–TP4 active state, percentage normalization, fallback-even split, integer contract distribution.
+// 3) Evaluate entries: confirm trigger + gates + MAE dual-cap check, then place entry with capped contracts.
+// 4) Manage protective logic: BE trigger, trail lock/advance, and active SL updates.
+// 5) Evaluate exits: override exits first (priority), then standard TP1–TP4 if no override fired on that bar.
+// 6) Enforce closes: stop/exit orders, MFFU flatten, session-end flatten, and daily-PnL compliance flatten.
+
 bool isFlat = strategy.position_size == 0
 bool isLong = strategy.position_size > 0
 bool isShort = strategy.position_size < 0
-
-f_prop_base_mini(string firm, string size, string accType, string phase) =>
-    int _mini = 0
-    if firm == "Tradeify"
-        _mini := size == "50k" ? 4 : size == "100k" ? 8 : 12
-    else if firm == "MyFundedFutures"
-        _mini := size == "50k" ? 5 : size == "100k" ? 10 : 15
-    else
-        _mini := size == "50k" ? 4 : size == "100k" ? 6 : 10
-    _mini
-
-int propMiniMax = f_prop_base_mini(propFirm, propAccSize, propAccType, propPhase)
-int propFirmMaxContracts = propContractType == "Micros (MNQ)" ? propMiniMax * 10 : propMiniMax
-int actualMaxContracts = useCompliance ? math.min(qtyInput, propFirmMaxContracts) : qtyInput
-float selectedTickValue = propContractType == "Micros (MNQ)" ? 0.5 : 5.0
 
 // --- SL Waterfall ---
 f_getSL(bool isLongDir, string mode) =>
@@ -1262,6 +1280,9 @@ f_getSL(bool isLongDir, string mode) =>
         _sl := isLongDir ? close - tickOff : close + tickOff
     _sl
 
+// -------------------------------------------------------------------------
+// 20a. 📦 SIZING
+// -------------------------------------------------------------------------
 // --- Position Sizing ---
 bool tp1Active = tp1_tf != "None"
 bool tp2Active = tp2_tf != "None"
@@ -1406,6 +1427,9 @@ string l_meta = f_trigger_meta(l_prim_tf, l_prim_ind, l_prim_cond, l_prim_comp, 
 string s_meta = f_trigger_meta(s_prim_tf, s_prim_ind, s_prim_cond, s_prim_comp, s_prim_targ, s_prim_val, -1)
 bool isBarClose = barstate.isconfirmed
 
+// -------------------------------------------------------------------------
+// 20b. 🟢/🔴 ENTRY
+// -------------------------------------------------------------------------
 // --- LONG ENTRY ---
 if fireLong and isFlat and isBarClose
     float sl = f_getSL(true, slMode)
@@ -1574,6 +1598,9 @@ if trailLocked and not isFlat
     if isShort and not na(trailStop) and trailStop < entrySL
         entrySL := trailStop
 
+// -------------------------------------------------------------------------
+// 21a. 🎯 TP ENGINE
+// -------------------------------------------------------------------------
 // --- Dynamic TP IDs ---
 string id_tp1 = "TP1-" + str.replace_all(tp1_tf, " ", "") + "-" + str.replace_all(tp1_ind, " ", "")
 string id_tp2 = "TP2-" + str.replace_all(tp2_tf, " ", "") + "-" + str.replace_all(tp2_ind, " ", "")
@@ -1634,6 +1661,9 @@ if isBarClose and not isFlat and (logLevel == "Trades Only" or logLevel == "Full
     if ex3TrigRaw and not ex3Trig
         log.info(str.format("⛔ EXIT3 BLOCKED @{0}: reason=NET_PNL_GUARD | openPnl={1,number,#.##} avg={2,number,#.##} close={3,number,#.##} | {4}", str.format_time(time, "HH:mm:ss", "America/New_York"), strategy.openprofit, strategy.position_avg_price, close, ex3Meta))
 
+// -------------------------------------------------------------------------
+// 21b. 🚪 OVERRIDE EXITS
+// -------------------------------------------------------------------------
 if isBarClose and isLong
     if not ex1Done and ex1Trig
         int ex1Qty = f_scale_qty(ex1_qty, strategy.position_size, actualMaxContracts)
@@ -1710,6 +1740,9 @@ if isBarClose and isShort
         if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
             log.info(str.format("🚪 EXIT3 HIT @{0}: side=SHORT qty={1} id={2} | {3}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(ex3Qty), id_ex3, ex3Meta))
 
+// -------------------------------------------------------------------------
+// 21c. 🎯 STANDARD TP EXECUTION
+// -------------------------------------------------------------------------
 if isBarClose and isLong
     if not anyExitTrig and qtyTP1 > 0 and not tp1Done and tp1Trig
         strategy.close(lbl_long_entry, qty=qtyTP1, comment=id_tp1)
@@ -1754,6 +1787,9 @@ if isBarClose and isShort
         if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
             log.info(str.format("🎯 TP4 HIT @{0}: side=SHORT qty={1} id={2} | {3}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(qtyTP4), id_tp4, tp4Meta))
 
+// -------------------------------------------------------------------------
+// 21d. 🛑 STOP/EXIT ORDERS
+// -------------------------------------------------------------------------
 // --- Apply SL & Exits ---
 if isLong
     strategy.exit(id_tp1, lbl_long_entry, qty=qtyTP1, stop=entrySL, comment_loss="SL Hit")
@@ -1785,6 +1821,9 @@ if closedOut and (logLevel == "Trades Only" or logLevel == "Full (Deep State)")
     float _pnl = _nct > 0 ? strategy.closedtrades.profit(_ix) : na
     log.warning(str.format("🛑 CLOSED OUT @{0}: entryId={1} exitId={2} exitComment={3} entryPx={4} exitPx={5} pnl={6}", str.format_time(time, "HH:mm:ss", "America/New_York"), _eid, _xid, _xcm, f_fmt_num(_epx), f_fmt_num(_xpx), f_fmt_num(_pnl)))
 
+// -------------------------------------------------------------------------
+// 21e. 🧯 COMPLIANCE CLOSES
+// -------------------------------------------------------------------------
 // --- MFFU Flatten ---
 if mffuFlattenNow and not isFlat
     strategy.close_all("MFFU Flatten")
