@@ -1,5 +1,7 @@
 # pine-code
 
+Current version: v6.1
+
 ## Release Notes
 
 ### v6.1 (2026-03-02)

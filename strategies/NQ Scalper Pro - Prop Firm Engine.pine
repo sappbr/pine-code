@@ -296,6 +296,8 @@ sessionStr     = input.session("0930-1600:23456", "NQ RTH Session (EST)", group=
 useOpenCarryLatch = input.bool(false, "Enable 09:30 Trigger Carryover", group=G_LIM, tooltip="Carries valid pre-open trigger into the first RTH bars if filters/risk gates remain valid.")
 openCarryPreBars = input.int(5, "Carryover Pre-Open Memory (Bars)", minval=1, maxval=200, group=G_LIM)
 openCarryGraceBars = input.int(1, "Carryover Post-Open Grace (Bars)", minval=0, maxval=20, group=G_LIM)
+useNewsKillzones = input.bool(true, "Enable News Killzones (CPI/NFP/GDP/FOMC)", group=G_LIM, tooltip="Uses static ET event windows from the compliance schedule. Entries are blocked during news windows.")
+newsKillzoneAction = input.string("Block Entries + Force Flatten", "News Killzone Action", options=["Block Entries Only", "Block Entries + Force Flatten"], group=G_LIM, tooltip="Block Entries Only: no new entries during news windows. Block Entries + Force Flatten: also closes any open position while window is active.")
 useKillzones   = input.bool(false, "Enable Killzone Filter", group=G_LIM)
 kzSession1     = input.session("0930-1030:23456", "Killzone 1 Session", group=G_LIM)
 kzSession2     = input.session("1400-1500:23456", "Killzone 2 Session", group=G_LIM)
@@ -818,6 +820,128 @@ if isNewSession
     sessionOpenBar := bar_index
 
 // =========================================================================
+// 17a2. 📰 STATIC NEWS KILLZONE WINDOWS (ET, NON-REPAINT)
+// =========================================================================
+f_news_add_epoch(array<int> _startArr, array<int> _endArr, array<string> _labelArr, int _startTs, int _endTs, string _lbl) =>
+    if _endTs > _startTs
+        array.push(_startArr, _startTs)
+        array.push(_endArr, _endTs)
+        array.push(_labelArr, _lbl)
+
+var array<int> newsStartTs = array.new_int()
+var array<int> newsEndTs   = array.new_int()
+var array<string> newsLbl  = array.new_string()
+
+if barstate.isfirst
+    // Fixed windows from compliance schedules:
+    // NFP/CPI/GDP: 08:25-08:35 ET, FOMC: 13:55-14:40 ET.
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1741353900000, 1741354500000, "NFP (2025-03-07)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1741782300000, 1741782900000, "CPI (2025-03-12)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1742406900000, 1742409600000, "FOMC (2025-03-19)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1743078300000, 1743078900000, "GDP (2025-03-27)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1743769500000, 1743770100000, "NFP (2025-04-04)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1744287900000, 1744288500000, "CPI (2025-04-10)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1745497500000, 1745498100000, "GDP (2025-04-24)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1746035700000, 1746038400000, "FOMC (2025-04-30)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1746188700000, 1746189300000, "NFP (2025-05-02)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1747225500000, 1747226100000, "CPI (2025-05-14)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1748521500000, 1748522100000, "GDP (2025-05-29)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1749212700000, 1749213300000, "NFP (2025-06-06)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1749731100000, 1749731700000, "CPI (2025-06-12)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1750269300000, 1750272000000, "FOMC (2025-06-18)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1750940700000, 1750941300000, "GDP (2025-06-26)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1751631900000, 1751632500000, "NFP (2025-07-04)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1752236700000, 1752237300000, "CPI (2025-07-11)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1753359900000, 1753360500000, "GDP (2025-07-24)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1753898100000, 1753900800000, "FOMC (2025-07-30)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1754051100000, 1754051700000, "NFP (2025-08-01)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1755087900000, 1755088500000, "CPI (2025-08-13)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1756383900000, 1756384500000, "GDP (2025-08-28)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1757075100000, 1757075700000, "NFP (2025-09-05)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1757593500000, 1757594100000, "CPI (2025-09-11)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1758131700000, 1758134400000, "FOMC (2025-09-17)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1758803100000, 1758803700000, "GDP (2025-09-25)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1759494300000, 1759494900000, "NFP (2025-10-03)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1760099100000, 1760099700000, "CPI (2025-10-10)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1761760500000, 1761763200000, "FOMC (2025-10-29)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1761827100000, 1761827700000, "GDP (2025-10-30)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1762521900000, 1762522500000, "NFP (2025-11-07)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1762953900000, 1762954500000, "CPI (2025-11-12)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1764077100000, 1764077700000, "GDP (2025-11-25)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1764941100000, 1764941700000, "NFP (2025-12-05)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1765392900000, 1765395600000, "FOMC (2025-12-10)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1765459500000, 1765460100000, "CPI (2025-12-11)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1766496300000, 1766496900000, "GDP (2025-12-23)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1767965100000, 1767965700000, "NFP (2026-01-09)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1768397100000, 1768397700000, "CPI (2026-01-14)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1769626500000, 1769629200000, "FOMC (2026-01-28)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1769693100000, 1769693700000, "GDP (2026-01-29)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1770384300000, 1770384900000, "NFP (2026-02-06)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1770816300000, 1770816900000, "CPI (2026-02-11)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1772112300000, 1772112900000, "GDP (2026-02-26)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1772803500000, 1772804100000, "NFP (2026-03-06)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1773231900000, 1773232500000, "CPI (2026-03-11)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1773404700000, 1773405300000, "GDP (2026-03-13)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1773856500000, 1773859200000, "FOMC (2026-03-18)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1775219100000, 1775219700000, "NFP (2026-04-03)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1775737500000, 1775738100000, "GDP (2026-04-09)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1775823900000, 1775824500000, "CPI (2026-04-10)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1777485300000, 1777488000000, "FOMC (2026-04-29)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1777551900000, 1777552500000, "GDP (2026-04-30)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1778243100000, 1778243700000, "NFP (2026-05-08)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1778588700000, 1778589300000, "CPI (2026-05-12)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1779971100000, 1779971700000, "GDP (2026-05-28)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1780662300000, 1780662900000, "NFP (2026-06-05)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1781094300000, 1781094900000, "CPI (2026-06-10)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1781718900000, 1781721600000, "FOMC (2026-06-17)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1782390300000, 1782390900000, "GDP (2026-06-25)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1782995100000, 1782995700000, "NFP (2026-07-02)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1784031900000, 1784032500000, "CPI (2026-07-14)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1785347700000, 1785350400000, "FOMC (2026-07-29)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1785414300000, 1785414900000, "GDP (2026-07-30)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1786105500000, 1786106100000, "NFP (2026-08-07)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1786537500000, 1786538100000, "CPI (2026-08-12)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1787747100000, 1787747700000, "GDP (2026-08-26)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1788524700000, 1788525300000, "NFP (2026-09-04)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1789129500000, 1789130100000, "CPI (2026-09-11)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1789581300000, 1789584000000, "FOMC (2026-09-16)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1790771100000, 1790771700000, "GDP (2026-09-30)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1790943900000, 1790944500000, "NFP (2026-10-02)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1791980700000, 1791981300000, "CPI (2026-10-14)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1793210100000, 1793212800000, "FOMC (2026-10-28)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1793276700000, 1793277300000, "GDP (2026-10-29)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1793971500000, 1793972100000, "NFP (2026-11-06)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1794317100000, 1794317700000, "CPI (2026-11-10)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1795613100000, 1795613700000, "GDP (2026-11-25)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1796390700000, 1796391300000, "NFP (2026-12-04)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1796842500000, 1796845200000, "FOMC (2026-12-09)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1796909100000, 1796909700000, "CPI (2026-12-10)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1798032300000, 1798032900000, "GDP (2026-12-23)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1799414700000, 1799415300000, "NFP (2027-01-08)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1799846700000, 1799847300000, "CPI (2027-01-13)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1801076100000, 1801078800000, "FOMC (2027-01-27)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1801142700000, 1801143300000, "GDP (2027-01-28)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1801833900000, 1801834500000, "NFP (2027-02-05)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1802352300000, 1802352900000, "CPI (2027-02-11)")
+    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1803561900000, 1803562500000, "GDP (2027-02-25)")
+
+int _tfSec = timeframe.in_seconds()
+int _barMs = (na(_tfSec) or _tfSec <= 0) ? 60000 : _tfSec * 1000
+int _barCloseTs = na(time_close) ? (time + _barMs) : int(time_close)
+bool inNewsKillzoneWindow = false
+string activeNewsKillzone = ""
+int _newsCount = array.size(newsStartTs)
+if _newsCount > 0
+    for _i = 0 to _newsCount - 1
+        int _s = array.get(newsStartTs, _i)
+        int _e = array.get(newsEndTs, _i)
+        bool _overlap = (time < _e) and (_barCloseTs > _s)
+        if _overlap
+            inNewsKillzoneWindow := true
+            activeNewsKillzone := array.get(newsLbl, _i)
+            break
+
+// =========================================================================
 // 17b. 📦 PACK PER-TF DATA INTO ARRAYS (f_eval optimization)
 // =========================================================================
 // Index: 0 = Chart, 1 = HTF 1, 2 = HTF 2, 3 = HTF 3
@@ -1232,6 +1356,10 @@ bool mffuFlattenNow = false
 if useMffuFlatten
     mffuFlattenNow := not na(time(timeframe.period, mffuFlattenTime, "America/New_York")) and na(time(timeframe.period, mffuFlattenTime, "America/New_York")[1])
 
+bool newsKillzoneNow = useNewsKillzones and inNewsKillzoneWindow
+bool newsEntryAllowed = not newsKillzoneNow
+bool newsForceFlattenNow = newsKillzoneNow and newsKillzoneAction == "Block Entries + Force Flatten"
+
 // =========================================================================
 // 19. 🧠 GOD MODE LOGIC EVALUATION & ARMING
 // =========================================================================
@@ -1255,7 +1383,7 @@ float atrBaseline = ta.sma(atrValue, atrVolLookback)
 bool atrVolOk = not useAtrVolFilter or (not na(atrBaseline) and atrValue <= atrBaseline * atrVolMult)
 bool longFiltersAligned = l_f1 and l_f2 and l_f3 and l_emaOk
 bool longInvalidated    = l_blk
-bool longArmedCore = longFiltersAligned and not longInvalidated and isKillzone and not dailyLimitHit and atrVolOk
+bool longArmedCore = longFiltersAligned and not longInvalidated and isKillzone and newsEntryAllowed and not dailyLimitHit and atrVolOk
 bool longArmed = longArmedCore and inSession
 bool l_prim = f_eval(l_prim_tf_eff, l_prim_ind, l_prim_cond, l_prim_comp, l_prim_targ, l_prim_val, 1)
 
@@ -1266,7 +1394,7 @@ bool s_blk = (s_blk_tf_eff == "None" or s_blk_ind == "—") ? false : f_eval(s_b
 bool s_emaOk = useEmaReversal ? (emaTrend < emaTrend[1]) : true
 bool shortFiltersAligned = s_f1 and s_f2 and s_f3 and s_emaOk
 bool shortInvalidated    = s_blk
-bool shortArmedCore = shortFiltersAligned and not shortInvalidated and isKillzone and not dailyLimitHit and atrVolOk
+bool shortArmedCore = shortFiltersAligned and not shortInvalidated and isKillzone and newsEntryAllowed and not dailyLimitHit and atrVolOk
 bool shortArmed = shortArmedCore and inSession
 bool s_prim = f_eval(s_prim_tf_eff, s_prim_ind, s_prim_cond, s_prim_comp, s_prim_targ, s_prim_val, -1)
 
@@ -1368,7 +1496,9 @@ if logLevel == "Full (Deep State)"
     arm_snap += " | sf1=" + str.tostring(s_f1) + " sf2=" + str.tostring(s_f2) + " sf3=" + str.tostring(s_f3) + " sblk=" + str.tostring(s_blk)
     arm_snap += " S_ARMED=" + str.tostring(shortArmed) + " S_TRIG=" + str.tostring(s_prim)
     arm_snap += " | BE=" + str.tostring(be_trigger) + " TRAIL=" + str.tostring(trail_act_trigger)
-    arm_snap += " | Sess=" + str.tostring(inSession) + " KZ=" + str.tostring(isKillzone) + " LimOk=" + str.tostring(not dailyLimitHit) + " Flat=" + str.tostring(strategy.position_size == 0)
+    arm_snap += " | Sess=" + str.tostring(inSession) + " KZ=" + str.tostring(isKillzone) + " NewsKZ=" + str.tostring(newsKillzoneNow) + " LimOk=" + str.tostring(not dailyLimitHit) + " Flat=" + str.tostring(strategy.position_size == 0)
+    if newsKillzoneNow
+        arm_snap += " NewsEvt=" + activeNewsKillzone
     log.info(str.format("{0}  bar={1}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(bar_index)))
     log.info(chart_snap)
     log.info(h1_snap)
@@ -2028,6 +2158,10 @@ if closedOut and (logLevel == "Trades Only" or logLevel == "Full (Deep State)")
 if mffuFlattenNow and not isFlat
     strategy.close_all("MFFU Flatten")
 
+// --- News Killzone Flatten ---
+if newsForceFlattenNow and not isFlat
+    strategy.close_all("News Killzone")
+
 // --- Session Close ---
 if useSession and not inSession and not isFlat
     strategy.close_all("Session End")
@@ -2235,7 +2369,7 @@ bgcolor(showSignals and shortFiltersAligned and shortInvalidated ? color.new(col
 // =========================================================================
 // 23. 📊 FILTER STATE DEBUG DASHBOARD
 // =========================================================================
-var table dashTbl = showFilterDashboard ? table.new(position.top_right, 3, 11, border_width=1, border_color=color.gray, bgcolor=color.new(color.black, 20)) : na
+var table dashTbl = showFilterDashboard ? table.new(position.top_right, 3, 12, border_width=1, border_color=color.gray, bgcolor=color.new(color.black, 20)) : na
 if showFilterDashboard and not na(dashTbl)
     // --- Helper colors ---
     color _cTrue  = color.new(#089981, 20)
@@ -2290,9 +2424,13 @@ if showFilterDashboard and not na(dashTbl)
     table.cell(dashTbl, 0, 9, "Sweep",      text_color=color.white, bgcolor=_cHdr, text_size=size.small)
     table.cell(dashTbl, 1, 9, "BAct=" + str.tostring(sweepBullActive) + " bSince=" + str.tostring(sweepBullSince), text_color=color.white, bgcolor=sweepBullActive ? _cTrue : _cFalse, text_size=size.tiny)
     table.cell(dashTbl, 2, 9, "Act=" + str.tostring(sweepBearActive) + " rSince=" + str.tostring(sweepBearSince), text_color=color.white, bgcolor=sweepBearActive ? _cTrue : _cFalse, text_size=size.tiny)
+    // --- News Killzone ---
+    table.cell(dashTbl, 0, 10, "News",      text_color=color.white, bgcolor=_cHdr, text_size=size.small)
+    table.cell(dashTbl, 1, 10, "Block=" + str.tostring(newsKillzoneNow) + (newsKillzoneNow ? "\n" + activeNewsKillzone : ""), text_color=color.white, bgcolor=newsKillzoneNow ? _cWarn : _cTrue, text_size=size.tiny)
+    table.cell(dashTbl, 2, 10, "Act=" + newsKillzoneAction, text_color=color.white, bgcolor=_cHdr, text_size=size.tiny)
     // --- Session/Killzone ---
-    table.cell(dashTbl, 0, 10, "Session",      text_color=color.white, bgcolor=_cHdr, text_size=size.small)
-    table.cell(dashTbl, 1, 10, "Sess=" + str.tostring(inSession) + " KZ=" + str.tostring(isKillzone) + " Lim=" + str.tostring(not dailyLimitHit), text_color=color.white, bgcolor=(inSession and isKillzone and not dailyLimitHit) ? _cTrue : _cFalse, text_size=size.tiny)
-    table.cell(dashTbl, 2, 10, "Trades=" + str.tostring(todayTradeCount) + "/" + str.tostring(maxDailyTrades) + " | Prop=" + str.tostring(useCompliance) + " MaxC=" + str.tostring(actualMaxContracts), text_color=color.white, bgcolor=_cHdr, text_size=size.tiny)
+    table.cell(dashTbl, 0, 11, "Session",      text_color=color.white, bgcolor=_cHdr, text_size=size.small)
+    table.cell(dashTbl, 1, 11, "Sess=" + str.tostring(inSession) + " KZ=" + str.tostring(isKillzone) + " NewsOk=" + str.tostring(newsEntryAllowed) + " Lim=" + str.tostring(not dailyLimitHit), text_color=color.white, bgcolor=(inSession and isKillzone and newsEntryAllowed and not dailyLimitHit) ? _cTrue : _cFalse, text_size=size.tiny)
+    table.cell(dashTbl, 2, 11, "Trades=" + str.tostring(todayTradeCount) + "/" + str.tostring(maxDailyTrades) + " | Prop=" + str.tostring(useCompliance) + " MaxC=" + str.tostring(actualMaxContracts), text_color=color.white, bgcolor=_cHdr, text_size=size.tiny)
 
 // — End of NQ Scalper Pro — Prop Firm Engine [GOD MODE] v6.1 —
