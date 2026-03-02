@@ -1547,75 +1547,12 @@ int actualMaxContracts = useCompliance ? math.min(qtyInput, propFirmMaxContracts
 // =========================================================================
 // --- Pine Script Logs: logs to Strategy Tester → Pine Logs tab every bar ---
 if logLevel == "Full (Deep State)"
-    string _tf = timeframe.period
-    // Chart snapshot
-    string chart_snap = "[CHART tf=" + _tf + "] trail=" + str.format("{0,number,#.##}", nz(smartTrail)) +
-         " ts=" + str.tostring(trailState) +
-         " slope=" + str.format("{0,number,#.####}", nz(emaSlope)) +
-         " ema=" + str.format("{0,number,#.##}", nz(emaTrend)) +
-         " bu1=" + str.tostring(isBullL1) + " be1=" + str.tostring(isBearL1) +
-         " bu2=" + str.tostring(isBullL2) + " be2=" + str.tostring(isBearL2) +
-         " bu3=" + str.tostring(isBullL3) + " be3=" + str.tostring(isBearL3) +
-         " bbos=" + str.tostring(isBullBOS) + " sbos=" + str.tostring(isBearBOS) +
-         " bchoch=" + str.tostring(isBullChoCh) + " schoch=" + str.tostring(isBearChoCh)
-    // HTF 1 tuple snapshot
-    string h1_snap = "[HTF1 tf=" + tfH1 + "] trail=" + str.format("{0,number,#.##}", nz(h1_st)) +
-         " ts=" + str.tostring(h1_ts) +
-         " slope=" + str.format("{0,number,#.####}", nz(h1_slp)) +
-         " ema=" + str.format("{0,number,#.##}", nz(h1_ema)) +
-         " c=" + str.format("{0,number,#.##}", nz(h1_c)) +
-         " bu1=" + str.tostring(h1_bu1) + " be1=" + str.tostring(h1_be1) +
-         " bu2=" + str.tostring(h1_bu2) + " be2=" + str.tostring(h1_be2) +
-         " bu3=" + str.tostring(h1_bu3) + " be3=" + str.tostring(h1_be3) +
-         " bbos=" + str.tostring(h1_bbos) + " sbos=" + str.tostring(h1_sbos) +
-         " bchoch=" + str.tostring(h1_bchoch) + " schoch=" + str.tostring(h1_schoch) +
-         " res=" + str.format("{0,number,#.##}", nz(h1_res)) + " sup=" + str.format("{0,number,#.##}", nz(h1_sup))
-    // HTF 2 tuple snapshot
-    string h2_snap = "[HTF2 tf=" + tfH2 + "] trail=" + str.format("{0,number,#.##}", nz(h2_st)) +
-         " ts=" + str.tostring(h2_ts) +
-         " slope=" + str.format("{0,number,#.####}", nz(h2_slp)) +
-         " c=" + str.format("{0,number,#.##}", nz(h2_c)) +
-         " bu1=" + str.tostring(h2_bu1) + " be1=" + str.tostring(h2_be1) +
-         " bu3=" + str.tostring(h2_bu3) + " be3=" + str.tostring(h2_be3) +
-         " bbos=" + str.tostring(h2_bbos) + " sbos=" + str.tostring(h2_sbos)
-    // HTF 3 tuple snapshot
-    string h3_snap = "[HTF3 tf=" + tfH3 + "] trail=" + str.format("{0,number,#.##}", nz(h3_st)) +
-         " ts=" + str.tostring(h3_ts) +
-         " slope=" + str.format("{0,number,#.####}", nz(h3_slp)) +
-         " c=" + str.format("{0,number,#.##}", nz(h3_c)) +
-         " bu3=" + str.tostring(h3_bu3) + " be3=" + str.tostring(h3_be3) +
-         " bbos=" + str.tostring(h3_bbos) + " sbos=" + str.tostring(h3_sbos)
-    // Arming snapshot
-    string arm_snap = "[ARMS] lf1=" + str.tostring(l_f1) + " lf2=" + str.tostring(l_f2) + " lf3=" + str.tostring(l_f3) + " lblk=" + str.tostring(l_blk)
-    arm_snap += " L_ARMED=" + str.tostring(longArmed) + " L_TRIG=" + str.tostring(l_prim)
-    arm_snap += " | sf1=" + str.tostring(s_f1) + " sf2=" + str.tostring(s_f2) + " sf3=" + str.tostring(s_f3) + " sblk=" + str.tostring(s_blk)
-    arm_snap += " S_ARMED=" + str.tostring(shortArmed) + " S_TRIG=" + str.tostring(s_prim)
-    arm_snap += " | BE=" + str.tostring(be_trigger) + " TRAIL=" + str.tostring(trail_act_trigger)
-    arm_snap += " | Sess=" + str.tostring(inSession) + " KZ=" + str.tostring(isKillzone) + " NewsKZ=" + str.tostring(newsKillzoneNow) + " NewsExpired=" + str.tostring(newsCalendarExpired) + " NewsUnsafe=" + str.tostring(allowTradingWhenNewsCalendarExpiredUnsafe) + " LimOk=" + str.tostring(not dailyLimitHit) + " Flat=" + str.tostring(strategy.position_size == 0)
-    if newsKillzoneNow
-        arm_snap += " NewsEvt=" + activeNewsKillzone
-    arm_snap += " | FirmNewsRestricted=" + str.tostring(firmMffuRestrictedNews) + " FirmNewsAllowed=" + str.tostring(firmAllowsNewsTrading)
-    log.info(str.format("{0}  bar={1}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(bar_index)))
-    log.info(chart_snap)
-    log.info(h1_snap)
-    log.info(h2_snap)
-    log.info(h3_snap)
-    log.info(arm_snap)
+    log.info(str.format("DBG @{0}: bar={1} L={2}/{3} S={4}/{5} flat={6}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(bar_index), str.tostring(longArmed), str.tostring(l_prim), str.tostring(shortArmed), str.tostring(s_prim), str.tostring(strategy.position_size == 0)))
 
 // --- On-Chart Debug Label: last bar only ---
 if showDebugLog and barstate.islast
     string _dir  = strategy.position_size > 0 ? "LONG" : strategy.position_size < 0 ? "SHORT" : "FLAT"
-    string _h1   = "H1[" + tfH1 + "]: trail=" + str.format("{0,number,#.##}", nz(h1_st)) + " ts=" + str.tostring(h1_ts) + " slp=" + str.format("{0,number,#.####}", nz(h1_slp))
-    string _h2   = "H2[" + tfH2 + "]: trail=" + str.format("{0,number,#.##}", nz(h2_st)) + " ts=" + str.tostring(h2_ts)
-    string _h3   = "H3[" + tfH3 + "]: trail=" + str.format("{0,number,#.##}", nz(h3_st)) + " ts=" + str.tostring(h3_ts)
-    string _filt = "LF1=" + str.tostring(l_f1) + " LF2=" + str.tostring(l_f2) + " LF3=" + str.tostring(l_f3) + " LBLK=" + str.tostring(l_blk)
-    string _sflt = "SF1=" + str.tostring(s_f1) + " SF2=" + str.tostring(s_f2) + " SF3=" + str.tostring(s_f3) + " SBLK=" + str.tostring(s_blk)
-    string _arm  = "L_ARMED=" + str.tostring(longArmed) + " L_TRIG=" + str.tostring(l_prim) + "  S_ARMED=" + str.tostring(shortArmed) + " S_TRIG=" + str.tostring(s_prim)
-    string _misc = "BE=" + str.tostring(be_trigger) + " TRAIL=" + str.tostring(trail_act_trigger) + "  Trades=" + str.tostring(todayTradeCount) + "/" + str.tostring(maxDailyTrades)
-    _misc += "  PropMode=" + str.tostring(useCompliance) + " MaxC=" + str.tostring(actualMaxContracts)
-    label.new(bar_index, high * 1.001,
-         "DIR: " + _dir + "\n" + _h1 + "\n" + _h2 + "\n" + _h3 + "\n" + _filt + "\n" + _sflt + "\n" + _arm + "\n" + _misc,
-         style=label.style_label_down, color=color.new(color.black, 50), textcolor=color.white, size=size.small)
+    label.new(bar_index, high * 1.001, "DIR: " + _dir + " | L=" + str.tostring(longArmed) + "/" + str.tostring(l_prim) + " | S=" + str.tostring(shortArmed) + "/" + str.tostring(s_prim), style=label.style_label_down, color=color.new(color.black, 50), textcolor=color.white, size=size.tiny)
 
 // =========================================================================
 // 20. 🚀 EXECUTION ENGINE — Phase 6 Tradovate Integer Math
@@ -1745,85 +1682,8 @@ var int   _entryShortBar = -1
 f_fmt_num(float v) =>
     na(v) ? "na" : str.format("{0,number,#.####}", v)
 
-f_tf_idx(string tf) =>
-    tf == "HTF 1" ? 1 : tf == "HTF 2" ? 2 : tf == "HTF 3" ? 3 : 0
-
-f_is_combo_tf(string tf) =>
-    tf == "Any HTF 1-3" or tf == "HTF 2 or HTF 3" or tf == "HTF 2 and HTF 3" or tf == "Any Timeframe (Chart+HTFs)" or tf == "HTF 1 or HTF 2" or tf == "HTF 1 or HTF 3" or tf == "HTF 1 and HTF 2" or tf == "HTF 1 and HTF 3" or tf == "Chart or HTF 1" or tf == "Chart or HTF 2" or tf == "Chart or HTF 3" or tf == "Chart and HTF 1" or tf == "Chart and HTF 2" or tf == "Chart and HTF 3"
-
-f_ind_num(string tf, string ind) =>
-    int _i = f_tf_idx(tf)
-    float _v = na
-    if ind == "Smart Trail"
-        _v := array.get(a_st, _i)
-    else if ind == "EMA Trail"
-        _v := array.get(a_ema, _i)
-    else if ind == "EMA Slope"
-        _v := array.get(a_slope, _i)
-    else if ind == "Close"
-        _v := array.get(a_close, _i)
-    else if ind == "Open"
-        _v := array.get(a_open, _i)
-    else if ind == "High"
-        _v := array.get(a_high, _i)
-    else if ind == "Low"
-        _v := array.get(a_low, _i)
-    else if ind == "hl2"
-        _v := array.get(a_hl2, _i)
-    else if ind == "hlc3"
-        _v := array.get(a_hlc3, _i)
-    else if ind == "ohlc4"
-        _v := array.get(a_ohlc4, _i)
-    _v
-
-f_targ_num(string tf, string targ, float val) =>
-    int _i = f_tf_idx(tf)
-    float _v = val
-    if targ == "Smart Trail"
-        _v := array.get(a_st, _i)
-    else if targ == "EMA Trend"
-        _v := array.get(a_ema, _i)
-    else if targ == "Support"
-        _v := array.get(a_sup, _i)
-    else if targ == "Resistance"
-        _v := array.get(a_res, _i)
-    _v
-
-f_ind_state(string tf, string ind, int dir) =>
-    int _i = f_tf_idx(tf)
-    bool _bu1 = array.get(a_bu1, _i), _bu2 = array.get(a_bu2, _i), _bu3 = array.get(a_bu3, _i)
-    bool _be1 = array.get(a_be1, _i), _be2 = array.get(a_be2, _i), _be3 = array.get(a_be3, _i)
-    bool _bu1a = array.get(a_bu1_act, _i), _bu2a = array.get(a_bu2_act, _i), _bu3a = array.get(a_bu3_act, _i)
-    bool _be1a = array.get(a_be1_act, _i), _be2a = array.get(a_be2_act, _i), _be3a = array.get(a_be3_act, _i)
-    bool _bsw = array.get(a_bsw, _i), _rsw = array.get(a_rsw, _i)
-    int _sw_since_bull = ta.barssince(_bsw)
-    int _sw_since_bear = ta.barssince(_rsw)
-    bool _sw_bull_act = na(_sw_since_bear) or (not na(_sw_since_bull) and _sw_since_bull <= _sw_since_bear)
-    bool _sw_bear_act = na(_sw_since_bull) or (not na(_sw_since_bear) and _sw_since_bear <= _sw_since_bull)
-    bool _bb = array.get(a_bbos, _i), _bc = array.get(a_bchoch, _i), _sb = array.get(a_sbos, _i), _sc = array.get(a_schoch, _i)
-    string _s = ""
-    if ind == "BOS or ChoCh"
-        _s := str.format("bbos={0} bchoch={1} sbos={2} schoch={3}", str.tostring(_bb), str.tostring(_bc), str.tostring(_sb), str.tostring(_sc))
-    else if ind == "BOS"
-        _s := str.format("bbos={0} sbos={1}", str.tostring(_bb), str.tostring(_sb))
-    else if ind == "ChoCh"
-        _s := str.format("bchoch={0} schoch={1}", str.tostring(_bc), str.tostring(_sc))
-    else if ind == "Liquidity Sweep" or ind == "Bullish Swing Sweep" or ind == "Bearish Swing Sweep"
-        _s := str.format("bsw={0} rsw={1} bswAct={2} rswAct={3} bSince={4} rSince={5}", str.tostring(_bsw), str.tostring(_rsw), str.tostring(_sw_bull_act), str.tostring(_sw_bear_act), str.tostring(_sw_since_bull), str.tostring(_sw_since_bear))
-    else if ind == "Exhaustion L1" or ind == "Exhaustion L2" or ind == "Exhaustion L3" or ind == "Any L1-L3" or ind == "L2 or L3" or ind == "L2 and L3"
-        _s := str.format("bu=[{0},{1},{2}] be=[{3},{4},{5}] bua=[{6},{7},{8}] bea=[{9},{10},{11}]", str.tostring(_bu1), str.tostring(_bu2), str.tostring(_bu3), str.tostring(_be1), str.tostring(_be2), str.tostring(_be3), str.tostring(_bu1a), str.tostring(_bu2a), str.tostring(_bu3a), str.tostring(_be1a), str.tostring(_be2a), str.tostring(_be3a))
-    _s
-
 f_trigger_meta(string tf, string ind, string cond, bool useComp, string targ, float val, int dir) =>
-    bool _comboTf = f_is_combo_tf(tf)
-    bool _ok = f_eval(tf, ind, cond, useComp, targ, val, dir)
-    float _lhs = _comboTf ? na : f_ind_num(tf, ind)
-    float _rhs = _comboTf ? na : (useComp ? f_targ_num(tf, targ, val) : val)
-    string _thr = _comboTf ? ("tfSet=" + tf) : (cond == "Occurred Within X Bars" ? str.format("lookback<={0}", str.tostring(int(val))) : useComp ? ("target=" + targ + " rhs=" + f_fmt_num(_rhs)) : ("custom=" + f_fmt_num(val)))
-    string _stateRaw = f_ind_state(tf, ind, dir)
-    string _state = _comboTf ? "" : _stateRaw
-    string _base = str.format("tf={0} ind={1} cond={2} eval={3} lhs={4} thr[{5}]", tf, ind, cond, str.tostring(_ok), f_fmt_num(_lhs), _thr)
-    _state == "" ? _base : _base + " state{" + _state + "}"
+    str.format("tf={0} ind={1} cond={2} comp={3} targ={4} val={5} dir={6}", tf, ind, cond, str.tostring(useComp), targ, f_fmt_num(val), str.tostring(dir))
 
 f_scale_qty(int reqQty, float posSz, int maxQty) =>
     int _absPos = int(math.abs(posSz))
