@@ -541,6 +541,66 @@ f_htf_data() =>
 // --- HTF 3 ---
 [h3_c, h3_h, h3_l, h3_st, h3_ts, h3_ema, h3_slp, h3_bu1, h3_bu2, h3_bu3, h3_be1, h3_be2, h3_be3, h3_atr, h3_sh, h3_sl, h3_bsw, h3_rsw, h3_o, h3_hl2, h3_hlc3, h3_ohlc4, h3_bbos, h3_bchoch, h3_sbos, h3_schoch, h3_res, h3_sup, h3_os] = request.security(syminfo.tickerid, tfH3, f_htf_data(), lookahead=barmerge.lookahead_on)
 
+f_update_state_memory(bu1, bu2, bu3, be1, be2, be3, bbos, bchoch, sbos, schoch, bu1Act, bu2Act, bu3Act, be1Act, be2Act, be3Act, bbosAct, bchochAct, sbosAct, schochAct, cBu1, cBu2, cBu3, cBe1, cBe2, cBe3, cBbos, cBchoch, cSbos, cSchoch) =>
+    bool _bu1Act = bu1Act
+    bool _bu2Act = bu2Act
+    bool _bu3Act = bu3Act
+    bool _be1Act = be1Act
+    bool _be2Act = be2Act
+    bool _be3Act = be3Act
+    bool _bbosAct = bbosAct
+    bool _bchochAct = bchochAct
+    bool _sbosAct = sbosAct
+    bool _schochAct = schochAct
+
+    if bu1
+        _bu1Act := true
+        _be1Act := false
+    if be1
+        _be1Act := true
+        _bu1Act := false
+    if bu2
+        _bu2Act := true
+        _be2Act := false
+    if be2
+        _be2Act := true
+        _bu2Act := false
+    if bu3
+        _bu3Act := true
+        _be3Act := false
+    if be3
+        _be3Act := true
+        _bu3Act := false
+
+    if bbos
+        _bbosAct := true
+    if bchoch
+        _bchochAct := true
+    if sbos or schoch
+        _bbosAct := false
+        _bchochAct := false
+
+    if sbos
+        _sbosAct := true
+    if schoch
+        _schochAct := true
+    if bbos or bchoch
+        _sbosAct := false
+        _schochAct := false
+
+    int _cBu1 = bu1 ? 0 : cBu1 + 1
+    int _cBu2 = bu2 ? 0 : cBu2 + 1
+    int _cBu3 = bu3 ? 0 : cBu3 + 1
+    int _cBe1 = be1 ? 0 : cBe1 + 1
+    int _cBe2 = be2 ? 0 : cBe2 + 1
+    int _cBe3 = be3 ? 0 : cBe3 + 1
+    int _cBbos = bbos ? 0 : cBbos + 1
+    int _cBchoch = bchoch ? 0 : cBchoch + 1
+    int _cSbos = sbos ? 0 : cSbos + 1
+    int _cSchoch = schoch ? 0 : cSchoch + 1
+
+    [_bu1Act, _bu2Act, _bu3Act, _be1Act, _be2Act, _be3Act, _bbosAct, _bchochAct, _sbosAct, _schochAct, _cBu1, _cBu2, _cBu3, _cBe1, _cBe2, _cBe3, _cBbos, _cBchoch, _cSbos, _cSchoch]
+
 // =========================================================================
 // 16. 🧠 THE STATE MACHINE & CYCLE MEMORY (ZERO-LOOP ENGINE)
 // =========================================================================
@@ -601,17 +661,6 @@ var int c_bchoch = 9999
 var int c_sbos   = 9999
 var int c_schoch = 9999
 
-c_bu1 := isBullL1 ? 0 : c_bu1 + 1
-c_bu2 := isBullL2 ? 0 : c_bu2 + 1
-c_bu3 := isBullL3 ? 0 : c_bu3 + 1
-c_be1 := isBearL1 ? 0 : c_be1 + 1
-c_be2 := isBearL2 ? 0 : c_be2 + 1
-c_be3 := isBearL3 ? 0 : c_be3 + 1
-c_bbos   := isBullBOS   ? 0 : c_bbos + 1
-c_bchoch := isBullChoCh ? 0 : c_bchoch + 1
-c_sbos   := isBearBOS   ? 0 : c_sbos + 1
-c_schoch := isBearChoCh ? 0 : c_schoch + 1
-
 // --- HTF 1 MEMORY ---
 var bool h1_bu1_act    = false
 var bool h1_bu2_act    = false
@@ -667,17 +716,6 @@ var int h1_c_bbos   = 9999
 var int h1_c_bchoch = 9999
 var int h1_c_sbos   = 9999
 var int h1_c_schoch = 9999
-
-h1_c_bu1 := h1_bu1 ? 0 : h1_c_bu1 + 1
-h1_c_bu2 := h1_bu2 ? 0 : h1_c_bu2 + 1
-h1_c_bu3 := h1_bu3 ? 0 : h1_c_bu3 + 1
-h1_c_be1 := h1_be1 ? 0 : h1_c_be1 + 1
-h1_c_be2 := h1_be2 ? 0 : h1_c_be2 + 1
-h1_c_be3 := h1_be3 ? 0 : h1_c_be3 + 1
-h1_c_bbos   := h1_bbos   ? 0 : h1_c_bbos + 1
-h1_c_bchoch := h1_bchoch ? 0 : h1_c_bchoch + 1
-h1_c_sbos   := h1_sbos   ? 0 : h1_c_sbos + 1
-h1_c_schoch := h1_schoch ? 0 : h1_c_schoch + 1
 
 // --- HTF 2 MEMORY ---
 var bool h2_bu1_act    = false
@@ -735,17 +773,6 @@ var int h2_c_bchoch = 9999
 var int h2_c_sbos   = 9999
 var int h2_c_schoch = 9999
 
-h2_c_bu1 := h2_bu1 ? 0 : h2_c_bu1 + 1
-h2_c_bu2 := h2_bu2 ? 0 : h2_c_bu2 + 1
-h2_c_bu3 := h2_bu3 ? 0 : h2_c_bu3 + 1
-h2_c_be1 := h2_be1 ? 0 : h2_c_be1 + 1
-h2_c_be2 := h2_be2 ? 0 : h2_c_be2 + 1
-h2_c_be3 := h2_be3 ? 0 : h2_c_be3 + 1
-h2_c_bbos   := h2_bbos   ? 0 : h2_c_bbos + 1
-h2_c_bchoch := h2_bchoch ? 0 : h2_c_bchoch + 1
-h2_c_sbos   := h2_sbos   ? 0 : h2_c_sbos + 1
-h2_c_schoch := h2_schoch ? 0 : h2_c_schoch + 1
-
 // --- HTF 3 MEMORY ---
 var bool h3_bu1_act    = false
 var bool h3_bu2_act    = false
@@ -802,16 +829,17 @@ var int h3_c_bchoch = 9999
 var int h3_c_sbos   = 9999
 var int h3_c_schoch = 9999
 
-h3_c_bu1 := h3_bu1 ? 0 : h3_c_bu1 + 1
-h3_c_bu2 := h3_bu2 ? 0 : h3_c_bu2 + 1
-h3_c_bu3 := h3_bu3 ? 0 : h3_c_bu3 + 1
-h3_c_be1 := h3_be1 ? 0 : h3_c_be1 + 1
-h3_c_be2 := h3_be2 ? 0 : h3_c_be2 + 1
-h3_c_be3 := h3_be3 ? 0 : h3_c_be3 + 1
-h3_c_bbos   := h3_bbos   ? 0 : h3_c_bbos + 1
-h3_c_bchoch := h3_bchoch ? 0 : h3_c_bchoch + 1
-h3_c_sbos   := h3_sbos   ? 0 : h3_c_sbos + 1
-h3_c_schoch := h3_schoch ? 0 : h3_c_schoch + 1
+[st_bullL1_act, st_bullL2_act, st_bullL3_act, st_bearL1_act, st_bearL2_act, st_bearL3_act, st_bbos_act, st_bchoch_act, st_sbos_act, st_schoch_act, c_bu1, c_bu2, c_bu3, c_be1, c_be2, c_be3, c_bbos, c_bchoch, c_sbos, c_schoch] :=
+    f_update_state_memory(isBullL1, isBullL2, isBullL3, isBearL1, isBearL2, isBearL3, isBullBOS, isBullChoCh, isBearBOS, isBearChoCh, st_bullL1_act, st_bullL2_act, st_bullL3_act, st_bearL1_act, st_bearL2_act, st_bearL3_act, st_bbos_act, st_bchoch_act, st_sbos_act, st_schoch_act, c_bu1, c_bu2, c_bu3, c_be1, c_be2, c_be3, c_bbos, c_bchoch, c_sbos, c_schoch)
+
+[h1_bu1_act, h1_bu2_act, h1_bu3_act, h1_be1_act, h1_be2_act, h1_be3_act, h1_bbos_act, h1_bchoch_act, h1_sbos_act, h1_schoch_act, h1_c_bu1, h1_c_bu2, h1_c_bu3, h1_c_be1, h1_c_be2, h1_c_be3, h1_c_bbos, h1_c_bchoch, h1_c_sbos, h1_c_schoch] :=
+    f_update_state_memory(h1_bu1, h1_bu2, h1_bu3, h1_be1, h1_be2, h1_be3, h1_bbos, h1_bchoch, h1_sbos, h1_schoch, h1_bu1_act, h1_bu2_act, h1_bu3_act, h1_be1_act, h1_be2_act, h1_be3_act, h1_bbos_act, h1_bchoch_act, h1_sbos_act, h1_schoch_act, h1_c_bu1, h1_c_bu2, h1_c_bu3, h1_c_be1, h1_c_be2, h1_c_be3, h1_c_bbos, h1_c_bchoch, h1_c_sbos, h1_c_schoch)
+
+[h2_bu1_act, h2_bu2_act, h2_bu3_act, h2_be1_act, h2_be2_act, h2_be3_act, h2_bbos_act, h2_bchoch_act, h2_sbos_act, h2_schoch_act, h2_c_bu1, h2_c_bu2, h2_c_bu3, h2_c_be1, h2_c_be2, h2_c_be3, h2_c_bbos, h2_c_bchoch, h2_c_sbos, h2_c_schoch] :=
+    f_update_state_memory(h2_bu1, h2_bu2, h2_bu3, h2_be1, h2_be2, h2_be3, h2_bbos, h2_bchoch, h2_sbos, h2_schoch, h2_bu1_act, h2_bu2_act, h2_bu3_act, h2_be1_act, h2_be2_act, h2_be3_act, h2_bbos_act, h2_bchoch_act, h2_sbos_act, h2_schoch_act, h2_c_bu1, h2_c_bu2, h2_c_bu3, h2_c_be1, h2_c_be2, h2_c_be3, h2_c_bbos, h2_c_bchoch, h2_c_sbos, h2_c_schoch)
+
+[h3_bu1_act, h3_bu2_act, h3_bu3_act, h3_be1_act, h3_be2_act, h3_be3_act, h3_bbos_act, h3_bchoch_act, h3_sbos_act, h3_schoch_act, h3_c_bu1, h3_c_bu2, h3_c_bu3, h3_c_be1, h3_c_be2, h3_c_be3, h3_c_bbos, h3_c_bchoch, h3_c_sbos, h3_c_schoch] :=
+    f_update_state_memory(h3_bu1, h3_bu2, h3_bu3, h3_be1, h3_be2, h3_be3, h3_bbos, h3_bchoch, h3_sbos, h3_schoch, h3_bu1_act, h3_bu2_act, h3_bu3_act, h3_be1_act, h3_be2_act, h3_be3_act, h3_bbos_act, h3_bchoch_act, h3_sbos_act, h3_schoch_act, h3_c_bu1, h3_c_bu2, h3_c_bu3, h3_c_be1, h3_c_be2, h3_c_be3, h3_c_bbos, h3_c_bchoch, h3_c_sbos, h3_c_schoch)
 
 // =========================================================================
 // 17a. 📡 SESSION DETECTION
@@ -835,7 +863,7 @@ var array<int> newsStartTs = array.new_int()
 var array<int> newsEndTs   = array.new_int()
 var array<string> newsLbl  = array.new_string()
 
-if barstate.isfirst
+f_seed_news_calendar() =>
     // Fixed windows from compliance schedules:
     // NFP/CPI/GDP: 08:25-08:35 ET, FOMC: 13:55-14:40 ET.
     f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1741353900000, 1741354500000, "NFP (2025-03-07)")
@@ -927,6 +955,9 @@ if barstate.isfirst
     f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1801833900000, 1801834500000, "NFP (2027-02-05)")
     f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1802352300000, 1802352900000, "CPI (2027-02-11)")
     f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1803561900000, 1803562500000, "GDP (2027-02-25)")
+
+if barstate.isfirst
+    f_seed_news_calendar()
 
 int _tfSec = timeframe.in_seconds()
 int _barMs = (na(_tfSec) or _tfSec <= 0) ? 60000 : _tfSec * 1000
@@ -1426,6 +1457,9 @@ var bool pendingShortCarry = false
 var int pendingLongCarryBar = na
 var int pendingShortCarryBar = na
 
+f_should_expire_carry(bool pendingCarry, int pendingCarryBar, int preBars, bool inSess, bool withinGrace) =>
+    pendingCarry and (na(pendingCarryBar) or (bar_index - pendingCarryBar > preBars) or (inSess and not withinGrace))
+
 bool withinOpenCarryGrace = useSession and inSession and not na(sessionOpenBar) and (bar_index - sessionOpenBar <= openCarryGraceBars)
 
 if useOpenCarryLatch and useSession and not inSession
@@ -1436,10 +1470,10 @@ if useOpenCarryLatch and useSession and not inSession
         pendingShortCarry := true
         pendingShortCarryBar := bar_index
 
-if pendingLongCarry and (na(pendingLongCarryBar) or (bar_index - pendingLongCarryBar > openCarryPreBars) or (inSession and not withinOpenCarryGrace))
+if f_should_expire_carry(pendingLongCarry, pendingLongCarryBar, openCarryPreBars, inSession, withinOpenCarryGrace)
     pendingLongCarry := false
     pendingLongCarryBar := na
-if pendingShortCarry and (na(pendingShortCarryBar) or (bar_index - pendingShortCarryBar > openCarryPreBars) or (inSession and not withinOpenCarryGrace))
+if f_should_expire_carry(pendingShortCarry, pendingShortCarryBar, openCarryPreBars, inSession, withinOpenCarryGrace)
     pendingShortCarry := false
     pendingShortCarryBar := na
 
@@ -1775,6 +1809,60 @@ f_effective_mae_ticks(int contracts) =>
          math.min(maeMaxTicks, math.min(_riskTicks, _dynUsdTicks))
     _eff
 
+f_reset_trade_state() =>
+    [false, false, na, false, false, false, false, false, false, false]
+
+f_tp_target(float base, bool isLongDir, string tf, float ticks, float h1st, float h2st, float h3st) =>
+    float _fallback = isLongDir ? base + ticks * syminfo.mintick : base - ticks * syminfo.mintick
+    if tf == "Chart"
+        _fallback
+    else
+        float _st = tf == "HTF 1" ? h1st : tf == "HTF 2" ? h2st : h3st
+        bool _valid = isLongDir ? (not na(_st) and _st > base) : (not na(_st) and _st < base)
+        _valid ? _st : _fallback
+
+f_exec_override_slot(string entryId, string sideLabel, string slotLabel, string slotId, bool trig, bool done, int reqQty, float posSz, int maxQty, string meta) =>
+    bool _done = done
+    bool _closeAll = false
+    if not done and trig
+        int _qty = f_scale_qty(reqQty, posSz, maxQty)
+        if reqQty == 0
+            strategy.close(entryId, comment=slotId)
+            _done := true
+            _closeAll := true
+        else if _qty > 0
+            strategy.close(entryId, qty=_qty, comment=slotId)
+            _done := true
+        if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
+            log.info(str.format("🚪 {0} HIT @{1}: side={2} qty={3} id={4} | {5}", slotLabel, str.format_time(time, "HH:mm:ss", "America/New_York"), sideLabel, str.tostring(_qty), slotId, meta))
+    [_done, _closeAll]
+
+f_exec_tp_slot(string entryId, string sideLabel, string slotLabel, string slotId, bool anyExitTrig, int qty, bool done, bool trig, string meta) =>
+    bool _done = done
+    if not anyExitTrig and qty > 0 and not done and trig
+        strategy.close(entryId, qty=qty, comment=slotId)
+        _done := true
+        if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
+            log.info(str.format("🎯 {0} HIT @{1}: side={2} qty={3} id={4} | {5}", slotLabel, str.format_time(time, "HH:mm:ss", "America/New_York"), sideLabel, str.tostring(qty), slotId, meta))
+    _done
+
+f_apply_stop_orders(string entryId, string id1, string id2, string id3, string id4, int q1, int q2, int q3, int q4, float stopPx) =>
+    strategy.exit(id1, entryId, qty=q1, stop=stopPx, comment_loss="SL Hit")
+    if q2 > 0
+        strategy.exit(id2, entryId, qty=q2, stop=stopPx, comment_loss="SL Hit")
+    if q3 > 0
+        strategy.exit(id3, entryId, qty=q3, stop=stopPx, comment_loss="SL Hit")
+    if q4 > 0
+        strategy.exit(id4, entryId, qty=q4, stop=stopPx, comment_loss="SL Hit")
+
+f_log_blocked_guard(string slotLabel, bool trigRaw, bool trig, string meta) =>
+    if trigRaw and not trig and (logLevel == "Trades Only" or logLevel == "Full (Deep State)")
+        log.info(str.format("⛔ {0} BLOCKED @{1}: reason=NET_PNL_GUARD | openPnl={2,number,#.##} avg={3,number,#.##} close={4,number,#.##} | {5}", slotLabel, str.format_time(time, "HH:mm:ss", "America/New_York"), strategy.openprofit, strategy.position_avg_price, close, meta))
+
+f_log_entry_rejected(string sideLabel, string reason, string details, string meta) =>
+    if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
+        log.info(str.format("⛔ {0} REJECTED @{1}: reason={2} {3} | {4}", sideLabel, str.format_time(time, "HH:mm:ss", "America/New_York"), reason, details, meta))
+
 // --- Track previous states to detect actual fills for logging ---
 var float lastPosSize = 0.0
 bool closedOut = strategy.position_size == 0 and lastPosSize != 0
@@ -1798,16 +1886,7 @@ if fireLong and isFlat and isBarClose
         if maeTicks <= effectiveMaeTicks
             entrySL     := sl
             entryPrice  := close
-            beHit       := false
-            trailLocked := false
-            trailStop   := na
-            tp1Done     := false
-            tp2Done     := false
-            tp3Done     := false
-            tp4Done     := false
-            ex1Done     := false
-            ex2Done     := false
-            ex3Done     := false
+            [beHit, trailLocked, trailStop, tp1Done, tp2Done, tp3Done, tp4Done, ex1Done, ex2Done, ex3Done] := f_reset_trade_state()
             int _longCarryBars = bar_index - nz(pendingLongCarryBar, bar_index)
             pendingLongCarry := false
             pendingLongCarryBar := na
@@ -1818,12 +1897,12 @@ if fireLong and isFlat and isBarClose
                 log.info(str.format("↪ LONG OPEN-CARRY EXECUTED @{0}: pendingBars={1}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(_longCarryBars)))
             if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
                 log.info(str.format("🟢 LONG ALLOWED @{0}: id={1} | entry={2,number,#.##} sl={3,number,#.##} distPts={4,number,#.##} | {5}", str.format_time(time, "HH:mm:ss", "America/New_York"), lbl_long_entry, close, sl, (close - sl), l_meta))
-        else if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
-            log.info(str.format("⛔ LONG REJECTED @{0}: reason=MAE_LIMIT maeEnforcementMode={1} maeTicks={2,number,#.##} effMaxTicks={3,number,#.##} close={4,number,#.##} sl={5,number,#.##} | {6}", str.format_time(time, "HH:mm:ss", "America/New_York"), maeLimitMode, maeTicks, effectiveMaeTicks, close, sl, l_meta))
-    else if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
-        log.info(str.format("⛔ LONG REJECTED @{0}: reason=INVALID_SL initialStopLossMode={1} close={2,number,#.##} sl={3} | {4}", str.format_time(time, "HH:mm:ss", "America/New_York"), slMode, close, f_fmt_num(sl), l_meta))
-else if fireLong and not isFlat and (logLevel == "Trades Only" or logLevel == "Full (Deep State)")
-    log.info(str.format("⛔ LONG REJECTED @{0}: reason=NOT_FLAT pos={1} | {2}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(strategy.position_size), l_meta))
+        else
+            f_log_entry_rejected("LONG", "MAE_LIMIT", str.format("maeEnforcementMode={0} maeTicks={1,number,#.##} effMaxTicks={2,number,#.##} close={3,number,#.##} sl={4,number,#.##}", maeLimitMode, maeTicks, effectiveMaeTicks, close, sl), l_meta)
+    else
+        f_log_entry_rejected("LONG", "INVALID_SL", str.format("initialStopLossMode={0} close={1,number,#.##} sl={2}", slMode, close, f_fmt_num(sl)), l_meta)
+else if fireLong and not isFlat
+    f_log_entry_rejected("LONG", "NOT_FLAT", str.format("pos={0}", str.tostring(strategy.position_size)), l_meta)
 
 // --- SHORT ENTRY ---
 if fireShort and isFlat and isBarClose
@@ -1834,16 +1913,7 @@ if fireShort and isFlat and isBarClose
         if maeTicks <= effectiveMaeTicks
             entrySL     := sl
             entryPrice  := close
-            beHit       := false
-            trailLocked := false
-            trailStop   := na
-            tp1Done     := false
-            tp2Done     := false
-            tp3Done     := false
-            tp4Done     := false
-            ex1Done     := false
-            ex2Done     := false
-            ex3Done     := false
+            [beHit, trailLocked, trailStop, tp1Done, tp2Done, tp3Done, tp4Done, ex1Done, ex2Done, ex3Done] := f_reset_trade_state()
             int _shortCarryBars = bar_index - nz(pendingShortCarryBar, bar_index)
             pendingShortCarry := false
             pendingShortCarryBar := na
@@ -1854,12 +1924,12 @@ if fireShort and isFlat and isBarClose
                 log.info(str.format("↪ SHORT OPEN-CARRY EXECUTED @{0}: pendingBars={1}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(_shortCarryBars)))
             if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
                 log.info(str.format("🔴 SHORT ALLOWED @{0}: id={1} | entry={2,number,#.##} sl={3,number,#.##} distPts={4,number,#.##} | {5}", str.format_time(time, "HH:mm:ss", "America/New_York"), lbl_short_entry, close, sl, (sl - close), s_meta))
-        else if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
-            log.info(str.format("⛔ SHORT REJECTED @{0}: reason=MAE_LIMIT maeEnforcementMode={1} maeTicks={2,number,#.##} effMaxTicks={3,number,#.##} close={4,number,#.##} sl={5,number,#.##} | {6}", str.format_time(time, "HH:mm:ss", "America/New_York"), maeLimitMode, maeTicks, effectiveMaeTicks, close, sl, s_meta))
-    else if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
-        log.info(str.format("⛔ SHORT REJECTED @{0}: reason=INVALID_SL initialStopLossMode={1} close={2,number,#.##} sl={3} | {4}", str.format_time(time, "HH:mm:ss", "America/New_York"), slMode, close, f_fmt_num(sl), s_meta))
-else if fireShort and not isFlat and (logLevel == "Trades Only" or logLevel == "Full (Deep State)")
-    log.info(str.format("⛔ SHORT REJECTED @{0}: reason=NOT_FLAT pos={1} | {2}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(strategy.position_size), s_meta))
+        else
+            f_log_entry_rejected("SHORT", "MAE_LIMIT", str.format("maeEnforcementMode={0} maeTicks={1,number,#.##} effMaxTicks={2,number,#.##} close={3,number,#.##} sl={4,number,#.##}", maeLimitMode, maeTicks, effectiveMaeTicks, close, sl), s_meta)
+    else
+        f_log_entry_rejected("SHORT", "INVALID_SL", str.format("initialStopLossMode={0} close={1,number,#.##} sl={2}", slMode, close, f_fmt_num(sl)), s_meta)
+else if fireShort and not isFlat
+    f_log_entry_rejected("SHORT", "NOT_FLAT", str.format("pos={0}", str.tostring(strategy.position_size)), s_meta)
 
 // =========================================================================
 // 21. 🎯 EXIT MANAGEMENT — TP / BE / Trail / MFFU
@@ -1889,43 +1959,17 @@ float tp4Tgt = na
 
 if isLong
     float base = not na(entryPrice) ? entryPrice : strategy.position_avg_price
-    tp1Tgt := base + tp1_val * syminfo.mintick
-    // TP2 anchor
-    if tp2_tf == "Chart"
-        tp2Tgt := base + tp2_val * syminfo.mintick
-    else
-        float tp2_st = tp2_tf == "HTF 1" ? h1_st : tp2_tf == "HTF 2" ? h2_st : h3_st
-        tp2Tgt := not na(tp2_st) and tp2_st > base ? tp2_st : base + tp2_val * syminfo.mintick
-    // TP3 anchor
-    if tp3_tf == "Chart"
-        tp3Tgt := base + tp3_val * syminfo.mintick
-    else
-        float tp3_st = tp3_tf == "HTF 1" ? h1_st : tp3_tf == "HTF 2" ? h2_st : h3_st
-        tp3Tgt := not na(tp3_st) and tp3_st > base ? tp3_st : base + tp3_val * syminfo.mintick
-    if tp4_tf == "Chart"
-        tp4Tgt := base + tp4_val * syminfo.mintick
-    else
-        float tp4_st = tp4_tf == "HTF 1" ? h1_st : tp4_tf == "HTF 2" ? h2_st : h3_st
-        tp4Tgt := not na(tp4_st) and tp4_st > base ? tp4_st : base + tp4_val * syminfo.mintick
+    tp1Tgt := f_tp_target(base, true, "Chart", tp1_val, h1_st, h2_st, h3_st)
+    tp2Tgt := f_tp_target(base, true, tp2_tf, tp2_val, h1_st, h2_st, h3_st)
+    tp3Tgt := f_tp_target(base, true, tp3_tf, tp3_val, h1_st, h2_st, h3_st)
+    tp4Tgt := f_tp_target(base, true, tp4_tf, tp4_val, h1_st, h2_st, h3_st)
 
 if isShort
     float base = not na(entryPrice) ? entryPrice : strategy.position_avg_price
-    tp1Tgt := base - tp1_val * syminfo.mintick
-    if tp2_tf == "Chart"
-        tp2Tgt := base - tp2_val * syminfo.mintick
-    else
-        float tp2_st = tp2_tf == "HTF 1" ? h1_st : tp2_tf == "HTF 2" ? h2_st : h3_st
-        tp2Tgt := not na(tp2_st) and tp2_st < base ? tp2_st : base - tp2_val * syminfo.mintick
-    if tp3_tf == "Chart"
-        tp3Tgt := base - tp3_val * syminfo.mintick
-    else
-        float tp3_st = tp3_tf == "HTF 1" ? h1_st : tp3_tf == "HTF 2" ? h2_st : h3_st
-        tp3Tgt := not na(tp3_st) and tp3_st < base ? tp3_st : base - tp3_val * syminfo.mintick
-    if tp4_tf == "Chart"
-        tp4Tgt := base - tp4_val * syminfo.mintick
-    else
-        float tp4_st = tp4_tf == "HTF 1" ? h1_st : tp4_tf == "HTF 2" ? h2_st : h3_st
-        tp4Tgt := not na(tp4_st) and tp4_st < base ? tp4_st : base - tp4_val * syminfo.mintick
+    tp1Tgt := f_tp_target(base, false, "Chart", tp1_val, h1_st, h2_st, h3_st)
+    tp2Tgt := f_tp_target(base, false, tp2_tf, tp2_val, h1_st, h2_st, h3_st)
+    tp3Tgt := f_tp_target(base, false, tp3_tf, tp3_val, h1_st, h2_st, h3_st)
+    tp4Tgt := f_tp_target(base, false, tp4_tf, tp4_val, h1_st, h2_st, h3_st)
 
 // --- Break Even Manager ---
 if not isFlat and not beHit and be_mode != "Off"
@@ -2004,169 +2048,82 @@ string ex1Meta = f_trigger_meta(ex1_tf, ex1_ind, ex1_cond, ex1_comp, ex1_targ, f
 string ex2Meta = f_trigger_meta(ex2_tf, ex2_ind, ex2_cond, ex2_comp, ex2_targ, float(ex2_val), tpDir)
 string ex3Meta = f_trigger_meta(ex3_tf, ex3_ind, ex3_cond, ex3_comp, ex3_targ, float(ex3_val), tpDir)
 
-if isBarClose and not isFlat and (logLevel == "Trades Only" or logLevel == "Full (Deep State)")
-    if tp1TrigRaw and not tp1Trig
-        log.info(str.format("⛔ TP1 BLOCKED @{0}: reason=NET_PNL_GUARD | openPnl={1,number,#.##} avg={2,number,#.##} close={3,number,#.##} | {4}", str.format_time(time, "HH:mm:ss", "America/New_York"), strategy.openprofit, strategy.position_avg_price, close, tp1Meta))
-    if tp2TrigRaw and not tp2Trig
-        log.info(str.format("⛔ TP2 BLOCKED @{0}: reason=NET_PNL_GUARD | openPnl={1,number,#.##} avg={2,number,#.##} close={3,number,#.##} | {4}", str.format_time(time, "HH:mm:ss", "America/New_York"), strategy.openprofit, strategy.position_avg_price, close, tp2Meta))
-    if tp3TrigRaw and not tp3Trig
-        log.info(str.format("⛔ TP3 BLOCKED @{0}: reason=NET_PNL_GUARD | openPnl={1,number,#.##} avg={2,number,#.##} close={3,number,#.##} | {4}", str.format_time(time, "HH:mm:ss", "America/New_York"), strategy.openprofit, strategy.position_avg_price, close, tp3Meta))
-    if tp4TrigRaw and not tp4Trig
-        log.info(str.format("⛔ TP4 BLOCKED @{0}: reason=NET_PNL_GUARD | openPnl={1,number,#.##} avg={2,number,#.##} close={3,number,#.##} | {4}", str.format_time(time, "HH:mm:ss", "America/New_York"), strategy.openprofit, strategy.position_avg_price, close, tp4Meta))
-    if ex1TrigRaw and not ex1Trig
-        log.info(str.format("⛔ EXIT1 BLOCKED @{0}: reason=NET_PNL_GUARD | openPnl={1,number,#.##} avg={2,number,#.##} close={3,number,#.##} | {4}", str.format_time(time, "HH:mm:ss", "America/New_York"), strategy.openprofit, strategy.position_avg_price, close, ex1Meta))
-    if ex2TrigRaw and not ex2Trig
-        log.info(str.format("⛔ EXIT2 BLOCKED @{0}: reason=NET_PNL_GUARD | openPnl={1,number,#.##} avg={2,number,#.##} close={3,number,#.##} | {4}", str.format_time(time, "HH:mm:ss", "America/New_York"), strategy.openprofit, strategy.position_avg_price, close, ex2Meta))
-    if ex3TrigRaw and not ex3Trig
-        log.info(str.format("⛔ EXIT3 BLOCKED @{0}: reason=NET_PNL_GUARD | openPnl={1,number,#.##} avg={2,number,#.##} close={3,number,#.##} | {4}", str.format_time(time, "HH:mm:ss", "America/New_York"), strategy.openprofit, strategy.position_avg_price, close, ex3Meta))
+if isBarClose and not isFlat
+    f_log_blocked_guard("TP1", tp1TrigRaw, tp1Trig, tp1Meta)
+    f_log_blocked_guard("TP2", tp2TrigRaw, tp2Trig, tp2Meta)
+    f_log_blocked_guard("TP3", tp3TrigRaw, tp3Trig, tp3Meta)
+    f_log_blocked_guard("TP4", tp4TrigRaw, tp4Trig, tp4Meta)
+    f_log_blocked_guard("EXIT1", ex1TrigRaw, ex1Trig, ex1Meta)
+    f_log_blocked_guard("EXIT2", ex2TrigRaw, ex2Trig, ex2Meta)
+    f_log_blocked_guard("EXIT3", ex3TrigRaw, ex3Trig, ex3Meta)
 
 // -------------------------------------------------------------------------
 // 21b. 🚪 OVERRIDE EXITS
 // -------------------------------------------------------------------------
 if isBarClose and isLong
-    if not ex1Done and ex1Trig
-        int ex1Qty = f_scale_qty(ex1_qty, strategy.position_size, actualMaxContracts)
-        if ex1_qty == 0
-            strategy.close(lbl_long_entry, comment=id_ex1)
-            ex1Done := true
-            ex2Done := true
-            ex3Done := true
-        else if ex1Qty > 0
-            strategy.close(lbl_long_entry, qty=ex1Qty, comment=id_ex1)
-            ex1Done := true
-        if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
-            log.info(str.format("🚪 EXIT1 HIT @{0}: side=LONG qty={1} id={2} | {3}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(ex1Qty), id_ex1, ex1Meta))
-    if not ex2Done and ex2Trig
-        int ex2Qty = f_scale_qty(ex2_qty, strategy.position_size, actualMaxContracts)
-        if ex2_qty == 0
-            strategy.close(lbl_long_entry, comment=id_ex2)
-            ex1Done := true
-            ex2Done := true
-            ex3Done := true
-        else if ex2Qty > 0
-            strategy.close(lbl_long_entry, qty=ex2Qty, comment=id_ex2)
-            ex2Done := true
-        if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
-            log.info(str.format("🚪 EXIT2 HIT @{0}: side=LONG qty={1} id={2} | {3}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(ex2Qty), id_ex2, ex2Meta))
-    if not ex3Done and ex3Trig
-        int ex3Qty = f_scale_qty(ex3_qty, strategy.position_size, actualMaxContracts)
-        if ex3_qty == 0
-            strategy.close(lbl_long_entry, comment=id_ex3)
-            ex1Done := true
-            ex2Done := true
-            ex3Done := true
-        else if ex3Qty > 0
-            strategy.close(lbl_long_entry, qty=ex3Qty, comment=id_ex3)
-            ex3Done := true
-        if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
-            log.info(str.format("🚪 EXIT3 HIT @{0}: side=LONG qty={1} id={2} | {3}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(ex3Qty), id_ex3, ex3Meta))
+    bool _ex1CloseAllLong = false
+    bool _ex2CloseAllLong = false
+    bool _ex3CloseAllLong = false
+    [ex1Done, _ex1CloseAllLong] := f_exec_override_slot(lbl_long_entry, "LONG", "EXIT1", id_ex1, ex1Trig, ex1Done, ex1_qty, strategy.position_size, actualMaxContracts, ex1Meta)
+    if _ex1CloseAllLong
+        ex1Done := true
+        ex2Done := true
+        ex3Done := true
+    [ex2Done, _ex2CloseAllLong] := f_exec_override_slot(lbl_long_entry, "LONG", "EXIT2", id_ex2, ex2Trig, ex2Done, ex2_qty, strategy.position_size, actualMaxContracts, ex2Meta)
+    if _ex2CloseAllLong
+        ex1Done := true
+        ex2Done := true
+        ex3Done := true
+    [ex3Done, _ex3CloseAllLong] := f_exec_override_slot(lbl_long_entry, "LONG", "EXIT3", id_ex3, ex3Trig, ex3Done, ex3_qty, strategy.position_size, actualMaxContracts, ex3Meta)
+    if _ex3CloseAllLong
+        ex1Done := true
+        ex2Done := true
+        ex3Done := true
 
 if isBarClose and isShort
-    if not ex1Done and ex1Trig
-        int ex1Qty = f_scale_qty(ex1_qty, strategy.position_size, actualMaxContracts)
-        if ex1_qty == 0
-            strategy.close(lbl_short_entry, comment=id_ex1)
-            ex1Done := true
-            ex2Done := true
-            ex3Done := true
-        else if ex1Qty > 0
-            strategy.close(lbl_short_entry, qty=ex1Qty, comment=id_ex1)
-            ex1Done := true
-        if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
-            log.info(str.format("🚪 EXIT1 HIT @{0}: side=SHORT qty={1} id={2} | {3}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(ex1Qty), id_ex1, ex1Meta))
-    if not ex2Done and ex2Trig
-        int ex2Qty = f_scale_qty(ex2_qty, strategy.position_size, actualMaxContracts)
-        if ex2_qty == 0
-            strategy.close(lbl_short_entry, comment=id_ex2)
-            ex1Done := true
-            ex2Done := true
-            ex3Done := true
-        else if ex2Qty > 0
-            strategy.close(lbl_short_entry, qty=ex2Qty, comment=id_ex2)
-            ex2Done := true
-        if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
-            log.info(str.format("🚪 EXIT2 HIT @{0}: side=SHORT qty={1} id={2} | {3}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(ex2Qty), id_ex2, ex2Meta))
-    if not ex3Done and ex3Trig
-        int ex3Qty = f_scale_qty(ex3_qty, strategy.position_size, actualMaxContracts)
-        if ex3_qty == 0
-            strategy.close(lbl_short_entry, comment=id_ex3)
-            ex1Done := true
-            ex2Done := true
-            ex3Done := true
-        else if ex3Qty > 0
-            strategy.close(lbl_short_entry, qty=ex3Qty, comment=id_ex3)
-            ex3Done := true
-        if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
-            log.info(str.format("🚪 EXIT3 HIT @{0}: side=SHORT qty={1} id={2} | {3}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(ex3Qty), id_ex3, ex3Meta))
+    bool _ex1CloseAllShort = false
+    bool _ex2CloseAllShort = false
+    bool _ex3CloseAllShort = false
+    [ex1Done, _ex1CloseAllShort] := f_exec_override_slot(lbl_short_entry, "SHORT", "EXIT1", id_ex1, ex1Trig, ex1Done, ex1_qty, strategy.position_size, actualMaxContracts, ex1Meta)
+    if _ex1CloseAllShort
+        ex1Done := true
+        ex2Done := true
+        ex3Done := true
+    [ex2Done, _ex2CloseAllShort] := f_exec_override_slot(lbl_short_entry, "SHORT", "EXIT2", id_ex2, ex2Trig, ex2Done, ex2_qty, strategy.position_size, actualMaxContracts, ex2Meta)
+    if _ex2CloseAllShort
+        ex1Done := true
+        ex2Done := true
+        ex3Done := true
+    [ex3Done, _ex3CloseAllShort] := f_exec_override_slot(lbl_short_entry, "SHORT", "EXIT3", id_ex3, ex3Trig, ex3Done, ex3_qty, strategy.position_size, actualMaxContracts, ex3Meta)
+    if _ex3CloseAllShort
+        ex1Done := true
+        ex2Done := true
+        ex3Done := true
 
 // -------------------------------------------------------------------------
 // 21c. 🎯 STANDARD TP EXECUTION
 // -------------------------------------------------------------------------
 if isBarClose and isLong
-    if not anyExitTrig and qtyTP1 > 0 and not tp1Done and tp1Trig
-        strategy.close(lbl_long_entry, qty=qtyTP1, comment=id_tp1)
-        tp1Done := true
-        if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
-            log.info(str.format("🎯 TP1 HIT @{0}: side=LONG qty={1} id={2} | {3}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(qtyTP1), id_tp1, tp1Meta))
-    if not anyExitTrig and qtyTP2 > 0 and not tp2Done and tp2Trig
-        strategy.close(lbl_long_entry, qty=qtyTP2, comment=id_tp2)
-        tp2Done := true
-        if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
-            log.info(str.format("🎯 TP2 HIT @{0}: side=LONG qty={1} id={2} | {3}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(qtyTP2), id_tp2, tp2Meta))
-    if not anyExitTrig and qtyTP3 > 0 and not tp3Done and tp3Trig
-        strategy.close(lbl_long_entry, qty=qtyTP3, comment=id_tp3)
-        tp3Done := true
-        if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
-            log.info(str.format("🎯 TP3 HIT @{0}: side=LONG qty={1} id={2} | {3}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(qtyTP3), id_tp3, tp3Meta))
-    if not anyExitTrig and qtyTP4 > 0 and not tp4Done and tp4Trig
-        strategy.close(lbl_long_entry, qty=qtyTP4, comment=id_tp4)
-        tp4Done := true
-        if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
-            log.info(str.format("🎯 TP4 HIT @{0}: side=LONG qty={1} id={2} | {3}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(qtyTP4), id_tp4, tp4Meta))
+    tp1Done := f_exec_tp_slot(lbl_long_entry, "LONG", "TP1", id_tp1, anyExitTrig, qtyTP1, tp1Done, tp1Trig, tp1Meta)
+    tp2Done := f_exec_tp_slot(lbl_long_entry, "LONG", "TP2", id_tp2, anyExitTrig, qtyTP2, tp2Done, tp2Trig, tp2Meta)
+    tp3Done := f_exec_tp_slot(lbl_long_entry, "LONG", "TP3", id_tp3, anyExitTrig, qtyTP3, tp3Done, tp3Trig, tp3Meta)
+    tp4Done := f_exec_tp_slot(lbl_long_entry, "LONG", "TP4", id_tp4, anyExitTrig, qtyTP4, tp4Done, tp4Trig, tp4Meta)
 
 if isBarClose and isShort
-    if not anyExitTrig and qtyTP1 > 0 and not tp1Done and tp1Trig
-        strategy.close(lbl_short_entry, qty=qtyTP1, comment=id_tp1)
-        tp1Done := true
-        if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
-            log.info(str.format("🎯 TP1 HIT @{0}: side=SHORT qty={1} id={2} | {3}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(qtyTP1), id_tp1, tp1Meta))
-    if not anyExitTrig and qtyTP2 > 0 and not tp2Done and tp2Trig
-        strategy.close(lbl_short_entry, qty=qtyTP2, comment=id_tp2)
-        tp2Done := true
-        if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
-            log.info(str.format("🎯 TP2 HIT @{0}: side=SHORT qty={1} id={2} | {3}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(qtyTP2), id_tp2, tp2Meta))
-    if not anyExitTrig and qtyTP3 > 0 and not tp3Done and tp3Trig
-        strategy.close(lbl_short_entry, qty=qtyTP3, comment=id_tp3)
-        tp3Done := true
-        if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
-            log.info(str.format("🎯 TP3 HIT @{0}: side=SHORT qty={1} id={2} | {3}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(qtyTP3), id_tp3, tp3Meta))
-    if not anyExitTrig and qtyTP4 > 0 and not tp4Done and tp4Trig
-        strategy.close(lbl_short_entry, qty=qtyTP4, comment=id_tp4)
-        tp4Done := true
-        if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
-            log.info(str.format("🎯 TP4 HIT @{0}: side=SHORT qty={1} id={2} | {3}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(qtyTP4), id_tp4, tp4Meta))
+    tp1Done := f_exec_tp_slot(lbl_short_entry, "SHORT", "TP1", id_tp1, anyExitTrig, qtyTP1, tp1Done, tp1Trig, tp1Meta)
+    tp2Done := f_exec_tp_slot(lbl_short_entry, "SHORT", "TP2", id_tp2, anyExitTrig, qtyTP2, tp2Done, tp2Trig, tp2Meta)
+    tp3Done := f_exec_tp_slot(lbl_short_entry, "SHORT", "TP3", id_tp3, anyExitTrig, qtyTP3, tp3Done, tp3Trig, tp3Meta)
+    tp4Done := f_exec_tp_slot(lbl_short_entry, "SHORT", "TP4", id_tp4, anyExitTrig, qtyTP4, tp4Done, tp4Trig, tp4Meta)
 
 // -------------------------------------------------------------------------
 // 21d. 🛑 STOP/EXIT ORDERS
 // -------------------------------------------------------------------------
 // --- Apply SL & Exits ---
 if isLong
-    strategy.exit(id_tp1, lbl_long_entry, qty=qtyTP1, stop=entrySL, comment_loss="SL Hit")
-    if qtyTP2 > 0
-        strategy.exit(id_tp2, lbl_long_entry, qty=qtyTP2, stop=entrySL, comment_loss="SL Hit")
-    if qtyTP3 > 0
-        strategy.exit(id_tp3, lbl_long_entry, qty=qtyTP3, stop=entrySL, comment_loss="SL Hit")
-    if qtyTP4 > 0
-        strategy.exit(id_tp4, lbl_long_entry, qty=qtyTP4, stop=entrySL, comment_loss="SL Hit")
+    f_apply_stop_orders(lbl_long_entry, id_tp1, id_tp2, id_tp3, id_tp4, qtyTP1, qtyTP2, qtyTP3, qtyTP4, entrySL)
 
 if isShort
-    strategy.exit(id_tp1, lbl_short_entry, qty=qtyTP1, stop=entrySL, comment_loss="SL Hit")
-    if qtyTP2 > 0
-        strategy.exit(id_tp2, lbl_short_entry, qty=qtyTP2, stop=entrySL, comment_loss="SL Hit")
-    if qtyTP3 > 0
-        strategy.exit(id_tp3, lbl_short_entry, qty=qtyTP3, stop=entrySL, comment_loss="SL Hit")
-    if qtyTP4 > 0
-        strategy.exit(id_tp4, lbl_short_entry, qty=qtyTP4, stop=entrySL, comment_loss="SL Hit")
+    f_apply_stop_orders(lbl_short_entry, id_tp1, id_tp2, id_tp3, id_tp4, qtyTP1, qtyTP2, qtyTP3, qtyTP4, entrySL)
 
 // --- Exit Logging ---
 if closedOut and (logLevel == "Trades Only" or logLevel == "Full (Deep State)")
