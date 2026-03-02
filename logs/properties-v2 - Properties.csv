@@ -1,0 +1,154 @@
+name,value
+Trading range, — 
+Backtesting range,"Feb 26, 2026, 19:00 — Feb 27, 2026, 16:59"
+Symbol,CME_MINI:MNQ1!
+Timeframe,1 minute
+Point value,2
+Chart type,Candles
+Currency,USD
+Tick size,0.25
+Precision,Default
+Use HTF 1,On
+Use HTF 2,On
+Use HTF 3,On
+Trend Filter 1:,Chart
+└─ Compare/Lookback:,Off
+Trend Filter 2:,HTF 1
+└─ Compare/Lookback:,Off
+Trend Filter 3:,HTF 2
+└─ Compare/Lookback:,On
+Invalidation Blocker:,HTF 3
+└─ Compare/Lookback:,On
+Primary Trigger:,Chart
+└─ Compare/Lookback:,On
+Trend Filter 1:,Chart
+└─ Compare/Lookback:,Off
+Trend Filter 2:,HTF 1
+└─ Compare/Lookback:,On
+Trend Filter 3:,HTF 2
+└─ Compare/Lookback:,On
+Invalidation Blocker:,HTF 1
+└─ Compare/Lookback:,On
+Primary Trigger:,Chart
+└─ Compare/Lookback:,On
+Max Order Size Contracts,3
+TP1 Lot % of Total,34
+TP2 Lot % of Total,33
+TP3 Lot % of Total,33
+TP4 Lot % of Total,0
+Exit 1 Qty (0 = Close All),0
+Exit 2 Qty (0 = Close All),0
+Exit 3 Qty (0 = Close All),0
+TP 1 (Lot 1) Target:,Chart
+Net Positive Only,On
+└─ Compare/Lookback:,Off
+TP 2 (Lot 2) Target:,HTF 1
+Net Positive Only,On
+└─ Compare/Lookback:,Off
+TP 3 (Lot 3) Target:,HTF 2
+Net Positive Only,On
+└─ Compare/Lookback:,Off
+TP 4 (Lot 4) Target:,None
+Net Positive Only,On
+└─ Compare/Lookback:,Off
+Enable Exit 1,Off
+Exit 1:,None
+Net Positive Only,On
+└─ Compare/Lookback:,Off
+Enable Exit 2,Off
+Exit 2:,None
+Net Positive Only,On
+└─ Compare/Lookback:,Off
+Enable Exit 3,Off
+Exit 3:,None
+Net Positive Only,On
+└─ Compare/Lookback:,Off
+Initial Stop Loss Mode,Smart Trail
+Min SL Distance (Ticks),20
+Max SL Distance (Ticks),80
+Max Risk Failsafe Action,Abort Trade Completely
+ATR SL Multiplier,1.5
+Fixed SL Ticks,40
+Max Adverse Excursion (Ticks),400
+Use Risk Per Trade (Dynamic MAE),On
+Risk Per Trade ($),250
+Dynamic MAE Dollar Cap ($),250
+Manual MAE Dollar Cap ($),250
+Break Even Mode,After TP1
+BE Offset (Ticks Above Entry for Fees),2
+Custom BE Trigger TF:,Chart
+└─ Compare/Lookback:,Off
+Trailing Activation,After TP1
+Trail Offset (Ticks Buffer),4
+Custom Trail Trigger TF:,Chart
+└─ Compare/Lookback:,Off
+Trail Anchor TF:,HTF 1
+Trail Anchor:,EMA Trail
+Enable Exhaustion Killswitch (Blocks New Arms),On
+Enable Pending Safety Disarm (Kills Pending Trades),On
+Enable EMA Slope Reversal Exit,Off
+Max Loss per Trade ($),250
+Enable ATR Volatility Filter,Off
+ATR Volatility Max Multiplier,1.5
+ATR Volatility Baseline Length,50
+Max Consecutive Losses,3
+Cooldown Bars After Win,3
+Cooldown Bars After Loss,5
+Microscalping Hold Delay (Seconds),10
+Enable Daily Limits,On
+Daily Profit Target ($),1000
+Daily Stop Loss ($),500
+Daily Stop = Risk Per Trade × Mult,Off
+Daily Risk Multiplier,3
+Max Entries Per Day,2
+RTH Session Filter Only,On
+NQ RTH Session (EST),09:30 — 16:00
+Enable Killzone Filter,On
+Killzone 1 Session,09:30 — 10:30
+Killzone 2 Session,14:00 — 15:00
+Enable MFFU Auto-Flatten,Off
+MFFU Flatten Time,15:55 — 16:00
+Enable Prop Mode (Firm Rule Caps),On
+Prop Firm,Tradeify
+Account Size,50k
+Account Type,Standard
+Phase,Challenge
+Contract Type,Micros (MNQ)
+EMA Trend Length,20
+Smart Trail Lookback,12
+ATR Length,14
+Swing Lookback,10
+Slope Angle / Tick Threshold,0.5
+Pivot Lookback,5
+Show Entry Arm Signals,On
+Show On-Chart Debug Label (Last Bar),Off
+Pine Script Logging Level,Trades Only
+📊 Show Filter State Dashboard,Off
+Draw Dynamic Trade Lines,On
+Entry Line,#ffffff
+Stop Loss Line,#f23645
+TP Lines,#2962ff
+HTF 1 Smart Trail,Off
+HTF 2 Smart Trail,Off
+HTF 3 Smart Trail,Off
+HTF 1 EMA Trend,On
+HTF 2 EMA Trend,On
+HTF 3 EMA Trend,On
+HTF 1 Exhaustion,Off
+HTF 2 Exhaustion,Off
+HTF 3 Exhaustion,Off
+HTF 1 BOS/ChoCH,Off
+HTF 2 BOS/ChoCH,Off
+HTF 3 BOS/ChoCH,Off
+Initial capital,50000
+Order size,3 contracts
+Pyramiding,0 orders
+Commission,2.5
+Slippage,2 ticks
+Verify price for limit orders,0 ticks
+Margin for long positions,0%
+Margin for short positions,0%
+Recalculate after order is filled,Off
+Recalculate on every tick,On
+Recalculate on bar close,Off
+Backtesting precision. Use bar magnifier,On
