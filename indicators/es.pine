@@ -1,0 +1,198 @@
+//@version=6
+indicator(title="Exhaustion Signal", shorttitle="ES", overlay=true)
+
+// Inputs
+string g1 = "Signal Visibility"
+bool showLevel1 = input.bool(true, "Show Level 1 Signals", group=g1, inline="L1")
+bool showLevel2 = input.bool(true, "Show Level 2 Signals", group=g1, inline="L2")
+bool showLevel3 = input.bool(true, "Show Level 3 Signals", group=g1, inline="L3")
+string i_icon_size = input.string("small", "Icon Size", options=["tiny","small","normal"], group=g1)
+
+string g2 = "Alert Triggers"
+string TT_ALERTS_GENERAL =
+     "Alerts fire on BAR CLOSE.\n" +
+     "They trigger only on the bar where the count reaches the level.\n" +
+     "Icon visibility does not affect alerts."
+string TT_L1 = "Level 1 alert.\n\n" + TT_ALERTS_GENERAL
+string TT_L2 = "Level 2 alert.\n\n" + TT_ALERTS_GENERAL
+string TT_L3 = "Level 3 alert (then resets).\n\n" + TT_ALERTS_GENERAL
+
+bool alertBullishL1 = input.bool(true, "Bullish L1", group=g2, inline="L1A", tooltip=TT_L1)
+bool alertBearishL1 = input.bool(true, "Bearish L1", group=g2, inline="L1A", tooltip=TT_L1)
+bool alertBullishL2 = input.bool(true, "Bullish L2", group=g2, inline="L2A", tooltip=TT_L2)
+bool alertBearishL2 = input.bool(true, "Bearish L2", group=g2, inline="L2A", tooltip=TT_L2)
+bool alertBullishL3 = input.bool(true, "Bullish L3", group=g2, inline="L3A", tooltip=TT_L3)
+bool alertBearishL3 = input.bool(true, "Bearish L3", group=g2, inline="L3A", tooltip=TT_L3)
+
+string g3 = "Thresholds"
+int i_L1 = input.int(9,  "Level 1 Threshold", minval=2, maxval=50, group=g3)
+int i_L2 = input.int(12, "Level 2 Threshold", minval=3, maxval=60, group=g3)
+int i_L3 = input.int(14, "Level 3 Threshold", minval=4, maxval=80, group=g3)
+
+int L1 = i_L1
+int L2 = math.max(i_L2, L1 + 1)
+int L3 = math.max(i_L3, L2 + 1)
+
+// State
+var int cycle = 0
+var int bullishCount = 0
+var int bearishCount = 0
+
+// Guards
+bool has4 = bar_index >= 4 and not na(close[4])
+bool has3 = bar_index >= 3 and not na(close[3])
+bool has2 = bar_index >= 2 and not na(close[2])
+
+f_resetAndRecheck() =>
+    int nb = 0
+    int ns = 0
+    int nc = 0
+    if has4
+        if close < close[4]
+            nb := 1
+            nc := 1
+        else if close > close[4]
+            ns := 1
+            nc := 1
+    [nb, ns, nc]
+
+// Logic
+int prevBullishCount = bullishCount
+int prevBearishCount = bearishCount
+int prevCycle = cycle
+
+if not has4
+    bullishCount := 0
+    bearishCount := 0
+    cycle := 0
+else
+    if prevCycle < L1
+        if close < close[4]
+            bullishCount := prevBullishCount + 1
+            bearishCount := 0
+            cycle := bullishCount
+        else if close > close[4]
+            bearishCount := prevBearishCount + 1
+            bullishCount := 0
+            cycle := bearishCount
+        else
+            [nb, ns, nc] = f_resetAndRecheck()
+            bullishCount := nb
+            bearishCount := ns
+            cycle := nc
+    else
+        if prevBullishCount > 0
+            if prevBullishCount < L2
+                if has3 and close < close[3]
+                    bullishCount := prevBullishCount + 1
+                    cycle := bullishCount
+                else
+                    [nb, ns, nc] = f_resetAndRecheck()
+                    bullishCount := nb
+                    bearishCount := ns
+                    cycle := nc
+            else if prevBullishCount < (L3 - 1)
+                if has2 and close < close[2]
+                    bullishCount := prevBullishCount + 1
+                    cycle := bullishCount
+                else
+                    [nb, ns, nc] = f_resetAndRecheck()
+                    bullishCount := nb
+                    bearishCount := ns
+                    cycle := nc
+            else if prevBullishCount == (L3 - 1)
+                if has2 and close < close[2]
+                    bullishCount := L3
+                    cycle := bullishCount
+                else
+                    [nb, ns, nc] = f_resetAndRecheck()
+                    bullishCount := nb
+                    bearishCount := ns
+                    cycle := nc
+        else if prevBearishCount > 0
+            if prevBearishCount < L2
+                if has3 and close > close[3]
+                    bearishCount := prevBearishCount + 1
+                    cycle := bearishCount
+                else
+                    [nb, ns, nc] = f_resetAndRecheck()
+                    bullishCount := nb
+                    bearishCount := ns
+                    cycle := nc
+            else if prevBearishCount < (L3 - 1)
+                if has2 and close > close[2]
+                    bearishCount := prevBearishCount + 1
+                    cycle := bearishCount
+                else
+                    [nb, ns, nc] = f_resetAndRecheck()
+                    bullishCount := nb
+                    bearishCount := ns
+                    cycle := nc
+            else if prevBearishCount == (L3 - 1)
+                if has2 and close > close[2]
+                    bearishCount := L3
+                    cycle := bearishCount
+                else
+                    [nb, ns, nc] = f_resetAndRecheck()
+                    bullishCount := nb
+                    bearishCount := ns
+                    cycle := nc
+        else
+            [nb, ns, nc] = f_resetAndRecheck()
+            bullishCount := nb
+            bearishCount := ns
+            cycle := nc
+
+// Signals
+bool sigBullL1 = showLevel1 and bullishCount == L1
+bool sigBearL1 = showLevel1 and bearishCount == L1
+bool sigBullL2 = showLevel2 and bullishCount == L2
+bool sigBearL2 = showLevel2 and bearishCount == L2
+bool sigBullL3 = showLevel3 and bullishCount == L3
+bool sigBearL3 = showLevel3 and bearishCount == L3
+
+bool szTiny   = i_icon_size == "tiny"
+bool szSmall  = i_icon_size == "small"
+bool szNormal = i_icon_size == "normal"
+
+color COL_BULL = color.new(#30ff85, 0)
+color COL_BEAR = color.new(#ff1200, 0)
+
+// Plot (tiny)
+plotshape(sigBullL1 and szTiny,  "L1 Bull (tiny)", shape.diamond, location=location.belowbar, color=COL_BULL, size=size.tiny)
+plotshape(sigBearL1 and szTiny,  "L1 Bear (tiny)", shape.diamond, location=location.abovebar, color=COL_BEAR, size=size.tiny)
+plotshape(sigBullL2 and szTiny,  "L2 Bull (tiny)", shape.xcross,  location=location.belowbar, color=COL_BULL, size=size.tiny)
+plotshape(sigBearL2 and szTiny,  "L2 Bear (tiny)", shape.xcross,  location=location.abovebar, color=COL_BEAR, size=size.tiny)
+plotshape(sigBullL3 and szTiny,  "L3 Bull (tiny)", shape.flag,    location=location.belowbar, color=COL_BULL, size=size.tiny)
+plotshape(sigBearL3 and szTiny,  "L3 Bear (tiny)", shape.flag,    location=location.abovebar, color=COL_BEAR, size=size.tiny)
+
+// Plot (small)
+plotshape(sigBullL1 and szSmall, "L1 Bull (small)", shape.diamond, location=location.belowbar, color=COL_BULL, size=size.small)
+plotshape(sigBearL1 and szSmall, "L1 Bear (small)", shape.diamond, location=location.abovebar, color=COL_BEAR, size=size.small)
+plotshape(sigBullL2 and szSmall, "L2 Bull (small)", shape.xcross,  location=location.belowbar, color=COL_BULL, size=size.small)
+plotshape(sigBearL2 and szSmall, "L2 Bear (small)", shape.xcross,  location=location.abovebar, color=COL_BEAR, size=size.small)
+plotshape(sigBullL3 and szSmall, "L3 Bull (small)", shape.flag,    location=location.belowbar, color=COL_BULL, size=size.small)
+plotshape(sigBearL3 and szSmall, "L3 Bear (small)", shape.flag,    location=location.abovebar, color=COL_BEAR, size=size.small)
+
+// Plot (normal)
+plotshape(sigBullL1 and szNormal, "L1 Bull (normal)", shape.diamond, location=location.belowbar, color=COL_BULL, size=size.normal)
+plotshape(sigBearL1 and szNormal, "L1 Bear (normal)", shape.diamond, location=location.abovebar, color=COL_BEAR, size=size.normal)
+plotshape(sigBullL2 and szNormal, "L2 Bull (normal)", shape.xcross,  location=location.belowbar, color=COL_BULL, size=size.normal)
+plotshape(sigBearL2 and szNormal, "L2 Bear (normal)", shape.xcross,  location=location.abovebar, color=COL_BEAR, size=size.normal)
+plotshape(sigBullL3 and szNormal, "L3 Bull (normal)", shape.flag,    location=location.belowbar, color=COL_BULL, size=size.normal)
+plotshape(sigBearL3 and szNormal, "L3 Bear (normal)", shape.flag,    location=location.abovebar, color=COL_BEAR, size=size.normal)
+
+// Alerts
+bool fire = barstate.isconfirmed
+alertcondition(fire and bullishCount == L1 and alertBullishL1, title="L1 Bullish Exhaustion", message="L1 Bullish Exhaustion (bar close): {{ticker}}")
+alertcondition(fire and bearishCount == L1 and alertBearishL1, title="L1 Bearish Exhaustion", message="L1 Bearish Exhaustion (bar close): {{ticker}}")
+alertcondition(fire and bullishCount == L2 and alertBullishL2, title="L2 Bullish Exhaustion", message="L2 Bullish Exhaustion (bar close): {{ticker}}")
+alertcondition(fire and bearishCount == L2 and alertBearishL2, title="L2 Bearish Exhaustion", message="L2 Bearish Exhaustion (bar close): {{ticker}}")
+alertcondition(fire and bullishCount == L3 and alertBullishL3, title="L3 Bullish Exhaustion", message="L3 Bullish Exhaustion (bar close, then resets): {{ticker}}")
+alertcondition(fire and bearishCount == L3 and alertBearishL3, title="L3 Bearish Exhaustion", message="L3 Bearish Exhaustion (bar close, then resets): {{ticker}}")
+
+// Reset
+if bullishCount == L3 or bearishCount == L3
+    bullishCount := 0
+    bearishCount := 0
+    cycle := 0

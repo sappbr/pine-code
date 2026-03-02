@@ -1,0 +1,960 @@
+//@version=6
+// -------------------------------------------------------------------------
+// 🎯 PHASE 1: STRATEGY DECLARATION & INSTITUTIONAL HANDICAPS
+// -------------------------------------------------------------------------
+// Constraint Satisfied: Cloud-routed handicaps applied (Slippage, Commissions, Bar Magnifier)[cite: 942].
+// Constraint Satisfied: calc_on_every_tick = true applied to ensure TradersPost webhooks fire intrabar for the 16:08 EST MFFU flatten.
+strategy("NQ Scalper Pro - Prop Firm Engine [GOD MODE] - TradersPost", 
+     overlay = true, 
+     calc_on_every_tick = true, // Forces instant webhook firing for TradersPost
+     initial_capital = 50000, 
+     default_qty_type = strategy.fixed, 
+     default_qty_value = 3, 
+     pyramiding = 0, 
+     commission_type = strategy.commission.cash_per_contract, // Institutional handicap [cite: 942]
+     commission_value = 2.50,                                 // Institutional handicap [cite: 942]
+     slippage = 2,                                            // Institutional handicap [cite: 942]
+     margin_long = 0, 
+     margin_short = 0, 
+     use_bar_magnifier = true)                                // Institutional handicap [cite: 942]
+
+// =========================================================================
+// 1. ⏱️ TIMEFRAME & FRACTAL SETUP
+// =========================================================================
+var G_TF = "1. ⏱️ TIMEFRAME & FRACTAL SETUP"
+useH1 = input.bool(true, "Use HTF 1", inline="h1", group=G_TF)
+tfH1  = input.timeframe("5", "", inline="h1", group=G_TF)
+useH2 = input.bool(true, "Use HTF 2", inline="h2", group=G_TF)
+tfH2  = input.timeframe("15", "", inline="h2", group=G_TF)
+useH3 = input.bool(true, "Use HTF 3", inline="h3", group=G_TF)
+tfH3  = input.timeframe("60", "", inline="h3", group=G_TF)
+
+// =========================================================================
+// 2. 🛡️ LONG CONDITIONS (FILTERS & BLOCKERS)
+// =========================================================================
+var G_L_COND = "2. 🛡️ LONG CONDITIONS (FILTERS)"
+l_f1_tf     = input.string("HTF 1", "Trend Filter 1:", options=["None", "Chart", "HTF 1", "HTF 2", "HTF 3"], inline="l_f1", group=G_L_COND)
+l_f1_ind    = input.string("Smart Trail", "", options=["Smart Trail", "EMA Slope", "Close", "Exhaustion L2", "Exhaustion L3"], inline="l_f1", group=G_L_COND)
+l_f1_cond   = input.string("Is Bullish", "", options=["Is Bullish", "Is Bearish", "Greater Than", "Less Than", "Is Active (Has Not Reset)", "Occurred Within X Bars"], inline="l_f1", group=G_L_COND)
+l_f1_comp   = input.bool(false, "└─ Compare/Lookback:", inline="l_f1b", group=G_L_COND)
+l_f1_targ   = input.string("Value/Price", "", options=["Value/Price", "Smart Trail", "EMA Trend"], inline="l_f1b", group=G_L_COND)
+l_f1_val    = input.float(0.0, "", inline="l_f1b", group=G_L_COND)
+
+l_f2_tf     = input.string("HTF 2", "Trend Filter 2:", options=["None", "Chart", "HTF 1", "HTF 2", "HTF 3"], inline="l_f2", group=G_L_COND)
+l_f2_ind    = input.string("EMA Slope", "", options=["Smart Trail", "EMA Slope", "Close", "Exhaustion L2", "Exhaustion L3"], inline="l_f2", group=G_L_COND)
+l_f2_cond   = input.string("Greater Than", "", options=["Is Bullish", "Is Bearish", "Greater Than", "Less Than", "Is Active (Has Not Reset)", "Occurred Within X Bars"], inline="l_f2", group=G_L_COND)
+l_f2_comp   = input.bool(true, "└─ Compare/Lookback:", inline="l_f2b", group=G_L_COND)
+l_f2_targ   = input.string("Custom Value", "", options=["Value/Price", "Custom Value", "Smart Trail", "EMA Trend"], inline="l_f2b", group=G_L_COND)
+l_f2_val    = input.float(0.5, "", inline="l_f2b", group=G_L_COND)
+
+l_f3_tf     = input.string("None", "Trend Filter 3:", options=["None", "Chart", "HTF 1", "HTF 2", "HTF 3"], inline="l_f3", group=G_L_COND)
+l_f3_ind    = input.string("Close", "", options=["Smart Trail", "EMA Slope", "Close", "Exhaustion L2", "Exhaustion L3"], inline="l_f3", group=G_L_COND)
+l_f3_cond   = input.string("Greater Than", "", options=["Is Bullish", "Is Bearish", "Greater Than", "Less Than", "Is Active (Has Not Reset)", "Occurred Within X Bars"], inline="l_f3", group=G_L_COND)
+l_f3_comp   = input.bool(true, "└─ Compare/Lookback:", inline="l_f3b", group=G_L_COND)
+l_f3_targ   = input.string("Smart Trail", "", options=["Value/Price", "Smart Trail", "EMA Trend"], inline="l_f3b", group=G_L_COND)
+l_f3_val    = input.float(0.0, "", inline="l_f3b", group=G_L_COND)
+
+l_blk_tf    = input.string("HTF 2", "Invalidation Blocker:", options=["None", "Chart", "HTF 1", "HTF 2", "HTF 3"], inline="l_blk", group=G_L_COND, tooltip="Kills trade if true.")
+l_blk_ind   = input.string("Exhaustion L3", "", options=["Exhaustion L2", "Exhaustion L3"], inline="l_blk", group=G_L_COND)
+l_blk_cond  = input.string("Occurred Within X Bars", "", options=["Is Active (Has Not Reset)", "Occurred Within X Bars"], inline="l_blk", group=G_L_COND)
+l_blk_comp  = input.bool(true, "└─ Compare/Lookback:", inline="l_blkb", group=G_L_COND)
+l_blk_targ  = input.string("Custom Value", "", options=["Custom Value", "Value/Price"], inline="l_blkb", group=G_L_COND)
+l_blk_val   = input.int(20, "", inline="l_blkb", group=G_L_COND)
+
+// =========================================================================
+// 3. 🟢 LONG ENTRY (TRIGGER)
+// =========================================================================
+var G_L_ENT = "3. 🟢 LONG ENTRY (TRIGGER)"
+l_prim_tf   = input.string("Chart", "Primary Trigger:", options=["Chart", "HTF 1", "HTF 2", "HTF 3"], inline="l_prim", group=G_L_ENT)
+l_prim_ind  = input.string("Close", "", options=["Exhaustion L1", "Exhaustion L2", "Exhaustion L3", "Smart Trail", "EMA Slope", "Close"], inline="l_prim", group=G_L_ENT)
+l_prim_cond = input.string("Crosses Over", "", options=["Printed Bullish", "Printed Bearish", "Crosses Over", "Crosses Under", "Greater Than", "Less Than"], inline="l_prim", group=G_L_ENT)
+l_prim_comp = input.bool(true, "└─ Compare/Lookback:", inline="l_primb", group=G_L_ENT)
+l_prim_targ = input.string("Smart Trail", "", options=["Value/Price", "Custom Value", "Smart Trail", "EMA Trend"], inline="l_primb", group=G_L_ENT)
+l_prim_val  = input.float(0.0, "", inline="l_primb", group=G_L_ENT)
+
+// =========================================================================
+// 4. 🛡️ SHORT CONDITIONS (FILTERS & BLOCKERS)
+// =========================================================================
+var G_S_COND = "4. 🛡️ SHORT CONDITIONS (FILTERS)"
+s_f1_tf     = input.string("HTF 1", "Trend Filter 1:", options=["None", "Chart", "HTF 1", "HTF 2", "HTF 3"], inline="s_f1", group=G_S_COND)
+s_f1_ind    = input.string("Smart Trail", "", options=["Smart Trail", "EMA Slope", "Close", "Exhaustion L2", "Exhaustion L3"], inline="s_f1", group=G_S_COND)
+s_f1_cond   = input.string("Is Bearish", "", options=["Is Bullish", "Is Bearish", "Greater Than", "Less Than", "Is Active (Has Not Reset)", "Occurred Within X Bars"], inline="s_f1", group=G_S_COND)
+s_f1_comp   = input.bool(false, "└─ Compare/Lookback:", inline="s_f1b", group=G_S_COND)
+s_f1_targ   = input.string("Value/Price", "", options=["Value/Price", "Smart Trail", "EMA Trend"], inline="s_f1b", group=G_S_COND)
+s_f1_val    = input.float(0.0, "", inline="s_f1b", group=G_S_COND)
+
+s_f2_tf     = input.string("HTF 2", "Trend Filter 2:", options=["None", "Chart", "HTF 1", "HTF 2", "HTF 3"], inline="s_f2", group=G_S_COND)
+s_f2_ind    = input.string("EMA Slope", "", options=["Smart Trail", "EMA Slope", "Close", "Exhaustion L2", "Exhaustion L3"], inline="s_f2", group=G_S_COND)
+s_f2_cond   = input.string("Less Than", "", options=["Is Bullish", "Is Bearish", "Greater Than", "Less Than", "Is Active (Has Not Reset)", "Occurred Within X Bars"], inline="s_f2", group=G_S_COND)
+s_f2_comp   = input.bool(true, "└─ Compare/Lookback:", inline="s_f2b", group=G_S_COND)
+s_f2_targ   = input.string("Custom Value", "", options=["Value/Price", "Custom Value", "Smart Trail", "EMA Trend"], inline="s_f2b", group=G_S_COND)
+s_f2_val    = input.float(-0.5, "", inline="s_f2b", group=G_S_COND)
+
+s_f3_tf     = input.string("None", "Trend Filter 3:", options=["None", "Chart", "HTF 1", "HTF 2", "HTF 3"], inline="s_f3", group=G_S_COND)
+s_f3_ind    = input.string("Close", "", options=["Smart Trail", "EMA Slope", "Close", "Exhaustion L2", "Exhaustion L3"], inline="s_f3", group=G_S_COND)
+s_f3_cond   = input.string("Less Than", "", options=["Is Bullish", "Is Bearish", "Greater Than", "Less Than", "Is Active (Has Not Reset)", "Occurred Within X Bars"], inline="s_f3", group=G_S_COND)
+s_f3_comp   = input.bool(true, "└─ Compare/Lookback:", inline="s_f3b", group=G_S_COND)
+s_f3_targ   = input.string("Smart Trail", "", options=["Value/Price", "Smart Trail", "EMA Trend"], inline="s_f3b", group=G_S_COND)
+s_f3_val    = input.float(0.0, "", inline="s_f3b", group=G_S_COND)
+
+s_blk_tf    = input.string("HTF 2", "Invalidation Blocker:", options=["None", "Chart", "HTF 1", "HTF 2", "HTF 3"], inline="s_blk", group=G_S_COND, tooltip="Kills trade if true.")
+s_blk_ind   = input.string("Exhaustion L3", "", options=["Exhaustion L2", "Exhaustion L3"], inline="s_blk", group=G_S_COND)
+s_blk_cond  = input.string("Occurred Within X Bars", "", options=["Is Active (Has Not Reset)", "Occurred Within X Bars"], inline="s_blk", group=G_S_COND)
+s_blk_comp  = input.bool(true, "└─ Compare/Lookback:", inline="s_blkb", group=G_S_COND)
+s_blk_targ  = input.string("Custom Value", "", options=["Custom Value", "Value/Price"], inline="s_blkb", group=G_S_COND)
+s_blk_val   = input.int(20, "", inline="s_blkb", group=G_S_COND)
+
+// =========================================================================
+// 5. 🔴 SHORT ENTRY (TRIGGER)
+// =========================================================================
+var G_S_ENT = "5. 🔴 SHORT ENTRY (TRIGGER)"
+s_prim_tf   = input.string("Chart", "Primary Trigger:", options=["Chart", "HTF 1", "HTF 2", "HTF 3"], inline="s_prim", group=G_S_ENT)
+s_prim_ind  = input.string("Close", "", options=["Exhaustion L1", "Exhaustion L2", "Exhaustion L3", "Smart Trail", "EMA Slope", "Close"], inline="s_prim", group=G_S_ENT)
+s_prim_cond = input.string("Crosses Under", "", options=["Printed Bullish", "Printed Bearish", "Crosses Over", "Crosses Under", "Greater Than", "Less Than"], inline="s_prim", group=G_S_ENT)
+s_prim_comp = input.bool(true, "└─ Compare/Lookback:", inline="s_primb", group=G_S_ENT)
+s_prim_targ = input.string("Smart Trail", "", options=["Value/Price", "Custom Value", "Smart Trail", "EMA Trend"], inline="s_primb", group=G_S_ENT)
+s_prim_val  = input.float(0.0, "", inline="s_primb", group=G_S_ENT)
+
+// =========================================================================
+// 6. 🎯 DYNAMIC EXITS & SCALING
+// =========================================================================
+var G_EX = "6. 🎯 DYNAMIC EXITS & SCALING"
+// Constraint Satisfied: strict integer formatting for qtyInput[cite: 936].
+qtyInput   = input.int(3, "Total Position Size (Whole Contracts Only)", minval=1, group=G_EX)
+
+tp1_tf     = input.string("Chart", "TP 1 (Lot 1) Target:", options=["None", "Chart", "HTF 1", "HTF 2", "HTF 3"], inline="tp1", group=G_EX)
+tp1_ind    = input.string("Exhaustion L1", "", options=["Exhaustion L1", "Exhaustion L2", "Exhaustion L3", "Close"], inline="tp1", group=G_EX)
+tp1_cond   = input.string("Printed Opposing", "", options=["Printed Opposing", "Occurred Within X Bars", "Crosses Over", "Crosses Under"], inline="tp1", group=G_EX)
+tp1_comp   = input.bool(false, "└─ Compare/Lookback:", inline="tp1b", group=G_EX)
+tp1_targ   = input.string("Value/Price", "", options=["Value/Price", "Smart Trail"], inline="tp1b", group=G_EX)
+tp1_val    = input.int(0, "", inline="tp1b", group=G_EX)
+moveBe     = input.bool(true, "Move SL to Break Even After TP1?", group=G_EX)
+
+tp2_tf     = input.string("Chart", "TP 2 (Lot 2) Target:", options=["None", "Chart", "HTF 1", "HTF 2", "HTF 3"], inline="tp2", group=G_EX)
+tp2_ind    = input.string("Close", "", options=["Exhaustion L1", "Exhaustion L2", "Exhaustion L3", "Close"], inline="tp2", group=G_EX)
+tp2_cond   = input.string("Crosses Under", "", options=["Printed Opposing", "Occurred Within X Bars", "Crosses Over", "Crosses Under"], inline="tp2", group=G_EX)
+tp2_comp   = input.bool(true, "└─ Compare/Lookback:", inline="tp2b", group=G_EX)
+tp2_targ   = input.string("Smart Trail", "", options=["Value/Price", "Smart Trail"], inline="tp2b", group=G_EX)
+tp2_val    = input.int(0, "", inline="tp2b", group=G_EX)
+
+tp3_tf     = input.string("HTF 1", "TP 3 (Lot 3) Target:", options=["None", "Chart", "HTF 1", "HTF 2", "HTF 3"], inline="tp3", group=G_EX)
+tp3_ind    = input.string("Exhaustion L3", "", options=["Exhaustion L1", "Exhaustion L2", "Exhaustion L3", "Close"], inline="tp3", group=G_EX)
+tp3_cond   = input.string("Printed Opposing", "", options=["Printed Opposing", "Occurred Within X Bars", "Crosses Over", "Crosses Under"], inline="tp3", group=G_EX)
+tp3_comp   = input.bool(false, "└─ Compare/Lookback:", inline="tp3b", group=G_EX)
+tp3_targ   = input.string("Value/Price", "", options=["Value/Price", "Smart Trail"], inline="tp3b", group=G_EX)
+tp3_val    = input.int(0, "", inline="tp3b", group=G_EX)
+
+// =========================================================================
+// 7. 🛑 INITIAL STOP LOSS & TRAILING
+// =========================================================================
+var G_SL = "7. 🛑 INITIAL STOP LOSS & TRAILING"
+slMode     = input.string("HTF Waterfall Failsafe", "Initial Stop Loss Mode", options=["HTF Waterfall Failsafe", "Recent Swing", "Smart Trail", "HTF 1 Smart Trail", "HTF 2 Smart Trail", "HTF 3 Smart Trail", "Fixed Ticks", "ATR"], group=G_SL)
+minSlTicks = input.int(20, "Min SL Distance (Ticks)", group=G_SL)
+maxSlTicks = input.int(80, "Max SL Distance (Ticks)", group=G_SL)
+failsafeAct= input.string("Abort Trade Completely", "Max Risk Failsafe Action", options=["Abort Trade Completely", "Snap to Max SL Ticks"], group=G_SL)
+trailMode  = input.string("Trail Smart Trail", "Trailing Stop Mode (After TP1)", options=["Trail Smart Trail", "Trail HTF 1 Smart Trail", "Trail HTF 2 Smart Trail", "Trail HTF 3 Smart Trail", "None"], group=G_SL)
+trailBuffer= input.int(4, "Trailing Tap Buffer (Ticks)", group=G_SL)
+
+// =========================================================================
+// 8. ⚠️ EXITS & SAFETY OVERRIDES
+// =========================================================================
+var G_SAFE = "8. ⚠️ EXITS & SAFETY OVERRIDES"
+useMacroKillswitch = input.bool(true, "Enable Exhaustion Killswitch (Blocks New Arms)", group=G_SAFE)
+useSafetyDisarm    = input.bool(true, "Enable Pending Safety Disarm (Kills Pending Trades)", group=G_SAFE)
+useEmaReversal     = input.bool(true, "Enable EMA Slope Reversal Exit", group=G_SAFE)
+maxLossTrade       = input.float(250.0, "Max Loss per Trade ($)", group=G_SAFE)
+maxLossesDay       = input.int(3, "Max Consecutive Losses", group=G_SAFE)
+cooldownWin        = input.int(3, "Cooldown Bars After Win", group=G_SAFE)
+cooldownLoss       = input.int(5, "Cooldown Bars After Loss", group=G_SAFE)
+// Constraint Satisfied: Temporal delay input for Tradeify micro-scalp protection[cite: 937, 938].
+microscalpDelay    = input.int(10, "Microscalping Hold Delay (Seconds)", tooltip="Prevents Tradeify microscalping bans by delaying trail cascade", group=G_SAFE)
+
+// =========================================================================
+// 9. 📅 DAILY LIMITS & SESSIONS
+// =========================================================================
+var G_LIM = "9. 📅 DAILY LIMITS & SESSIONS"
+useLimits      = input.bool(true, "Enable Daily Limits", group=G_LIM)
+dailyTarget    = input.float(1000.0, "Daily Profit Target ($)", group=G_LIM)
+dailySl        = input.float(500.0, "Daily Stop Loss ($)", group=G_LIM)
+maxDailyTrades = input.int(6, "Max Entries Per Day", group=G_LIM)
+useSession     = input.bool(true, "RTH Session Filter Only", group=G_LIM)
+sessionStr     = input.session("0930-1600:23456", "NQ RTH Session (EST)", group=G_LIM)
+useCompliance  = input.bool(true, "Enable Prop Firm Compliance", group=G_LIM)
+
+// =========================================================================
+// 10. 🧮 INDICATOR PARAMETERS (BACKEND MATH)
+// =========================================================================
+var G_IND = "10. 🧮 INDICATOR PARAMETERS (BACKEND MATH)"
+emaLen      = input.int(20, "EMA Trend Length", group=G_IND)
+trailLen    = input.int(12, "Smart Trail Lookback", group=G_IND)
+atrLen      = input.int(14, "ATR Length", group=G_IND)
+swingLen    = input.int(10, "Swing Lookback", group=G_IND)
+slopeThresh = input.float(0.5, "Slope Angle / Tick Threshold", group=G_IND, tooltip="Defines 'Strong' vs 'Flat/Choppy' slope.")
+
+// =========================================================================
+// 11. 🎨 VISUALS & SELECTIVE RENDERING
+// =========================================================================
+var G_VIS = "11. 🎨 VISUALS & SELECTIVE RENDERING"
+showActiveOnly = input.bool(true, "Only Show Active Condition Signals", group=G_VIS)
+
+// Shape Render Styles
+c_bullL1 = input.color(color.new(#30ff85, 0), "Bull L1 Shape", inline="v_bl1", group=G_VIS)
+s_bullL1 = input.string("Tiny", "", options=["Tiny", "Small", "Normal", "Large"], inline="v_bl1", group=G_VIS)
+c_bearL1 = input.color(color.new(#ff1200, 0), "Bear L1 Shape", inline="v_be1", group=G_VIS)
+s_bearL1 = input.string("Tiny", "", options=["Tiny", "Small", "Normal", "Large"], inline="v_be1", group=G_VIS)
+c_bullL2 = input.color(color.new(#30ff85, 0), "Bull L2 Shape", inline="v_bl2", group=G_VIS)
+s_bullL2 = input.string("Small", "", options=["Tiny", "Small", "Normal", "Large"], inline="v_bl2", group=G_VIS)
+c_bearL2 = input.color(color.new(#ff1200, 0), "Bear L2 Shape", inline="v_be2", group=G_VIS)
+s_bearL2 = input.string("Small", "", options=["Tiny", "Small", "Normal", "Large"], inline="v_be2", group=G_VIS)
+c_bullL3 = input.color(color.new(#00e5ff, 0), "Bull L3 Shape", inline="v_bl3", group=G_VIS)
+s_bullL3 = input.string("Normal", "", options=["Tiny", "Small", "Normal", "Large"], inline="v_bl3", group=G_VIS)
+c_bearL3 = input.color(color.new(#ff6d00, 0), "Bear L3 Shape", inline="v_be3", group=G_VIS)
+s_bearL3 = input.string("Normal", "", options=["Tiny", "Small", "Normal", "Large"], inline="v_be3", group=G_VIS)
+
+drawLines  = input.bool(true, "Draw Dynamic Trade Lines", group=G_VIS)
+c_lineEnt  = input.color(color.white, "Entry Line", inline="v_lineE", group=G_VIS)
+st_lineEnt = input.string("Dotted", "", options=["Solid", "Dotted", "Dashed"], inline="v_lineE", group=G_VIS)
+c_lineSl   = input.color(color.red, "Stop Loss Line", inline="v_lineS", group=G_VIS)
+st_lineSl  = input.string("Solid", "", options=["Solid", "Dotted", "Dashed"], inline="v_lineS", group=G_VIS)
+c_lineTp   = input.color(color.blue, "TP Lines", inline="v_lineT", group=G_VIS)
+st_lineTp  = input.string("Solid", "", options=["Solid", "Dotted", "Dashed"], inline="v_lineT", group=G_VIS)
+
+// =========================================================================
+// 12. 🧮 BASE MATH & INDICATORS (Chart Timeframe)
+// =========================================================================
+// Constraint Satisfied: All base math is calculated natively on the execution chart to minimize TradingView memory overhead before tuple packing.
+
+// --- Volatility & Swings ---
+atrValue  = ta.atr(atrLen)
+swingHigh = ta.highest(high, swingLen)
+swingLow  = ta.lowest(low, swingLen)
+
+// --- EMA & Slope Calculation ---
+emaTrend = ta.ema(close, emaLen)
+emaSlope = (emaTrend - nz(emaTrend[1], emaTrend)) / syminfo.mintick
+
+// --- Smart Trail Calculation ---
+upperTrail = ta.highest(high, trailLen)
+lowerTrail = ta.lowest(low, trailLen)
+var float smartTrail = na
+smartTrail := close > smartTrail[1] ? lowerTrail : close < smartTrail[1] ? upperTrail : nz(smartTrail[1], close)
+
+var int trailState = 1
+if close > smartTrail
+    trailState := 1
+else if close < smartTrail
+    trailState := -1
+
+// --- Exhaustion Sequence Logic ---
+// Constraint Satisfied: Custom rolling function completely avoids memory-heavy ta.barssince() loops.
+f_exh() =>
+    bool has4 = bar_index >= 4 and not na(close[4])
+    int bll = 0
+    int brr = 0
+    if has4
+        bll := close < close[4] ? nz(bll[1]) + 1 : 0
+        brr := close > close[4] ? nz(brr[1]) + 1 : 0
+    [bll, brr]
+
+[bullCnt, bearCnt] = f_exh()
+bool isBullL1 = bullCnt == 9
+bool isBullL2 = bullCnt == 12
+bool isBullL3 = bullCnt == 14
+bool isBearL1 = bearCnt == 9
+bool isBearL2 = bearCnt == 12
+bool isBearL3 = bearCnt == 14
+
+// =========================================================================
+// 13. ⏱️ ZERO-REPAINTING MULTI-TIMEFRAME ARRAYS
+// =========================================================================
+// Constraint Satisfied: 16 structural variables are packed into a single array tuple per timeframe inside request.security() to bypass limits.
+// Constraint Satisfied: Absolute safest zero-repainting configuration enforces `[1]` historical offset with lookahead_on.
+
+f_htf_data() =>
+    [close[1], high[1], low[1], smartTrail[1], trailState[1], emaTrend[1], emaSlope[1], isBullL1[1], isBullL2[1], isBullL3[1], isBearL1[1], isBearL2[1], isBearL3[1], atrValue[1], swingHigh[1], swingLow[1]]
+
+// --- HTF 1 Array ---
+[h1_c, h1_h, h1_l, h1_st, h1_ts, h1_ema, h1_slp, h1_bu1, h1_bu2, h1_bu3, h1_be1, h1_be2, h1_be3, h1_atr, h1_sh, h1_sl] = request.security(syminfo.tickerid, tfH1, f_htf_data(), lookahead=barmerge.lookahead_on)
+
+// --- HTF 2 Array ---
+[h2_c, h2_h, h2_l, h2_st, h2_ts, h2_ema, h2_slp, h2_bu1, h2_bu2, h2_bu3, h2_be1, h2_be2, h2_be3, h2_atr, h2_sh, h2_sl] = request.security(syminfo.tickerid, tfH2, f_htf_data(), lookahead=barmerge.lookahead_on)
+
+// --- HTF 3 Array ---
+[h3_c, h3_h, h3_l, h3_st, h3_ts, h3_ema, h3_slp, h3_bu1, h3_bu2, h3_bu3, h3_be1, h3_be2, h3_be3, h3_atr, h3_sh, h3_sl] = request.security(syminfo.tickerid, tfH3, f_htf_data(), lookahead=barmerge.lookahead_on)
+
+// =========================================================================
+// 14. 🧠 THE STATE MACHINE & CYCLE MEMORY (ZERO-LOOP ENGINE)
+// =========================================================================
+// Constraint Satisfied: ta.barssince() is completely banned. Single-threaded
+// native 'var' state-toggles and rolling counters track all historical cycle data natively.
+// Constraint Satisfied: Macro-anchors established. Active states only reset when 
+// the core structural geometry (Smart Trail) flips, bypassing arbitrary lookback guessing.
+
+// -------------------------------------------------------------------------
+// BASE CHART MEMORY
+// -------------------------------------------------------------------------
+var bool st_bullL2_act = false
+var bool st_bullL3_act = false
+var bool st_bearL2_act = false
+var bool st_bearL3_act = false
+
+if isBullL2
+    st_bullL2_act := true
+if isBullL3
+    st_bullL3_act := true
+if isBearL2
+    st_bearL2_act := true
+if isBearL3
+    st_bearL3_act := true
+
+// Reset States when Smart Trail CONFIRMS the reversal (opposite flip)
+if trailState == 1
+    st_bullL2_act := false
+    st_bullL3_act := false
+if trailState == -1
+    st_bearL2_act := false
+    st_bearL3_act := false
+
+// Forward-Rolling Cycle Counters (Replaces ta.barssince)
+var int c_bu1 = 9999
+var int c_bu2 = 9999
+var int c_bu3 = 9999
+var int c_be1 = 9999
+var int c_be2 = 9999
+var int c_be3 = 9999
+
+c_bu1 := isBullL1 ? 0 : c_bu1 + 1
+c_bu2 := isBullL2 ? 0 : c_bu2 + 1
+c_bu3 := isBullL3 ? 0 : c_bu3 + 1
+c_be1 := isBearL1 ? 0 : c_be1 + 1
+c_be2 := isBearL2 ? 0 : c_be2 + 1
+c_be3 := isBearL3 ? 0 : c_be3 + 1
+
+// -------------------------------------------------------------------------
+// HTF 1 MEMORY (5 Minute)
+// -------------------------------------------------------------------------
+var bool h1_bu2_act = false
+var bool h1_bu3_act = false
+var bool h1_be2_act = false
+var bool h1_be3_act = false
+
+if h1_bu2
+    h1_bu2_act := true
+if h1_bu3
+    h1_bu3_act := true
+if h1_be2
+    h1_be2_act := true
+if h1_be3
+    h1_be3_act := true
+
+if h1_ts == 1
+    h1_bu2_act := false
+    h1_bu3_act := false
+if h1_ts == -1
+    h1_be2_act := false
+    h1_be3_act := false
+
+var int h1_c_bu1 = 9999
+var int h1_c_bu2 = 9999
+var int h1_c_bu3 = 9999
+var int h1_c_be1 = 9999
+var int h1_c_be2 = 9999
+var int h1_c_be3 = 9999
+
+h1_c_bu1 := h1_bu1 ? 0 : h1_c_bu1 + 1
+h1_c_bu2 := h1_bu2 ? 0 : h1_c_bu2 + 1
+h1_c_bu3 := h1_bu3 ? 0 : h1_c_bu3 + 1
+h1_c_be1 := h1_be1 ? 0 : h1_c_be1 + 1
+h1_c_be2 := h1_be2 ? 0 : h1_c_be2 + 1
+h1_c_be3 := h1_be3 ? 0 : h1_c_be3 + 1
+
+// -------------------------------------------------------------------------
+// HTF 2 MEMORY (15 Minute)
+// -------------------------------------------------------------------------
+var bool h2_bu2_act = false
+var bool h2_bu3_act = false
+var bool h2_be2_act = false
+var bool h2_be3_act = false
+
+if h2_bu2
+    h2_bu2_act := true
+if h2_bu3
+    h2_bu3_act := true
+if h2_be2
+    h2_be2_act := true
+if h2_be3
+    h2_be3_act := true
+
+if h2_ts == 1
+    h2_bu2_act := false
+    h2_bu3_act := false
+if h2_ts == -1
+    h2_be2_act := false
+    h2_be3_act := false
+
+var int h2_c_bu1 = 9999
+var int h2_c_bu2 = 9999
+var int h2_c_bu3 = 9999
+var int h2_c_be1 = 9999
+var int h2_c_be2 = 9999
+var int h2_c_be3 = 9999
+
+h2_c_bu1 := h2_bu1 ? 0 : h2_c_bu1 + 1
+h2_c_bu2 := h2_bu2 ? 0 : h2_c_bu2 + 1
+h2_c_bu3 := h2_bu3 ? 0 : h2_c_bu3 + 1
+h2_c_be1 := h2_be1 ? 0 : h2_c_be1 + 1
+h2_c_be2 := h2_be2 ? 0 : h2_c_be2 + 1
+h2_c_be3 := h2_be3 ? 0 : h2_c_be3 + 1
+
+// -------------------------------------------------------------------------
+// HTF 3 MEMORY (1 Hour)
+// -------------------------------------------------------------------------
+var bool h3_bu2_act = false
+var bool h3_bu3_act = false
+var bool h3_be2_act = false
+var bool h3_be3_act = false
+
+if h3_bu2
+    h3_bu2_act := true
+if h3_bu3
+    h3_bu3_act := true
+if h3_be2
+    h3_be2_act := true
+if h3_be3
+    h3_be3_act := true
+
+if h3_ts == 1
+    h3_bu2_act := false
+    h3_bu3_act := false
+if h3_ts == -1
+    h3_be2_act := false
+    h3_be3_act := false
+
+var int h3_c_bu1 = 9999
+var int h3_c_bu2 = 9999
+var int h3_c_bu3 = 9999
+var int h3_c_be1 = 9999
+var int h3_c_be2 = 9999
+var int h3_c_be3 = 9999
+
+h3_c_bu1 := h3_bu1 ? 0 : h3_c_bu1 + 1
+h3_c_bu2 := h3_bu2 ? 0 : h3_c_bu2 + 1
+h3_c_bu3 := h3_bu3 ? 0 : h3_c_bu3 + 1
+h3_c_be1 := h3_be1 ? 0 : h3_c_be1 + 1
+h3_c_be2 := h3_be2 ? 0 : h3_c_be2 + 1
+h3_c_be3 := h3_be3 ? 0 : h3_c_be3 + 1
+
+// =========================================================================
+// 15a. 📡 SESSION DETECTION
+// =========================================================================
+// Constraint Satisfied: Session filter and new-session detection derived from user input.
+// inSession gates trade arming; isNewSession resets daily trackers.
+bool inSession    = useSession ? not na(time(timeframe.period, sessionStr, "America/New_York")) : true
+bool isNewSession = inSession and not inSession[1]
+
+// =========================================================================
+// 15b. ⚙️ GOD MODE UNIVERSAL EVALUATOR (f_eval)
+// =========================================================================
+// Constraint Satisfied: Single monolithic evaluator maps user-selected string inputs
+// to the correct timeframe data, indicator, and condition logic.
+// dir = 1 (long context), dir = -1 (short context). Affects directional exhaustion
+// mapping and cross-direction reversal for shared TP inputs.
+f_eval(string tf, string ind, string cond, bool useComp, string targ, float val, int dir) =>
+    // --- Timeframe Data Selection (unconditional for v6 consistency) ---
+    float _close = tf == "HTF 1" ? h1_c : tf == "HTF 2" ? h2_c : tf == "HTF 3" ? h3_c : close
+    float _st    = tf == "HTF 1" ? h1_st : tf == "HTF 2" ? h2_st : tf == "HTF 3" ? h3_st : smartTrail
+    float _ts    = tf == "HTF 1" ? h1_ts : tf == "HTF 2" ? h2_ts : tf == "HTF 3" ? h3_ts : float(trailState)
+    float _ema   = tf == "HTF 1" ? h1_ema : tf == "HTF 2" ? h2_ema : tf == "HTF 3" ? h3_ema : emaTrend
+    float _slope = tf == "HTF 1" ? h1_slp : tf == "HTF 2" ? h2_slp : tf == "HTF 3" ? h3_slp : emaSlope
+
+    // --- Exhaustion Signals (Both Sides) ---
+    bool _bu1 = tf == "HTF 1" ? h1_bu1 : tf == "HTF 2" ? h2_bu1 : tf == "HTF 3" ? h3_bu1 : isBullL1
+    bool _bu2 = tf == "HTF 1" ? h1_bu2 : tf == "HTF 2" ? h2_bu2 : tf == "HTF 3" ? h3_bu2 : isBullL2
+    bool _bu3 = tf == "HTF 1" ? h1_bu3 : tf == "HTF 2" ? h2_bu3 : tf == "HTF 3" ? h3_bu3 : isBullL3
+    bool _be1 = tf == "HTF 1" ? h1_be1 : tf == "HTF 2" ? h2_be1 : tf == "HTF 3" ? h3_be1 : isBearL1
+    bool _be2 = tf == "HTF 1" ? h1_be2 : tf == "HTF 2" ? h2_be2 : tf == "HTF 3" ? h3_be2 : isBearL2
+    bool _be3 = tf == "HTF 1" ? h1_be3 : tf == "HTF 2" ? h2_be3 : tf == "HTF 3" ? h3_be3 : isBearL3
+
+    // --- Active State Flags ---
+    bool _bu2a = tf == "HTF 1" ? h1_bu2_act : tf == "HTF 2" ? h2_bu2_act : tf == "HTF 3" ? h3_bu2_act : st_bullL2_act
+    bool _bu3a = tf == "HTF 1" ? h1_bu3_act : tf == "HTF 2" ? h2_bu3_act : tf == "HTF 3" ? h3_bu3_act : st_bullL3_act
+    bool _be2a = tf == "HTF 1" ? h1_be2_act : tf == "HTF 2" ? h2_be2_act : tf == "HTF 3" ? h3_be2_act : st_bearL2_act
+    bool _be3a = tf == "HTF 1" ? h1_be3_act : tf == "HTF 2" ? h2_be3_act : tf == "HTF 3" ? h3_be3_act : st_bearL3_act
+
+    // --- Forward-Rolling Cycle Counters ---
+    int _cbu1 = tf == "HTF 1" ? h1_c_bu1 : tf == "HTF 2" ? h2_c_bu1 : tf == "HTF 3" ? h3_c_bu1 : c_bu1
+    int _cbu2 = tf == "HTF 1" ? h1_c_bu2 : tf == "HTF 2" ? h2_c_bu2 : tf == "HTF 3" ? h3_c_bu2 : c_bu2
+    int _cbu3 = tf == "HTF 1" ? h1_c_bu3 : tf == "HTF 2" ? h2_c_bu3 : tf == "HTF 3" ? h3_c_bu3 : c_bu3
+    int _cbe1 = tf == "HTF 1" ? h1_c_be1 : tf == "HTF 2" ? h2_c_be1 : tf == "HTF 3" ? h3_c_be1 : c_be1
+    int _cbe2 = tf == "HTF 1" ? h1_c_be2 : tf == "HTF 2" ? h2_c_be2 : tf == "HTF 3" ? h3_c_be2 : c_be2
+    int _cbe3 = tf == "HTF 1" ? h1_c_be3 : tf == "HTF 2" ? h2_c_be3 : tf == "HTF 3" ? h3_c_be3 : c_be3
+
+    // --- Directional Mapping (dir=1 → bullish side, dir=-1 → bearish side) ---
+    bool _exh1 = dir == 1 ? _bu1 : _be1
+    bool _exh2 = dir == 1 ? _bu2 : _be2
+    bool _exh3 = dir == 1 ? _bu3 : _be3
+    bool _opp1 = dir == 1 ? _be1 : _bu1
+    bool _opp2 = dir == 1 ? _be2 : _bu2
+    bool _opp3 = dir == 1 ? _be3 : _bu3
+    bool _act2 = dir == 1 ? _bu2a : _be2a
+    bool _act3 = dir == 1 ? _bu3a : _be3a
+    int  _cnt1 = dir == 1 ? _cbu1 : _cbe1
+    int  _cnt2 = dir == 1 ? _cbu2 : _cbe2
+    int  _cnt3 = dir == 1 ? _cbu3 : _cbe3
+
+    // --- Indicator & Target Value Resolution ---
+    float _iv = ind == "Smart Trail" ? _st : ind == "EMA Slope" ? _slope : ind == "Close" ? _close : na
+    float _tv = targ == "Smart Trail" ? _st : targ == "EMA Trend" ? _ema : val
+
+    // v6 Fix: Pre-compute crossover/crossunder unconditionally at function top level
+    // so they execute on every bar regardless of cond or tf value.
+    bool _co_iv_tv  = ta.crossover(_iv, _tv)
+    bool _cu_iv_tv  = ta.crossunder(_iv, _tv)
+    bool _co_iv_val = ta.crossover(_iv, val)
+    bool _cu_iv_val = ta.crossunder(_iv, val)
+
+    // --- Condition Evaluation ---
+    bool r = false
+    if cond == "Is Bullish"
+        r := ind == "Smart Trail" ? _ts > 0 : ind == "EMA Slope" ? _slope > slopeThresh : false
+    else if cond == "Is Bearish"
+        r := ind == "Smart Trail" ? _ts < 0 : ind == "EMA Slope" ? _slope < -slopeThresh : false
+    else if cond == "Greater Than"
+        r := useComp ? _iv > _tv : _iv > val
+    else if cond == "Less Than"
+        r := useComp ? _iv < _tv : _iv < val
+    else if cond == "Printed Bullish"
+        r := ind == "Exhaustion L1" ? _bu1 : ind == "Exhaustion L2" ? _bu2 : ind == "Exhaustion L3" ? _bu3 : false
+    else if cond == "Printed Bearish"
+        r := ind == "Exhaustion L1" ? _be1 : ind == "Exhaustion L2" ? _be2 : ind == "Exhaustion L3" ? _be3 : false
+    else if cond == "Printed Opposing"
+        r := ind == "Exhaustion L1" ? _opp1 : ind == "Exhaustion L2" ? _opp2 : ind == "Exhaustion L3" ? _opp3 : false
+    else if cond == "Is Active (Has Not Reset)"
+        r := ind == "Exhaustion L2" ? _act2 : ind == "Exhaustion L3" ? _act3 : false
+    else if cond == "Occurred Within X Bars"
+        int _cnt = ind == "Exhaustion L1" ? _cnt1 : ind == "Exhaustion L2" ? _cnt2 : ind == "Exhaustion L3" ? _cnt3 : 9999
+        r := _cnt <= int(val)
+    else if cond == "Crosses Over"
+        r := useComp ? _co_iv_tv : _co_iv_val
+    else if cond == "Crosses Under"
+        r := useComp ? _cu_iv_tv : _cu_iv_val
+    // v6 Fix: tf == "None" or disabled HTF bypass via ternary return
+    (tf == "None" or (tf == "HTF 1" and not useH1) or (tf == "HTF 2" and not useH2) or (tf == "HTF 3" and not useH3)) ? true : r
+
+// =========================================================================
+// 16. 📅 COMPLIANCE ENGINE & DAILY LIMITS (PHASE 5)
+// =========================================================================
+// Constraint Satisfied: No ta.barssince() or request.economic(). Hardcoded static 
+// arrays and forward-rolling counters ensure zero latency or memory overhead.
+// Constraint Satisfied: Built for calc_on_every_tick = true to bypass TradingView's bar-close webhook delays.
+
+var int consecLosses = 0
+var int lastExitBar = -1000
+var float dailyPnL = 0.0
+var int dailyTrades = 0
+
+// Prop Firm Failsafe Trackers
+var bool lucidDisarm = false
+var bool mffuCircuitBreaker = false
+
+// Reset Trackers at 18:00 EST for MFFU restart, or standard 09:30 EST session open
+int currHour = hour(time, "America/New_York")
+int currMin  = minute(time, "America/New_York")
+bool isResetTime = (currHour == 18 and currMin == 0) or isNewSession
+
+if isResetTime
+    consecLosses := 0
+    dailyPnL := 0.0
+    dailyTrades := 0
+    lucidDisarm := false
+    mffuCircuitBreaker := false
+
+// Track Real-Time Session PnL Natively
+if strategy.position_size == 0 and strategy.position_size[1] != 0
+    lastExitBar := bar_index
+    dailyTrades += 1
+    float lastTradeProfit = strategy.closedtrades.profit(strategy.closedtrades - 1)
+    dailyPnL += lastTradeProfit
+    if lastTradeProfit < 0
+        consecLosses += 1
+    else
+        consecLosses := 0
+
+// Constraint Satisfied: LucidFlex 50% Consistency Math.
+// Disarms the bot entirely if the running session PnL hits 48% of the total target, preventing target-inflation rules.
+if useLimits and dailyTarget > 0 and dailyPnL >= (dailyTarget * 0.48)
+    lucidDisarm := true
+
+// Constraint Satisfied: MFFU Daily Loss Circuit Breaker.
+// Halts trading instead of blowing the account if the hard daily drawdown boundary is hit.
+if useLimits and dailySl > 0 and dailyPnL <= -dailySl
+    mffuCircuitBreaker := true
+
+bool maxLossBlocked = consecLosses >= maxLossesDay
+int reqCooldown = (consecLosses > 0 ? cooldownLoss : cooldownWin)
+bool cooldownOk = (bar_index - lastExitBar) > reqCooldown
+bool dailyLimitReached = useLimits and ((dailyTrades >= maxDailyTrades) or lucidDisarm or mffuCircuitBreaker)
+
+// --- Prop Firm News Killzones (Hardcoded Unix Timestamps) ---
+// Constraint Satisfied: request.economic() is explicitly banned. ±120-second buffers included in EXIT BY / RESUME BY logic.
+var array<int> kill_start = array.new_int()
+var array<int> kill_end   = array.new_int()
+
+if barstate.isfirst and useCompliance
+    // 2026 Q1 Core Data — Pre-computed Unix epoch ms (EST/EDT-aware).
+    // v6 Fix: timestamp() multi-arg form removed in v6; using hardcoded constants.
+    array.push(kill_start, 1772803500000) // NFP  2026-03-06 08:25 EST
+    array.push(kill_end,   1772804100000) //      2026-03-06 08:35 EST
+    array.push(kill_start, 1773231900000) // CPI  2026-03-11 08:25 EDT
+    array.push(kill_end,   1773232500000) //      2026-03-11 08:35 EDT
+    array.push(kill_start, 1773856500000) // FOMC 2026-03-18 13:55 EDT
+    array.push(kill_end,   1773859200000) //      2026-03-18 14:40 EDT
+    array.push(kill_start, 1775219100000) // NFP  2026-04-03 08:25 EDT
+    array.push(kill_end,   1775219700000) //      2026-04-03 08:35 EDT
+
+bool inKillzone = false
+if useCompliance
+    for i = 0 to array.size(kill_start) - 1
+        if time >= array.get(kill_start, i) and time <= array.get(kill_end, i)
+            inKillzone := true
+            break
+
+// Constraint Satisfied: MFFU 16:09 EST Daily Flatten Trap (Tick-Based Bypass)
+// Fires exactly at 16:08 EST. Since calc_on_every_tick is enabled, TradingView sends the webhook 
+// to Tradovate/TradersPost immediately, closing open lots safely before the 16:09 Prop Firm purge.
+bool mffuFlattenTrap = currHour == 16 and currMin >= 8 and currHour < 17
+
+if (inKillzone or mffuFlattenTrap) and strategy.position_size != 0
+    strategy.close_all(comment="Compliance Flatten")
+
+// =========================================================================
+// 17. ⚙️ GOD MODE LOGIC EVALUATION & ARMING
+// =========================================================================
+// Constraint Satisfied: Evaluates the parsed strings across timeframes while passing directional logic arguments (dir: 1 / -1)
+
+// Evaluate Longs
+bool long_prim = f_eval(l_prim_tf, l_prim_ind, l_prim_cond, l_prim_comp, l_prim_targ, l_prim_val, 1)
+bool long_f1   = f_eval(l_f1_tf, l_f1_ind, l_f1_cond, l_f1_comp, l_f1_targ, l_f1_val, 1)
+bool long_f2   = f_eval(l_f2_tf, l_f2_ind, l_f2_cond, l_f2_comp, l_f2_targ, l_f2_val, 1)
+bool long_f3   = f_eval(l_f3_tf, l_f3_ind, l_f3_cond, l_f3_comp, l_f3_targ, l_f3_val, 1)
+bool long_blk  = f_eval(l_blk_tf, l_blk_ind, l_blk_cond, l_blk_comp, l_blk_targ, l_blk_val, -1)  // FIX: Inverted dir — blocker checks OPPOSING (bearish) exhaustion to invalidate longs
+
+bool fireLong = long_prim and long_f1 and long_f2 and long_f3 and not long_blk and cooldownOk and not maxLossBlocked and not dailyLimitReached and inSession
+
+// Evaluate Shorts
+bool short_prim = f_eval(s_prim_tf, s_prim_ind, s_prim_cond, s_prim_comp, s_prim_targ, s_prim_val, -1)
+bool short_f1   = f_eval(s_f1_tf, s_f1_ind, s_f1_cond, s_f1_comp, s_f1_targ, s_f1_val, -1)
+bool short_f2   = f_eval(s_f2_tf, s_f2_ind, s_f2_cond, s_f2_comp, s_f2_targ, s_f2_val, -1)
+bool short_f3   = f_eval(s_f3_tf, s_f3_ind, s_f3_cond, s_f3_comp, s_f3_targ, s_f3_val, -1)
+bool short_blk  = f_eval(s_blk_tf, s_blk_ind, s_blk_cond, s_blk_comp, s_blk_targ, s_blk_val, 1)   // FIX: Inverted dir — blocker checks OPPOSING (bullish) exhaustion to invalidate shorts
+
+bool fireShort = short_prim and short_f1 and short_f2 and short_f3 and not short_blk and cooldownOk and not maxLossBlocked and not dailyLimitReached and inSession
+
+// =========================================================================
+// 17b. 🔍 GOD MODE DEBUGGING LOGS
+// =========================================================================
+if long_prim
+    log.info("🎯 LONG TRIGGERED. Blockers -> F1: {0} | F2: {1} | F3: {2} | Blocker: {3} | Killzone: {4} | DailyLimit: {5} | Cooldown: {6} | InSession: {7}", str.tostring(long_f1), str.tostring(long_f2), str.tostring(long_f3), str.tostring(long_blk), str.tostring(inKillzone), str.tostring(dailyLimitReached), str.tostring(cooldownOk), str.tostring(inSession))
+if short_prim
+    log.info("🎯 SHORT TRIGGERED. Blockers -> F1: {0} | F2: {1} | F3: {2} | Blocker: {3} | Killzone: {4} | DailyLimit: {5} | Cooldown: {6} | InSession: {7}", str.tostring(short_f1), str.tostring(short_f2), str.tostring(short_f3), str.tostring(short_blk), str.tostring(inKillzone), str.tostring(dailyLimitReached), str.tostring(cooldownOk), str.tostring(inSession))
+if fireLong
+    log.info("✅ LONG ARMED. Entry: {0} | SL Mode: {1} | Qty: {2}", str.tostring(close), slMode, str.tostring(qtyInput))
+if fireShort
+    log.info("✅ SHORT ARMED. Entry: {0} | SL Mode: {1} | Qty: {2}", str.tostring(close), slMode, str.tostring(qtyInput))
+
+// Arming Logic & Pending Safety Disarm
+var bool longArmed = false
+var bool shortArmed = false
+
+// Force Disarm in Killzones or Daily Cutoffs
+if inKillzone or mffuFlattenTrap
+    longArmed := false
+    shortArmed := false
+
+if fireLong and not inKillzone and not mffuFlattenTrap
+    longArmed := true
+    shortArmed := false
+
+if fireShort and not inKillzone and not mffuFlattenTrap
+    shortArmed := true
+    longArmed := false
+
+if useSafetyDisarm
+    if longArmed and (isBearL1 or h1_be1)
+        longArmed := false
+    if shortArmed and (isBullL1 or h1_bu1)
+        shortArmed := false
+
+// Exhaustion Killswitch: blocks new arms when macro exhaustion is active on chart or HTF 1
+if useMacroKillswitch
+    if longArmed and (st_bearL2_act or st_bearL3_act or h1_be2_act or h1_be3_act)
+        longArmed := false
+    if shortArmed and (st_bullL2_act or st_bullL3_act or h1_bu2_act or h1_bu3_act)
+        shortArmed := false
+
+// =========================================================================
+// 18. 🌊 INSTITUTIONAL WATERFALL RISK ENGINE & EXECUTION (PHASE 6)
+// =========================================================================
+// Constraint Satisfied: Strict Integer Math (Fractional Scaling Trap). Calculates absolute
+// whole-number contracts natively to bypass Tradovate's rejection of fractional scaling.
+
+var float activeSl = na
+var float entryPrice = na
+var bool tp1Hit = false
+var bool tp2Hit = false
+
+// Dynamic Scale-Out Integer Lots
+var int lot1 = 0
+var int lot2 = 0
+var int lot3 = 0
+lot1 := math.max(1, math.round(qtyInput / 3))
+lot2 := math.max(1, math.round((qtyInput - lot1) / 2))
+lot3 := math.max(0, qtyInput - lot1 - lot2)
+
+// Constraint Satisfied: Zero-Repainting Visuals (Object Management). 
+// Garbage collection arrays delete old lines respectfully within max_lines_count bounds.
+var array<line> ln_entries = array.new_line()
+var array<line> ln_sls = array.new_line()
+var line current_ln_entry = na
+var line current_ln_sl = na
+
+// Constraint Satisfied: Max Adverse Excursion (MAE) Hard Failsafe calculation (Dollars to Ticks).
+// FIX: Must divide by mintick to convert points → ticks. NQ: $250/(20*0.25*3) = 16.67 ticks.
+float maxRiskTicks = maxLossTrade / (syminfo.pointvalue * syminfo.mintick * qtyInput)
+
+// --- LONG EXECUTION ---
+if longArmed and strategy.position_size == 0
+    float proposed_sl = na
+    bool abortTrade = false
+    
+    // Constraint Satisfied: Institutional Waterfall SL Engine. Steps down from HTF 3 to Base.
+    if slMode == "HTF Waterfall Failsafe"
+        if useH3 and not na(h3_st) and (close - h3_st)/syminfo.mintick <= maxSlTicks and (close - h3_st)/syminfo.mintick >= minSlTicks
+            proposed_sl := h3_st
+        else if useH2 and not na(h2_st) and (close - h2_st)/syminfo.mintick <= maxSlTicks and (close - h2_st)/syminfo.mintick >= minSlTicks
+            proposed_sl := h2_st
+        else if useH1 and not na(h1_st) and (close - h1_st)/syminfo.mintick <= maxSlTicks and (close - h1_st)/syminfo.mintick >= minSlTicks
+            proposed_sl := h1_st
+        else
+            // Constraint Satisfied: Abort vs. Snap Logic invoked if structural limit exceeded.
+            if failsafeAct == "Abort Trade Completely"
+                abortTrade := true
+            else
+                proposed_sl := close - (maxSlTicks * syminfo.mintick)
+    else if slMode == "ATR"
+        proposed_sl := close - atrValue
+    else if slMode == "Recent Swing"
+        proposed_sl := swingLow
+    else if slMode == "Smart Trail"
+        proposed_sl := smartTrail
+    else if slMode == "HTF 1 Smart Trail" and not na(h1_st)
+        proposed_sl := h1_st
+    else if slMode == "HTF 2 Smart Trail" and not na(h2_st)
+        proposed_sl := h2_st
+    else if slMode == "HTF 3 Smart Trail" and not na(h3_st)
+        proposed_sl := h3_st
+    else
+        proposed_sl := close - (maxSlTicks * syminfo.mintick)
+
+    // Override with Hard MAE limits before execution
+    if not na(proposed_sl) and (close - proposed_sl)/syminfo.mintick > maxRiskTicks
+        proposed_sl := close - (maxRiskTicks * syminfo.mintick)
+
+    if not abortTrade
+        strategy.entry("Long", strategy.long, qty=qtyInput)
+        activeSl := proposed_sl
+        entryPrice := close
+        tp1Hit := false
+        tp2Hit := false
+        longArmed := false
+        
+        if drawLines
+            current_ln_entry := line.new(bar_index, entryPrice, bar_index, entryPrice, color=c_lineEnt, style=st_lineEnt == "Dotted" ? line.style_dotted : st_lineEnt == "Dashed" ? line.style_dashed : line.style_solid, width=2)
+            current_ln_sl    := line.new(bar_index, activeSl, bar_index, activeSl, color=c_lineSl, style=st_lineSl == "Dotted" ? line.style_dotted : st_lineSl == "Dashed" ? line.style_dashed : line.style_solid, width=2)
+            array.push(ln_entries, current_ln_entry)
+            array.push(ln_sls, current_ln_sl)
+            // Memory cleanup
+            if array.size(ln_entries) > 200
+                line.delete(array.shift(ln_entries))
+            if array.size(ln_sls) > 200
+                line.delete(array.shift(ln_sls))
+
+// --- SHORT EXECUTION ---
+if shortArmed and strategy.position_size == 0
+    float proposed_sl = na
+    bool abortTrade = false
+    
+    if slMode == "HTF Waterfall Failsafe"
+        if useH3 and not na(h3_st) and (h3_st - close)/syminfo.mintick <= maxSlTicks and (h3_st - close)/syminfo.mintick >= minSlTicks
+            proposed_sl := h3_st
+        else if useH2 and not na(h2_st) and (h2_st - close)/syminfo.mintick <= maxSlTicks and (h2_st - close)/syminfo.mintick >= minSlTicks
+            proposed_sl := h2_st
+        else if useH1 and not na(h1_st) and (h1_st - close)/syminfo.mintick <= maxSlTicks and (h1_st - close)/syminfo.mintick >= minSlTicks
+            proposed_sl := h1_st
+        else
+            if failsafeAct == "Abort Trade Completely"
+                abortTrade := true
+            else
+                proposed_sl := close + (maxSlTicks * syminfo.mintick)
+    else if slMode == "ATR"
+        proposed_sl := close + atrValue
+    else if slMode == "Recent Swing"
+        proposed_sl := swingHigh
+    else if slMode == "Smart Trail"
+        proposed_sl := smartTrail
+    else if slMode == "HTF 1 Smart Trail" and not na(h1_st)
+        proposed_sl := h1_st
+    else if slMode == "HTF 2 Smart Trail" and not na(h2_st)
+        proposed_sl := h2_st
+    else if slMode == "HTF 3 Smart Trail" and not na(h3_st)
+        proposed_sl := h3_st
+    else
+        proposed_sl := close + (maxSlTicks * syminfo.mintick)
+
+    if not na(proposed_sl) and (proposed_sl - close)/syminfo.mintick > maxRiskTicks
+        proposed_sl := close + (maxRiskTicks * syminfo.mintick)
+
+    if not abortTrade
+        strategy.entry("Short", strategy.short, qty=qtyInput)
+        activeSl := proposed_sl
+        entryPrice := close
+        tp1Hit := false
+        tp2Hit := false
+        shortArmed := false
+        
+        if drawLines
+            current_ln_entry := line.new(bar_index, entryPrice, bar_index, entryPrice, color=c_lineEnt, style=st_lineEnt == "Dotted" ? line.style_dotted : st_lineEnt == "Dashed" ? line.style_dashed : line.style_solid, width=2)
+            current_ln_sl    := line.new(bar_index, activeSl, bar_index, activeSl, color=c_lineSl, style=st_lineSl == "Dotted" ? line.style_dotted : st_lineSl == "Dashed" ? line.style_dashed : line.style_solid, width=2)
+            array.push(ln_entries, current_ln_entry)
+            array.push(ln_sls, current_ln_sl)
+            if array.size(ln_entries) > 200
+                line.delete(array.shift(ln_entries))
+            if array.size(ln_sls) > 200
+                line.delete(array.shift(ln_sls))
+
+// =========================================================================
+// 19. 🎯 DYNAMIC EXITS & TRAILING STOP MANAGER
+// =========================================================================
+if drawLines and strategy.position_size != 0
+    line.set_x2(current_ln_entry, bar_index)
+    line.set_y2(current_ln_sl, activeSl)
+    line.set_x2(current_ln_sl, bar_index)
+
+// Constraint Satisfied: Tradeify Microscalping Temporal Guard.
+// Locks the macro SL from trailing or executing reversal exits until the 10-second hold limit is satisfied.
+bool microscalpGuard = strategy.opentrades > 0 ? (time - strategy.opentrades.entry_time(strategy.opentrades - 1)) > (microscalpDelay * 1000) : true
+
+// Constraint Satisfied: Real-Time Max Adverse Excursion (MAE) Hard Failsafe override
+if strategy.position_size != 0
+    float unrealizedLoss = strategy.position_size > 0 ? (strategy.position_avg_price - close) * syminfo.pointvalue * strategy.position_size : (close - strategy.position_avg_price) * syminfo.pointvalue * math.abs(strategy.position_size)
+    if unrealizedLoss > maxLossTrade
+        strategy.close_all(comment="MAE Hard Failsafe")
+
+// v6 Fix: f_eval uses ta.crossover/crossunder internally and must be called on every
+// bar for consistent results. Pre-compute all TP evaluations at global scope.
+bool hitTP1_L = f_eval(tp1_tf, tp1_ind, tp1_cond, tp1_comp, tp1_targ, tp1_val, 1)
+bool hitTP2_L = f_eval(tp2_tf, tp2_ind, tp2_cond, tp2_comp, tp2_targ, tp2_val, 1)
+bool hitTP3_L = f_eval(tp3_tf, tp3_ind, tp3_cond, tp3_comp, tp3_targ, tp3_val, 1)
+bool hitTP1_S = f_eval(tp1_tf, tp1_ind, tp1_cond, tp1_comp, tp1_targ, tp1_val, -1)
+bool hitTP2_S = f_eval(tp2_tf, tp2_ind, tp2_cond, tp2_comp, tp2_targ, tp2_val, -1)
+bool hitTP3_S = f_eval(tp3_tf, tp3_ind, tp3_cond, tp3_comp, tp3_targ, tp3_val, -1)
+
+if strategy.position_size > 0
+    if hitTP1_L and not tp1Hit
+        strategy.close("Long", qty = lot1, comment = "TP1")
+        tp1Hit := true
+        if moveBe and microscalpGuard
+            activeSl := math.max(activeSl, entryPrice)
+
+    if hitTP2_L and tp1Hit and not tp2Hit and lot2 > 0
+        strategy.close("Long", qty = lot2, comment = "TP2")
+        tp2Hit := true
+
+    if hitTP3_L and tp1Hit
+        strategy.close("Long", qty = lot3, comment = "TP3")
+
+    if tp1Hit and microscalpGuard
+        if trailMode == "Trail Smart Trail"
+            activeSl := math.max(activeSl, smartTrail - (trailBuffer * syminfo.mintick))
+        else if trailMode == "Trail HTF 1 Smart Trail" and not na(h1_st)
+            activeSl := math.max(activeSl, h1_st - (trailBuffer * syminfo.mintick))
+        else if trailMode == "Trail HTF 2 Smart Trail" and not na(h2_st)
+            activeSl := math.max(activeSl, h2_st - (trailBuffer * syminfo.mintick))
+        else if trailMode == "Trail HTF 3 Smart Trail" and not na(h3_st)
+            activeSl := math.max(activeSl, h3_st - (trailBuffer * syminfo.mintick))
+        
+    if useEmaReversal and emaSlope < 0 and microscalpGuard
+        strategy.close("Long", comment="EMA Reversal")
+
+    strategy.exit("SL_Long", "Long", stop = activeSl)
+
+if strategy.position_size < 0
+    if hitTP1_S and not tp1Hit
+        strategy.close("Short", qty = lot1, comment = "TP1")
+        tp1Hit := true
+        if moveBe and microscalpGuard
+            activeSl := math.min(activeSl, entryPrice)
+
+    if hitTP2_S and tp1Hit and not tp2Hit and lot2 > 0
+        strategy.close("Short", qty = lot2, comment = "TP2")
+        tp2Hit := true
+
+    if hitTP3_S and tp1Hit
+        strategy.close("Short", qty = lot3, comment = "TP3")
+
+    if tp1Hit and microscalpGuard
+        if trailMode == "Trail Smart Trail"
+            activeSl := math.min(activeSl, smartTrail + (trailBuffer * syminfo.mintick))
+        else if trailMode == "Trail HTF 1 Smart Trail" and not na(h1_st)
+            activeSl := math.min(activeSl, h1_st + (trailBuffer * syminfo.mintick))
+        else if trailMode == "Trail HTF 2 Smart Trail" and not na(h2_st)
+            activeSl := math.min(activeSl, h2_st + (trailBuffer * syminfo.mintick))
+        else if trailMode == "Trail HTF 3 Smart Trail" and not na(h3_st)
+            activeSl := math.min(activeSl, h3_st + (trailBuffer * syminfo.mintick))
+
+    if useEmaReversal and emaSlope > 0 and microscalpGuard
+        strategy.close("Short", comment="EMA Reversal")
+
+    strategy.exit("SL_Short", "Short", stop = activeSl)
+
+// =========================================================================
+// 20. 🎨 SELECTIVE RENDERING (PLOTSHAPE)
+// =========================================================================
+// v6 Fix: plotshape size parameter requires const string. Split into per-size calls.
+bool _showBullL1 = (not showActiveOnly or l_prim_ind == "Exhaustion L1") and isBullL1
+plotshape(_showBullL1 and s_bullL1 == "Tiny",   "Bull L1 [Tiny]",   shape.diamond, location.belowbar, color=c_bullL1, size=size.tiny)
+plotshape(_showBullL1 and s_bullL1 == "Small",  "Bull L1 [Small]",  shape.diamond, location.belowbar, color=c_bullL1, size=size.small)
+plotshape(_showBullL1 and s_bullL1 == "Normal", "Bull L1 [Normal]", shape.diamond, location.belowbar, color=c_bullL1, size=size.normal)
+plotshape(_showBullL1 and s_bullL1 == "Large",  "Bull L1 [Large]",  shape.diamond, location.belowbar, color=c_bullL1, size=size.large)
+bool _showBearL1 = (not showActiveOnly or s_prim_ind == "Exhaustion L1") and isBearL1
+plotshape(_showBearL1 and s_bearL1 == "Tiny",   "Bear L1 [Tiny]",   shape.diamond, location.abovebar, color=c_bearL1, size=size.tiny)
+plotshape(_showBearL1 and s_bearL1 == "Small",  "Bear L1 [Small]",  shape.diamond, location.abovebar, color=c_bearL1, size=size.small)
+plotshape(_showBearL1 and s_bearL1 == "Normal", "Bear L1 [Normal]", shape.diamond, location.abovebar, color=c_bearL1, size=size.normal)
+plotshape(_showBearL1 and s_bearL1 == "Large",  "Bear L1 [Large]",  shape.diamond, location.abovebar, color=c_bearL1, size=size.large)
+
+// --- L2 Shapes ---
+bool _showBullL2 = (not showActiveOnly or l_prim_ind == "Exhaustion L2" or s_prim_ind == "Exhaustion L2" or l_blk_ind == "Exhaustion L2" or s_blk_ind == "Exhaustion L2") and isBullL2
+plotshape(_showBullL2 and s_bullL2 == "Tiny",   "Bull L2 [Tiny]",   shape.triangleup, location.belowbar, color=c_bullL2, size=size.tiny)
+plotshape(_showBullL2 and s_bullL2 == "Small",  "Bull L2 [Small]",  shape.triangleup, location.belowbar, color=c_bullL2, size=size.small)
+plotshape(_showBullL2 and s_bullL2 == "Normal", "Bull L2 [Normal]", shape.triangleup, location.belowbar, color=c_bullL2, size=size.normal)
+plotshape(_showBullL2 and s_bullL2 == "Large",  "Bull L2 [Large]",  shape.triangleup, location.belowbar, color=c_bullL2, size=size.large)
+bool _showBearL2 = (not showActiveOnly or l_prim_ind == "Exhaustion L2" or s_prim_ind == "Exhaustion L2" or l_blk_ind == "Exhaustion L2" or s_blk_ind == "Exhaustion L2") and isBearL2
+plotshape(_showBearL2 and s_bearL2 == "Tiny",   "Bear L2 [Tiny]",   shape.triangledown, location.abovebar, color=c_bearL2, size=size.tiny)
+plotshape(_showBearL2 and s_bearL2 == "Small",  "Bear L2 [Small]",  shape.triangledown, location.abovebar, color=c_bearL2, size=size.small)
+plotshape(_showBearL2 and s_bearL2 == "Normal", "Bear L2 [Normal]", shape.triangledown, location.abovebar, color=c_bearL2, size=size.normal)
+plotshape(_showBearL2 and s_bearL2 == "Large",  "Bear L2 [Large]",  shape.triangledown, location.abovebar, color=c_bearL2, size=size.large)
+
+// --- L3 Shapes ---
+bool _showBullL3 = (not showActiveOnly or l_prim_ind == "Exhaustion L3" or s_prim_ind == "Exhaustion L3" or l_blk_ind == "Exhaustion L3" or s_blk_ind == "Exhaustion L3") and isBullL3
+plotshape(_showBullL3 and s_bullL3 == "Tiny",   "Bull L3 [Tiny]",   shape.triangleup, location.belowbar, color=c_bullL3, size=size.tiny)
+plotshape(_showBullL3 and s_bullL3 == "Small",  "Bull L3 [Small]",  shape.triangleup, location.belowbar, color=c_bullL3, size=size.small)
+plotshape(_showBullL3 and s_bullL3 == "Normal", "Bull L3 [Normal]", shape.triangleup, location.belowbar, color=c_bullL3, size=size.normal)
+plotshape(_showBullL3 and s_bullL3 == "Large",  "Bull L3 [Large]",  shape.triangleup, location.belowbar, color=c_bullL3, size=size.large)
+bool _showBearL3 = (not showActiveOnly or l_prim_ind == "Exhaustion L3" or s_prim_ind == "Exhaustion L3" or l_blk_ind == "Exhaustion L3" or s_blk_ind == "Exhaustion L3") and isBearL3
+plotshape(_showBearL3 and s_bearL3 == "Tiny",   "Bear L3 [Tiny]",   shape.triangledown, location.abovebar, color=c_bearL3, size=size.tiny)
+plotshape(_showBearL3 and s_bearL3 == "Small",  "Bear L3 [Small]",  shape.triangledown, location.abovebar, color=c_bearL3, size=size.small)
+plotshape(_showBearL3 and s_bearL3 == "Normal", "Bear L3 [Normal]", shape.triangledown, location.abovebar, color=c_bearL3, size=size.normal)
+plotshape(_showBearL3 and s_bearL3 == "Large",  "Bear L3 [Large]",  shape.triangledown, location.abovebar, color=c_bearL3, size=size.large)
+
+bgcolor(inKillzone ? color.new(color.red, 90) : na, title="News Killzone")
+

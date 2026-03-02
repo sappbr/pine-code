@@ -1,0 +1,73 @@
+Date,Message
+2026-02-25T10:30:00.000-05:00,10:30:00  bar=19030
+2026-02-25T10:30:00.000-05:00,[CHART tf=3] trail=25281.25 ts=1 slope=18.3298 ema=25293.72 bu1=false be1=false bu2=false be2=false bu3=false be3=false bbos=false sbos=false bchoch=false schoch=false
+2026-02-25T10:30:00.000-05:00,[HTF1 tf=3] trail=25281.25 ts=1 slope=18.9961 ema=25289.13 c=25334.25 bu1=false be1=false bu2=false be2=false bu3=false be3=false bbos=false sbos=false bchoch=false schoch=false res=25361 sup=25130
+2026-02-25T10:30:00.000-05:00,[HTF2 tf=5] trail=25156.75 ts=1 slope=31.2852 c=25334.25 bu1=false be1=false bu3=false be3=false bbos=false sbos=false
+2026-02-25T10:30:00.000-05:00,[HTF3 tf=15] trail=25122.25 ts=1 slope=62.9618 c=25334.25 bu3=false be3=false bbos=false sbos=false
+2026-02-25T10:30:00.000-05:00,[ARMS] lf1=false lf2=true lf3=true lblk=true L_ARMED=false L_TRIG=false | sf1=true sf2=false sf3=false sblk=false S_ARMED=false S_TRIG=false | BE=false TRAIL=false | Sess=true KZ=true LimOk=true Flat=true
+2026-02-25T10:33:00.000-05:00,10:33:00  bar=19031
+2026-02-25T10:33:00.000-05:00,[CHART tf=3] trail=25281.25 ts=1 slope=0.1079 ema=25293.74 bu1=false be1=false bu2=false be2=false bu3=false be3=false bbos=false sbos=false bchoch=false schoch=false
+2026-02-25T10:33:00.000-05:00,[HTF1 tf=3] trail=25281.25 ts=1 slope=18.3298 ema=25293.72 c=25337.25 bu1=false be1=false bu2=false be2=false bu3=false be3=false bbos=false sbos=false bchoch=false schoch=false res=25361 sup=25130
+2026-02-25T10:33:00.000-05:00,[HTF2 tf=5] trail=25156.75 ts=1 slope=31.2852 c=25334.25 bu1=false be1=false bu3=false be3=false bbos=false sbos=false
+2026-02-25T10:33:00.000-05:00,[HTF3 tf=15] trail=25122.25 ts=1 slope=62.9618 c=25334.25 bu3=false be3=false bbos=false sbos=false
+2026-02-25T10:33:00.000-05:00,[ARMS] lf1=false lf2=true lf3=true lblk=true L_ARMED=false L_TRIG=false | sf1=true sf2=false sf3=false sblk=false S_ARMED=false S_TRIG=false | BE=false TRAIL=false | Sess=true KZ=true LimOk=true Flat=true
+2026-02-25T10:36:00.000-05:00,10:36:00  bar=19032
+2026-02-25T10:36:00.000-05:00,[CHART tf=3] trail=25281.25 ts=1 slope=2.1929 ema=25294.29 bu1=false be1=false bu2=false be2=false bu3=false be3=false bbos=false sbos=false bchoch=false schoch=false
+2026-02-25T10:36:00.000-05:00,[HTF1 tf=3] trail=25281.25 ts=1 slope=0.1079 ema=25293.74 c=25294 bu1=false be1=false bu2=false be2=false bu3=false be3=false bbos=false sbos=false bchoch=false schoch=false res=25361 sup=25130
+2026-02-25T10:36:00.000-05:00,[HTF2 tf=5] trail=25217.25 ts=1 slope=14.3057 c=25297.5 bu1=false be1=false bu3=false be3=false bbos=false sbos=false
+2026-02-25T10:36:00.000-05:00,[HTF3 tf=15] trail=25122.25 ts=1 slope=62.9618 c=25334.25 bu3=false be3=false bbos=false sbos=false
+2026-02-25T10:36:00.000-05:00,[ARMS] lf1=false lf2=true lf3=true lblk=true L_ARMED=false L_TRIG=false | sf1=true sf2=false sf3=false sblk=false S_ARMED=false S_TRIG=false | BE=false TRAIL=false | Sess=true KZ=true LimOk=true Flat=true
+2026-02-25T10:39:00.000-05:00,10:39:00  bar=19033
+2026-02-25T10:39:00.000-05:00,[CHART tf=3] trail=25281.25 ts=1 slope=2.9364 ema=25295.03 bu1=false be1=false bu2=false be2=false bu3=false be3=false bbos=false sbos=false bchoch=false schoch=false
+2026-02-25T10:39:00.000-05:00,[HTF1 tf=3] trail=25281.25 ts=1 slope=2.1929 ema=25294.29 c=25299.5 bu1=false be1=false bu2=false be2=false bu3=false be3=false bbos=false sbos=false bchoch=false schoch=false res=25341.75 sup=25130
+2026-02-25T10:39:00.000-05:00,[HTF2 tf=5] trail=25217.25 ts=1 slope=14.3057 c=25297.5 bu1=false be1=false bu3=false be3=false bbos=false sbos=false
+2026-02-25T10:39:00.000-05:00,[HTF3 tf=15] trail=25122.25 ts=1 slope=62.9618 c=25334.25 bu3=false be3=false bbos=false sbos=false
+2026-02-25T10:39:00.000-05:00,[ARMS] lf1=false lf2=true lf3=true lblk=true L_ARMED=false L_TRIG=false | sf1=true sf2=false sf3=false sblk=false S_ARMED=false S_TRIG=false | BE=false TRAIL=false | Sess=true KZ=true LimOk=true Flat=true
+2026-02-26T10:30:00.000-05:00,10:30:00  bar=19490
+2026-02-26T10:30:00.000-05:00,[CHART tf=3] trail=25224 ts=-1 slope=-84.2451 ema=25099.08 bu1=false be1=false bu2=false be2=false bu3=false be3=false bbos=false sbos=false bchoch=false schoch=false
+2026-02-26T10:30:00.000-05:00,[HTF1 tf=3] trail=25241.5 ts=-1 slope=-78.5867 ema=25120.14 c=24933.5 bu1=false be1=false bu2=false be2=false bu3=false be3=false bbos=false sbos=false bchoch=false schoch=false res=25415.5 sup=25384.5
+2026-02-26T10:30:00.000-05:00,[HTF2 tf=5] trail=25342 ts=-1 slope=-103.6479 c=24933.5 bu1=false be1=false bu3=false be3=false bbos=false sbos=false
+2026-02-26T10:30:00.000-05:00,[HTF3 tf=15] trail=25415.5 ts=-1 slope=-146.235 c=24933.5 bu3=false be3=false bbos=false sbos=false
+2026-02-26T10:30:00.000-05:00,[ARMS] lf1=true lf2=true lf3=true lblk=false L_ARMED=true L_TRIG=false | sf1=true sf2=true sf3=true sblk=false S_ARMED=true S_TRIG=false | BE=false TRAIL=false | Sess=true KZ=true LimOk=true Flat=true
+2026-02-26T10:33:00.000-05:00,10:33:00  bar=19491
+2026-02-26T10:33:00.000-05:00,[CHART tf=3] trail=25211 ts=-1 slope=-73.7456 ema=25080.65 bu1=false be1=false bu2=false be2=false bu3=false be3=false bbos=false sbos=false bchoch=false schoch=false
+2026-02-26T10:33:00.000-05:00,[HTF1 tf=3] trail=25224 ts=-1 slope=-84.2451 ema=25099.08 c=24899 bu1=false be1=false bu2=false be2=false bu3=false be3=false bbos=false sbos=false bchoch=false schoch=false res=25415.5 sup=25384.5
+2026-02-26T10:33:00.000-05:00,[HTF2 tf=5] trail=25342 ts=-1 slope=-103.6479 c=24933.5 bu1=false be1=false bu3=false be3=false bbos=false sbos=false
+2026-02-26T10:33:00.000-05:00,[HTF3 tf=15] trail=25415.5 ts=-1 slope=-146.235 c=24933.5 bu3=false be3=false bbos=false sbos=false
+2026-02-26T10:33:00.000-05:00,[ARMS] lf1=true lf2=true lf3=true lblk=false L_ARMED=true L_TRIG=false | sf1=true sf2=true sf3=true sblk=false S_ARMED=true S_TRIG=false | BE=false TRAIL=false | Sess=true KZ=true LimOk=true Flat=true
+2026-02-26T10:36:00.000-05:00,10:36:00  bar=19492
+2026-02-26T10:36:00.000-05:00,[CHART tf=3] trail=25190 ts=-1 slope=-43.0079 ema=25069.89 bu1=false be1=false bu2=false be2=false bu3=false be3=false bbos=false sbos=false bchoch=false schoch=false
+2026-02-26T10:36:00.000-05:00,[HTF1 tf=3] trail=25211 ts=-1 slope=-73.7456 ema=25080.65 c=24905.5 bu1=false be1=false bu2=false be2=false bu3=false be3=false bbos=false sbos=false bchoch=false schoch=false res=25415.5 sup=25384.5
+2026-02-26T10:36:00.000-05:00,[HTF2 tf=5] trail=25295.5 ts=-1 slope=-117.3005 c=24871.75 bu1=false be1=false bu3=false be3=false bbos=false sbos=false
+2026-02-26T10:36:00.000-05:00,[HTF3 tf=15] trail=25415.5 ts=-1 slope=-146.235 c=24933.5 bu3=false be3=false bbos=false sbos=false
+2026-02-26T10:36:00.000-05:00,[ARMS] lf1=true lf2=true lf3=true lblk=false L_ARMED=true L_TRIG=false | sf1=true sf2=true sf3=true sblk=false S_ARMED=true S_TRIG=false | BE=false TRAIL=false | Sess=true KZ=true LimOk=true Flat=true
+2026-02-26T10:39:00.000-05:00,10:39:00  bar=19493
+2026-02-26T10:39:00.000-05:00,[CHART tf=3] trail=25177.25 ts=-1 slope=-30.7215 ema=25062.21 bu1=false be1=false bu2=false be2=false bu3=false be3=false bbos=false sbos=false bchoch=false schoch=false
+2026-02-26T10:39:00.000-05:00,[HTF1 tf=3] trail=25190 ts=-1 slope=-43.0079 ema=25069.89 c=24967.75 bu1=false be1=false bu2=false be2=false bu3=false be3=false bbos=false sbos=false bchoch=false schoch=false res=25415.5 sup=25384.5
+2026-02-26T10:39:00.000-05:00,[HTF2 tf=5] trail=25295.5 ts=-1 slope=-117.3005 c=24871.75 bu1=false be1=false bu3=false be3=false bbos=false sbos=false
+2026-02-26T10:39:00.000-05:00,[HTF3 tf=15] trail=25415.5 ts=-1 slope=-146.235 c=24933.5 bu3=false be3=false bbos=false sbos=false
+2026-02-26T10:39:00.000-05:00,[ARMS] lf1=true lf2=true lf3=true lblk=false L_ARMED=true L_TRIG=false | sf1=true sf2=true sf3=true sblk=false S_ARMED=true S_TRIG=false | BE=false TRAIL=false | Sess=true KZ=true LimOk=true Flat=true
+2026-02-27T10:30:00.000-05:00,10:30:00  bar=19950
+2026-02-27T10:30:00.000-05:00,[CHART tf=3] trail=24861 ts=1 slope=1.934 ema=24926.16 bu1=false be1=false bu2=false be2=false bu3=false be3=false bbos=false sbos=false bchoch=false schoch=false
+2026-02-27T10:30:00.000-05:00,[HTF1 tf=3] trail=24850 ts=1 slope=19.085 ema=24925.67 c=24971 bu1=false be1=false bu2=false be2=false bu3=false be3=false bbos=false sbos=false bchoch=false schoch=false res=24938.75 sup=24921
+2026-02-27T10:30:00.000-05:00,[HTF2 tf=5] trail=24780 ts=1 slope=24.6242 c=24971 bu1=false be1=false bu3=false be3=false bbos=false sbos=false
+2026-02-27T10:30:00.000-05:00,[HTF3 tf=15] trail=24997.75 ts=-1 slope=18.8622 c=24971 bu3=false be3=false bbos=false sbos=false
+2026-02-27T10:30:00.000-05:00,[ARMS] lf1=false lf2=true lf3=true lblk=true L_ARMED=false L_TRIG=false | sf1=false sf2=false sf3=false sblk=true S_ARMED=false S_TRIG=false | BE=false TRAIL=false | Sess=true KZ=true LimOk=true Flat=true
+2026-02-27T10:33:00.000-05:00,10:33:00  bar=19951
+2026-02-27T10:33:00.000-05:00,[CHART tf=3] trail=24866.25 ts=1 slope=12.8927 ema=24929.38 bu1=false be1=false bu2=false be2=false bu3=false be3=false bbos=false sbos=false bchoch=false schoch=false
+2026-02-27T10:33:00.000-05:00,[HTF1 tf=3] trail=24861 ts=1 slope=1.934 ema=24926.16 c=24930.75 bu1=false be1=false bu2=false be2=false bu3=false be3=false bbos=false sbos=false bchoch=false schoch=false res=24997.75 sup=24921
+2026-02-27T10:33:00.000-05:00,[HTF2 tf=5] trail=24780 ts=1 slope=24.6242 c=24971 bu1=false be1=false bu3=false be3=false bbos=false sbos=false
+2026-02-27T10:33:00.000-05:00,[HTF3 tf=15] trail=24997.75 ts=-1 slope=18.8622 c=24971 bu3=false be3=false bbos=false sbos=false
+2026-02-27T10:33:00.000-05:00,[ARMS] lf1=false lf2=true lf3=true lblk=true L_ARMED=false L_TRIG=false | sf1=false sf2=false sf3=false sblk=true S_ARMED=false S_TRIG=false | BE=false TRAIL=false | Sess=true KZ=true LimOk=true Flat=true
+2026-02-27T10:36:00.000-05:00,10:36:00  bar=19952
+2026-02-27T10:36:00.000-05:00,[CHART tf=3] trail=24891 ts=1 slope=20.2363 ema=24934.44 bu1=false be1=false bu2=false be2=false bu3=false be3=false bbos=false sbos=false bchoch=false schoch=false
+2026-02-27T10:36:00.000-05:00,[HTF1 tf=3] trail=24866.25 ts=1 slope=12.8927 ema=24929.38 c=24960 bu1=false be1=false bu2=false be2=false bu3=false be3=false bbos=false sbos=false bchoch=false schoch=false res=24997.75 sup=24921
+2026-02-27T10:36:00.000-05:00,[HTF2 tf=5] trail=24780 ts=1 slope=15.9933 c=24954.5 bu1=false be1=false bu3=false be3=false bbos=false sbos=false
+2026-02-27T10:36:00.000-05:00,[HTF3 tf=15] trail=24997.75 ts=-1 slope=18.8622 c=24971 bu3=false be3=false bbos=false sbos=false
+2026-02-27T10:36:00.000-05:00,[ARMS] lf1=false lf2=true lf3=true lblk=true L_ARMED=false L_TRIG=false | sf1=false sf2=false sf3=false sblk=true S_ARMED=false S_TRIG=false | BE=false TRAIL=false | Sess=true KZ=true LimOk=true Flat=true
+2026-02-27T10:39:00.000-05:00,10:39:00  bar=19953
+2026-02-27T10:39:00.000-05:00,[CHART tf=3] trail=24921 ts=1 slope=13.928 ema=24937.92 bu1=false be1=false bu2=false be2=false bu3=false be3=false bbos=false sbos=false bchoch=false schoch=false
+2026-02-27T10:39:00.000-05:00,[HTF1 tf=3] trail=24891 ts=1 slope=20.2363 ema=24934.44 c=24982.5 bu1=false be1=false bu2=false be2=false bu3=false be3=false bbos=false sbos=false bchoch=false schoch=false res=24997.75 sup=24921
+2026-02-27T10:39:00.000-05:00,[HTF2 tf=5] trail=24780 ts=1 slope=15.9933 c=24954.5 bu1=false be1=false bu3=false be3=false bbos=false sbos=false
+2026-02-27T10:39:00.000-05:00,[HTF3 tf=15] trail=24997.75 ts=-1 slope=18.8622 c=24971 bu3=false be3=false bbos=false sbos=false
+2026-02-27T10:39:00.000-05:00,[ARMS] lf1=false lf2=true lf3=true lblk=true L_ARMED=false L_TRIG=false | sf1=false sf2=false sf3=false sblk=true S_ARMED=false S_TRIG=false | BE=false TRAIL=false | Sess=true KZ=true LimOk=true Flat=true
