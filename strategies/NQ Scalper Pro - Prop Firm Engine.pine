@@ -334,6 +334,7 @@ pivotLen    = input.int(5, "Pivot Lookback", group=G_IND)
 var G_VIS = "13. 🎨 VISUALS"
 showSignals    = input.bool(true,  "Show Entry Arm Signals", group=G_VIS)
 showDebugLog   = input.bool(false, "Show On-Chart Debug Label (Last Bar)", group=G_VIS)
+showNewsBoundarySignals = input.bool(true, "Show News PRE/POST Markers", group=G_VIS)
 showPolicyModeLabel = input.bool(true, "Show Policy Mode Label", group=G_VIS, tooltip="Displays current prop-firm news compliance mode and safety state on chart.")
 logLevel = input.string("Trades Only", "Pine Script Logging Level", options=["None", "Trades Only", "Full (Deep State)"], group=G_VIS)
 showFilterDashboard = input.bool(false, "📊 Show Filter State Dashboard", group=G_VIS, tooltip="Displays a real-time table showing the true/false status of every filter and blocker.")
@@ -919,12 +920,16 @@ int _barMs = (na(_tfSec) or _tfSec <= 0) ? 60000 : _tfSec * 1000
 int _barCloseTs = na(time_close) ? (time + _barMs) : int(time_close)
 int _lastNewsEndTs = array.size(newsEndTs) > 0 ? array.get(newsEndTs, array.size(newsEndTs) - 1) : 0
 bool newsCalendarExpired = useNewsKillzones and _lastNewsEndTs > 0 and time > _lastNewsEndTs
+var int _lastPreBoundaryEventTs = na
+var int _lastPostBoundaryEventTs = na
 bool inNewsKillzoneWindow = false
 string activeNewsKillzone = ""
 bool redFolderPreBoundaryNow = false
 bool redFolderPostBoundaryNow = false
 string redFolderPreLabel = ""
 string redFolderPostLabel = ""
+int redFolderPreBoundaryTs = na
+int redFolderPostBoundaryTs = na
 int _newsCount = array.size(newsStartTs)
 if _newsCount > 0
     for _i = 0 to _newsCount - 1
@@ -937,11 +942,27 @@ if _newsCount > 0
         bool _preBoundary = time <= _s and _barCloseTs >= _s
         if _preBoundary and not redFolderPreBoundaryNow
             redFolderPreBoundaryNow := true
+            redFolderPreBoundaryTs := _s
             redFolderPreLabel := "Scheduled Red Folder Window"
         bool _postBoundary = time <= _e and _barCloseTs >= _e
         if _postBoundary and not redFolderPostBoundaryNow
             redFolderPostBoundaryNow := true
+            redFolderPostBoundaryTs := _e
             redFolderPostLabel := "Scheduled Red Folder Window"
+
+if redFolderPreBoundaryNow and not na(redFolderPreBoundaryTs)
+    bool _isDupPre = not na(_lastPreBoundaryEventTs) and redFolderPreBoundaryTs == _lastPreBoundaryEventTs
+    if _isDupPre
+        redFolderPreBoundaryNow := false
+    else
+        _lastPreBoundaryEventTs := redFolderPreBoundaryTs
+
+if redFolderPostBoundaryNow and not na(redFolderPostBoundaryTs)
+    bool _isDupPost = not na(_lastPostBoundaryEventTs) and redFolderPostBoundaryTs == _lastPostBoundaryEventTs
+    if _isDupPost
+        redFolderPostBoundaryNow := false
+    else
+        _lastPostBoundaryEventTs := redFolderPostBoundaryTs
 
 // =========================================================================
 // 17b. 📦 PACK PER-TF DATA INTO ARRAYS (f_eval optimization)
@@ -1465,9 +1486,19 @@ int actualMaxContracts = useCompliance ? math.min(qtyInput, propFirmMaxContracts
 // =========================================================================
 // --- Pine Script Logs: logs to Strategy Tester → Pine Logs tab every bar ---
 // --- On-Chart Debug Label: last bar only ---
+var label _dbgLabel = na
 if showDebugLog and barstate.islast
     string _dir  = strategy.position_size > 0 ? "LONG" : strategy.position_size < 0 ? "SHORT" : "FLAT"
-    label.new(bar_index, high * 1.001, "DIR: " + _dir + " | L=" + str.tostring(longArmed) + "/" + str.tostring(l_prim) + " | S=" + str.tostring(shortArmed) + "/" + str.tostring(s_prim), style=label.style_label_down, color=color.new(color.black, 50), textcolor=color.white, size=size.tiny)
+    string _txt = "DIR: " + _dir + " | L=" + str.tostring(longArmed) + "/" + str.tostring(l_prim) + " | S=" + str.tostring(shortArmed) + "/" + str.tostring(s_prim)
+    if na(_dbgLabel)
+        _dbgLabel := label.new(bar_index, high, _txt, yloc=yloc.abovebar, style=label.style_label_down, color=color.new(color.black, 50), textcolor=color.white, size=size.tiny)
+    else
+        label.set_x(_dbgLabel, bar_index)
+        label.set_y(_dbgLabel, high)
+        label.set_text(_dbgLabel, _txt)
+else if not showDebugLog and not na(_dbgLabel)
+    label.delete(_dbgLabel)
+    _dbgLabel := na
 
 // =========================================================================
 // 20. 🚀 EXECUTION ENGINE — Phase 6 Tradovate Integer Math
@@ -1979,6 +2010,9 @@ if dailyPnlLimitHit and not isFlat
 // =========================================================================
 // 22. 🎨 VISUAL RENDERING — Unified Color Gradient + Lux-Style BOS/ChoCH
 // =========================================================================
+plotshape(showNewsBoundarySignals and newsPreAlertNow, "News PRE", style=shape.labeldown, location=location.top, color=color.new(c_l3_bear, 0), text="PRE", textcolor=color.white, size=size.tiny)
+plotshape(showNewsBoundarySignals and newsPostAlertNow, "News POST", style=shape.labelup, location=location.bottom, color=color.new(c_l3_bull, 0), text="POST", textcolor=color.white, size=size.tiny)
+
 // --- ENTRY SIGNAL OVERLAYS ---
 plotshape(showSignals and _entryLongBar  == bar_index, "Long Entry",  style=shape.triangleup,   location=location.belowbar, color=color.new(color.green, 0), size=size.small)
 plotshape(showSignals and _entryShortBar == bar_index, "Short Entry", style=shape.triangledown, location=location.abovebar, color=color.new(color.red,   0), size=size.small)
