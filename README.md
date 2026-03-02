@@ -1,8 +1,12 @@
 # pine-code
 
-Current version: v6.1
+Current version: v6.2
 
 ## Release Notes
+
+### v6.2 (2026-03-02)
+- Added an on-chart `Policy Mode` label to display active firm/news compliance state in real time.
+- Added compliance reference documentation under `supporting docs/` (MFFU, Tradify, Lucid, 365-day schedule, and historical summary).
 
 ### v6.1 (2026-03-02)
 - Added advanced timeframe combo selectors for long/short filters, blockers, and triggers.
