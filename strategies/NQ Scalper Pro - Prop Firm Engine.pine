@@ -1451,6 +1451,7 @@ bool fireLong = longTriggerNow or longCarryEligible
 bool fireShort = shortTriggerNow or shortCarryEligible
 bool longFromCarry = longCarryEligible and not longTriggerNow
 bool shortFromCarry = shortCarryEligible and not shortTriggerNow
+bool isBarClose = barstate.isconfirmed
 
 if isBarClose and newsPreAlertNow and (logLevel == "Trades Only" or logLevel == "Full (Deep State)")
     log.info(str.format("📰 RED FOLDER PRE-EVENT @{0}: {1} | policy=NEWS_ALLOWED_ALERT_ONLY", str.format_time(time, "HH:mm:ss", "America/New_York"), redFolderPreLabel))
@@ -1784,7 +1785,6 @@ string lbl_long_entry  = "LONG-" + str.replace_all(l_prim_tf_eff, " ", "") + "-"
 string lbl_short_entry = "SHRT-" + str.replace_all(s_prim_tf_eff, " ", "") + "-" + str.replace_all(s_prim_ind, " ", "")
 string l_meta = f_trigger_meta(l_prim_tf_eff, l_prim_ind, l_prim_cond, l_prim_comp, l_prim_targ, l_prim_val, 1)
 string s_meta = f_trigger_meta(s_prim_tf_eff, s_prim_ind, s_prim_cond, s_prim_comp, s_prim_targ, s_prim_val, -1)
-bool isBarClose = barstate.isconfirmed
 
 // -------------------------------------------------------------------------
 // 20b. 🟢/🔴 ENTRY
