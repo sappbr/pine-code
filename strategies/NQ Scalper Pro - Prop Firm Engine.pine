@@ -928,6 +928,8 @@ if barstate.isfirst
 int _tfSec = timeframe.in_seconds()
 int _barMs = (na(_tfSec) or _tfSec <= 0) ? 60000 : _tfSec * 1000
 int _barCloseTs = na(time_close) ? (time + _barMs) : int(time_close)
+int _lastNewsEndTs = array.size(newsEndTs) > 0 ? array.get(newsEndTs, array.size(newsEndTs) - 1) : 0
+bool newsCalendarExpired = useNewsKillzones and _lastNewsEndTs > 0 and time > _lastNewsEndTs
 bool inNewsKillzoneWindow = false
 string activeNewsKillzone = ""
 int _newsCount = array.size(newsStartTs)
@@ -1357,7 +1359,7 @@ if useMffuFlatten
     mffuFlattenNow := not na(time(timeframe.period, mffuFlattenTime, "America/New_York")) and na(time(timeframe.period, mffuFlattenTime, "America/New_York")[1])
 
 bool newsKillzoneNow = useNewsKillzones and inNewsKillzoneWindow
-bool newsEntryAllowed = not newsKillzoneNow
+bool newsEntryAllowed = not newsKillzoneNow and not newsCalendarExpired
 bool newsForceFlattenNow = newsKillzoneNow and newsKillzoneAction == "Block Entries + Force Flatten"
 
 // =========================================================================
@@ -1496,7 +1498,7 @@ if logLevel == "Full (Deep State)"
     arm_snap += " | sf1=" + str.tostring(s_f1) + " sf2=" + str.tostring(s_f2) + " sf3=" + str.tostring(s_f3) + " sblk=" + str.tostring(s_blk)
     arm_snap += " S_ARMED=" + str.tostring(shortArmed) + " S_TRIG=" + str.tostring(s_prim)
     arm_snap += " | BE=" + str.tostring(be_trigger) + " TRAIL=" + str.tostring(trail_act_trigger)
-    arm_snap += " | Sess=" + str.tostring(inSession) + " KZ=" + str.tostring(isKillzone) + " NewsKZ=" + str.tostring(newsKillzoneNow) + " LimOk=" + str.tostring(not dailyLimitHit) + " Flat=" + str.tostring(strategy.position_size == 0)
+    arm_snap += " | Sess=" + str.tostring(inSession) + " KZ=" + str.tostring(isKillzone) + " NewsKZ=" + str.tostring(newsKillzoneNow) + " NewsExpired=" + str.tostring(newsCalendarExpired) + " LimOk=" + str.tostring(not dailyLimitHit) + " Flat=" + str.tostring(strategy.position_size == 0)
     if newsKillzoneNow
         arm_snap += " NewsEvt=" + activeNewsKillzone
     log.info(str.format("{0}  bar={1}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(bar_index)))
@@ -2201,6 +2203,9 @@ plot(show_swing_h3 ? h3_sl : na, "Swing Low (HTF 3)",  color=color.new(c_bull_h3
 plotshape(isBullSweep, "Bullish Sweep (Chart)", style=shape.circle, location=location.belowbar, color=c_bull_c, size=size.tiny)
 plotshape(isBearSweep, "Bearish Sweep (Chart)", style=shape.circle, location=location.abovebar, color=c_bear_c, size=size.tiny)
 
+// --- NEWS CALENDAR EXPIRY WARNING ---
+plotshape(newsCalendarExpired and barstate.islast, "News Calendar Expired", style=shape.triangledown, location=location.top, color=color.new(c_bear_c, 0), size=size.small, text="NEWS CAL EXPIRED")
+
 // --- CHART BOS/ChoCH (lux-ms-fractals style: line.new + label.new) ---
 var line chart_sup_line = na
 var bool chart_sup_broken = false
@@ -2426,7 +2431,7 @@ if showFilterDashboard and not na(dashTbl)
     table.cell(dashTbl, 2, 9, "Act=" + str.tostring(sweepBearActive) + " rSince=" + str.tostring(sweepBearSince), text_color=color.white, bgcolor=sweepBearActive ? _cTrue : _cFalse, text_size=size.tiny)
     // --- News Killzone ---
     table.cell(dashTbl, 0, 10, "News",      text_color=color.white, bgcolor=_cHdr, text_size=size.small)
-    table.cell(dashTbl, 1, 10, "Block=" + str.tostring(newsKillzoneNow) + (newsKillzoneNow ? "\n" + activeNewsKillzone : ""), text_color=color.white, bgcolor=newsKillzoneNow ? _cWarn : _cTrue, text_size=size.tiny)
+    table.cell(dashTbl, 1, 10, "Block=" + str.tostring(newsKillzoneNow) + " Exp=" + str.tostring(newsCalendarExpired) + (newsKillzoneNow ? "\n" + activeNewsKillzone : ""), text_color=color.white, bgcolor=(newsKillzoneNow or newsCalendarExpired) ? _cWarn : _cTrue, text_size=size.tiny)
     table.cell(dashTbl, 2, 10, "Act=" + newsKillzoneAction, text_color=color.white, bgcolor=_cHdr, text_size=size.tiny)
     // --- Session/Killzone ---
     table.cell(dashTbl, 0, 11, "Session",      text_color=color.white, bgcolor=_cHdr, text_size=size.small)
