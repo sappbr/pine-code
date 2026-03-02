@@ -893,100 +893,23 @@ f_news_add_epoch(array<int> _startArr, array<int> _endArr, array<string> _labelA
 
 var array<int> newsStartTs = array.new_int()
 var array<int> newsEndTs   = array.new_int()
-var array<string> newsLbl  = array.new_string()
+string NEWS_WINDOWS_PACKED = "1741353900000,1741354500000;1741782300000,1741782900000;1742406900000,1742409600000;1743078300000,1743078900000;1743769500000,1743770100000;1744287900000,1744288500000;1745497500000,1745498100000;1746035700000,1746038400000;1746188700000,1746189300000;1747225500000,1747226100000;1748521500000,1748522100000;1749212700000,1749213300000;1749731100000,1749731700000;1750269300000,1750272000000;1750940700000,1750941300000;1751631900000,1751632500000;1752236700000,1752237300000;1753359900000,1753360500000;1753898100000,1753900800000;1754051100000,1754051700000;1755087900000,1755088500000;1756383900000,1756384500000;1757075100000,1757075700000;1757593500000,1757594100000;1758131700000,1758134400000;1758803100000,1758803700000;1759494300000,1759494900000;1760099100000,1760099700000;1761760500000,1761763200000;1761827100000,1761827700000;1762521900000,1762522500000;1762953900000,1762954500000;1764077100000,1764077700000;1764941100000,1764941700000;1765392900000,1765395600000;1765459500000,1765460100000;1766496300000,1766496900000;1767965100000,1767965700000;1768397100000,1768397700000;1769626500000,1769629200000;1769693100000,1769693700000;1770384300000,1770384900000;1770816300000,1770816900000;1772112300000,1772112900000;1772803500000,1772804100000;1773231900000,1773232500000;1773404700000,1773405300000;1773856500000,1773859200000;1775219100000,1775219700000;1775737500000,1775738100000;1775823900000,1775824500000;1777485300000,1777488000000;1777551900000,1777552500000;1778243100000,1778243700000;1778588700000,1778589300000;1779971100000,1779971700000;1780662300000,1780662900000;1781094300000,1781094900000;1781718900000,1781721600000;1782390300000,1782390900000;1782995100000,1782995700000;1784031900000,1784032500000;1785347700000,1785350400000;1785414300000,1785414900000;1786105500000,1786106100000;1786537500000,1786538100000;1787747100000,1787747700000;1788524700000,1788525300000;1789129500000,1789130100000;1789581300000,1789584000000;1790771100000,1790771700000;1790943900000,1790944500000;1791980700000,1791981300000;1793210100000,1793212800000;1793276700000,1793277300000;1793971500000,1793972100000;1794317100000,1794317700000;1795613100000,1795613700000;1796390700000,1796391300000;1796842500000,1796845200000;1796909100000,1796909700000;1798032300000,1798032900000;1799414700000,1799415300000;1799846700000,1799847300000;1801076100000,1801078800000;1801142700000,1801143300000;1801833900000,1801834500000;1802352300000,1802352900000;1803561900000,1803562500000"
 
 f_seed_news_calendar() =>
-    // Fixed windows from compliance schedules:
-    // NFP/CPI/GDP: 08:25-08:35 ET, FOMC: 13:55-14:40 ET.
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1741353900000, 1741354500000, "NFP (2025-03-07)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1741782300000, 1741782900000, "CPI (2025-03-12)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1742406900000, 1742409600000, "FOMC (2025-03-19)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1743078300000, 1743078900000, "GDP (2025-03-27)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1743769500000, 1743770100000, "NFP (2025-04-04)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1744287900000, 1744288500000, "CPI (2025-04-10)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1745497500000, 1745498100000, "GDP (2025-04-24)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1746035700000, 1746038400000, "FOMC (2025-04-30)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1746188700000, 1746189300000, "NFP (2025-05-02)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1747225500000, 1747226100000, "CPI (2025-05-14)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1748521500000, 1748522100000, "GDP (2025-05-29)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1749212700000, 1749213300000, "NFP (2025-06-06)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1749731100000, 1749731700000, "CPI (2025-06-12)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1750269300000, 1750272000000, "FOMC (2025-06-18)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1750940700000, 1750941300000, "GDP (2025-06-26)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1751631900000, 1751632500000, "NFP (2025-07-04)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1752236700000, 1752237300000, "CPI (2025-07-11)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1753359900000, 1753360500000, "GDP (2025-07-24)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1753898100000, 1753900800000, "FOMC (2025-07-30)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1754051100000, 1754051700000, "NFP (2025-08-01)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1755087900000, 1755088500000, "CPI (2025-08-13)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1756383900000, 1756384500000, "GDP (2025-08-28)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1757075100000, 1757075700000, "NFP (2025-09-05)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1757593500000, 1757594100000, "CPI (2025-09-11)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1758131700000, 1758134400000, "FOMC (2025-09-17)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1758803100000, 1758803700000, "GDP (2025-09-25)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1759494300000, 1759494900000, "NFP (2025-10-03)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1760099100000, 1760099700000, "CPI (2025-10-10)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1761760500000, 1761763200000, "FOMC (2025-10-29)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1761827100000, 1761827700000, "GDP (2025-10-30)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1762521900000, 1762522500000, "NFP (2025-11-07)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1762953900000, 1762954500000, "CPI (2025-11-12)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1764077100000, 1764077700000, "GDP (2025-11-25)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1764941100000, 1764941700000, "NFP (2025-12-05)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1765392900000, 1765395600000, "FOMC (2025-12-10)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1765459500000, 1765460100000, "CPI (2025-12-11)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1766496300000, 1766496900000, "GDP (2025-12-23)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1767965100000, 1767965700000, "NFP (2026-01-09)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1768397100000, 1768397700000, "CPI (2026-01-14)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1769626500000, 1769629200000, "FOMC (2026-01-28)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1769693100000, 1769693700000, "GDP (2026-01-29)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1770384300000, 1770384900000, "NFP (2026-02-06)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1770816300000, 1770816900000, "CPI (2026-02-11)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1772112300000, 1772112900000, "GDP (2026-02-26)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1772803500000, 1772804100000, "NFP (2026-03-06)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1773231900000, 1773232500000, "CPI (2026-03-11)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1773404700000, 1773405300000, "GDP (2026-03-13)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1773856500000, 1773859200000, "FOMC (2026-03-18)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1775219100000, 1775219700000, "NFP (2026-04-03)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1775737500000, 1775738100000, "GDP (2026-04-09)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1775823900000, 1775824500000, "CPI (2026-04-10)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1777485300000, 1777488000000, "FOMC (2026-04-29)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1777551900000, 1777552500000, "GDP (2026-04-30)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1778243100000, 1778243700000, "NFP (2026-05-08)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1778588700000, 1778589300000, "CPI (2026-05-12)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1779971100000, 1779971700000, "GDP (2026-05-28)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1780662300000, 1780662900000, "NFP (2026-06-05)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1781094300000, 1781094900000, "CPI (2026-06-10)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1781718900000, 1781721600000, "FOMC (2026-06-17)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1782390300000, 1782390900000, "GDP (2026-06-25)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1782995100000, 1782995700000, "NFP (2026-07-02)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1784031900000, 1784032500000, "CPI (2026-07-14)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1785347700000, 1785350400000, "FOMC (2026-07-29)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1785414300000, 1785414900000, "GDP (2026-07-30)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1786105500000, 1786106100000, "NFP (2026-08-07)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1786537500000, 1786538100000, "CPI (2026-08-12)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1787747100000, 1787747700000, "GDP (2026-08-26)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1788524700000, 1788525300000, "NFP (2026-09-04)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1789129500000, 1789130100000, "CPI (2026-09-11)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1789581300000, 1789584000000, "FOMC (2026-09-16)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1790771100000, 1790771700000, "GDP (2026-09-30)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1790943900000, 1790944500000, "NFP (2026-10-02)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1791980700000, 1791981300000, "CPI (2026-10-14)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1793210100000, 1793212800000, "FOMC (2026-10-28)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1793276700000, 1793277300000, "GDP (2026-10-29)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1793971500000, 1793972100000, "NFP (2026-11-06)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1794317100000, 1794317700000, "CPI (2026-11-10)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1795613100000, 1795613700000, "GDP (2026-11-25)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1796390700000, 1796391300000, "NFP (2026-12-04)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1796842500000, 1796845200000, "FOMC (2026-12-09)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1796909100000, 1796909700000, "CPI (2026-12-10)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1798032300000, 1798032900000, "GDP (2026-12-23)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1799414700000, 1799415300000, "NFP (2027-01-08)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1799846700000, 1799847300000, "CPI (2027-01-13)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1801076100000, 1801078800000, "FOMC (2027-01-27)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1801142700000, 1801143300000, "GDP (2027-01-28)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1801833900000, 1801834500000, "NFP (2027-02-05)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1802352300000, 1802352900000, "CPI (2027-02-11)")
-    f_news_add_epoch(newsStartTs, newsEndTs, newsLbl, 1803561900000, 1803562500000, "GDP (2027-02-25)")
+    array.clear(newsStartTs)
+    array.clear(newsEndTs)
+    array<string> _windows = str.split(NEWS_WINDOWS_PACKED, ";")
+    int _n = array.size(_windows)
+    if _n > 0
+        for _i = 0 to _n - 1
+            string _w = array.get(_windows, _i)
+            array<string> _parts = str.split(_w, ",")
+            if array.size(_parts) == 2
+                int _s = int(str.tonumber(array.get(_parts, 0)))
+                int _e = int(str.tonumber(array.get(_parts, 1)))
+                if _e > _s
+                    array.push(newsStartTs, _s)
+                    array.push(newsEndTs, _e)
 
 if barstate.isfirst
     f_seed_news_calendar()
@@ -1010,15 +933,15 @@ if _newsCount > 0
         bool _overlap = (time < _e) and (_barCloseTs > _s)
         if _overlap
             inNewsKillzoneWindow := true
-            activeNewsKillzone := array.get(newsLbl, _i)
+            activeNewsKillzone := "Scheduled Red Folder Window"
         bool _preBoundary = time <= _s and _barCloseTs >= _s
         if _preBoundary and not redFolderPreBoundaryNow
             redFolderPreBoundaryNow := true
-            redFolderPreLabel := array.get(newsLbl, _i)
+            redFolderPreLabel := "Scheduled Red Folder Window"
         bool _postBoundary = time <= _e and _barCloseTs >= _e
         if _postBoundary and not redFolderPostBoundaryNow
             redFolderPostBoundaryNow := true
-            redFolderPostLabel := array.get(newsLbl, _i)
+            redFolderPostLabel := "Scheduled Red Folder Window"
 
 // =========================================================================
 // 17b. 📦 PACK PER-TF DATA INTO ARRAYS (f_eval optimization)
@@ -1519,11 +1442,6 @@ bool longFromCarry = longCarryEligible and not longTriggerNow
 bool shortFromCarry = shortCarryEligible and not shortTriggerNow
 bool isBarClose = barstate.isconfirmed
 
-if isBarClose and newsPreAlertNow and (logLevel == "Trades Only" or logLevel == "Full (Deep State)")
-    log.info(str.format("📰 RED FOLDER PRE-EVENT @{0}: {1} | policy=NEWS_ALLOWED_ALERT_ONLY", str.format_time(time, "HH:mm:ss", "America/New_York"), redFolderPreLabel))
-if isBarClose and newsPostAlertNow and (logLevel == "Trades Only" or logLevel == "Full (Deep State)")
-    log.info(str.format("📰 RED FOLDER POST-EVENT @{0}: {1} | policy=NEWS_ALLOWED_ALERT_ONLY", str.format_time(time, "HH:mm:ss", "America/New_York"), redFolderPostLabel))
-
 // --- Break Even Trigger ---
 bool be_trigger = be_mode == "Off" ? false : f_eval(be_tf, be_ind, be_cond, be_comp, be_targ, be_val, strategy.position_size > 0 ? 1 : -1)
 // --- Trail Activation Trigger ---
@@ -1546,9 +1464,6 @@ int actualMaxContracts = useCompliance ? math.min(qtyInput, propFirmMaxContracts
 // 19b. 🐞 DEBUG LOGS
 // =========================================================================
 // --- Pine Script Logs: logs to Strategy Tester → Pine Logs tab every bar ---
-if logLevel == "Full (Deep State)"
-    log.info(str.format("DBG @{0}: bar={1} L={2}/{3} S={4}/{5} flat={6}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(bar_index), str.tostring(longArmed), str.tostring(l_prim), str.tostring(shortArmed), str.tostring(s_prim), str.tostring(strategy.position_size == 0)))
-
 // --- On-Chart Debug Label: last bar only ---
 if showDebugLog and barstate.islast
     string _dir  = strategy.position_size > 0 ? "LONG" : strategy.position_size < 0 ? "SHORT" : "FLAT"
@@ -1682,9 +1597,6 @@ var int   _entryShortBar = -1
 f_fmt_num(float v) =>
     na(v) ? "na" : str.format("{0,number,#.####}", v)
 
-f_trigger_meta(string tf, string ind, string cond, bool useComp, string targ, float val, int dir) =>
-    str.format("tf={0} ind={1} cond={2} comp={3} targ={4} val={5} dir={6}", tf, ind, cond, str.tostring(useComp), targ, f_fmt_num(val), str.tostring(dir))
-
 f_scale_qty(int reqQty, float posSz, int maxQty) =>
     int _absPos = int(math.abs(posSz))
     int _qty = reqQty <= 0 ? _absPos : reqQty
@@ -1722,8 +1634,6 @@ f_exec_override_slot(string entryId, string sideLabel, string slotLabel, string 
         else if _qty > 0
             strategy.close(entryId, qty=_qty, comment=slotId)
             _done := true
-        if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
-            log.info(str.format("🚪 {0} HIT @{1}: side={2} qty={3} id={4} | {5}", slotLabel, str.format_time(time, "HH:mm:ss", "America/New_York"), sideLabel, str.tostring(_qty), slotId, meta))
     [_done, _closeAll]
 
 f_exec_tp_slot(string entryId, string sideLabel, string slotLabel, string slotId, bool anyExitTrig, int qty, bool done, bool trig, string meta) =>
@@ -1731,8 +1641,6 @@ f_exec_tp_slot(string entryId, string sideLabel, string slotLabel, string slotId
     if not anyExitTrig and qty > 0 and not done and trig
         strategy.close(entryId, qty=qty, comment=slotId)
         _done := true
-        if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
-            log.info(str.format("🎯 {0} HIT @{1}: side={2} qty={3} id={4} | {5}", slotLabel, str.format_time(time, "HH:mm:ss", "America/New_York"), sideLabel, str.tostring(qty), slotId, meta))
     _done
 
 f_apply_stop_orders(string entryId, string id1, string id2, string id3, string id4, int q1, int q2, int q3, int q4, float stopPx) =>
@@ -1744,14 +1652,6 @@ f_apply_stop_orders(string entryId, string id1, string id2, string id3, string i
     if q4 > 0
         strategy.exit(id4, entryId, qty=q4, stop=stopPx, comment_loss="SL Hit")
 
-f_log_blocked_guard(string slotLabel, bool trigRaw, bool trig, string meta) =>
-    if trigRaw and not trig and (logLevel == "Trades Only" or logLevel == "Full (Deep State)")
-        log.info(str.format("⛔ {0} BLOCKED @{1}: reason=NET_PNL_GUARD | openPnl={2,number,#.##} avg={3,number,#.##} close={4,number,#.##} | {5}", slotLabel, str.format_time(time, "HH:mm:ss", "America/New_York"), strategy.openprofit, strategy.position_avg_price, close, meta))
-
-f_log_entry_rejected(string sideLabel, string reason, string details, string meta) =>
-    if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
-        log.info(str.format("⛔ {0} REJECTED @{1}: reason={2} {3} | {4}", sideLabel, str.format_time(time, "HH:mm:ss", "America/New_York"), reason, details, meta))
-
 // --- Track previous states to detect actual fills for logging ---
 var float lastPosSize = 0.0
 bool closedOut = strategy.position_size == 0 and lastPosSize != 0
@@ -1760,8 +1660,6 @@ lastPosSize := strategy.position_size
 // --- Dynamic Entry IDs ---
 string lbl_long_entry  = "LONG-" + str.replace_all(l_prim_tf_eff, " ", "") + "-" + str.replace_all(l_prim_ind, " ", "")
 string lbl_short_entry = "SHRT-" + str.replace_all(s_prim_tf_eff, " ", "") + "-" + str.replace_all(s_prim_ind, " ", "")
-string l_meta = f_trigger_meta(l_prim_tf_eff, l_prim_ind, l_prim_cond, l_prim_comp, l_prim_targ, l_prim_val, 1)
-string s_meta = f_trigger_meta(s_prim_tf_eff, s_prim_ind, s_prim_cond, s_prim_comp, s_prim_targ, s_prim_val, -1)
 
 // -------------------------------------------------------------------------
 // 20b. 🟢/🔴 ENTRY
@@ -1794,13 +1692,13 @@ if fireLong and isFlat and isBarClose
             if longFromCarry and (logLevel == "Trades Only" or logLevel == "Full (Deep State)")
                 log.info(str.format("↪ LONG OPEN-CARRY EXECUTED @{0}: pendingBars={1}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(_longCarryBars)))
             if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
-                log.info(str.format("🟢 LONG ALLOWED @{0}: id={1} | entry={2,number,#.##} sl={3,number,#.##} distPts={4,number,#.##} | {5}", str.format_time(time, "HH:mm:ss", "America/New_York"), lbl_long_entry, close, sl, (close - sl), l_meta))
+                log.info(str.format("🟢 LONG ALLOWED @{0}: id={1} | entry={2,number,#.##} sl={3,number,#.##} distPts={4,number,#.##}", str.format_time(time, "HH:mm:ss", "America/New_York"), lbl_long_entry, close, sl, (close - sl)))
         else
-            f_log_entry_rejected("LONG", "MAE_LIMIT", str.format("maeEnforcementMode={0} maeTicks={1,number,#.##} effMaxTicks={2,number,#.##} close={3,number,#.##} sl={4,number,#.##}", maeLimitMode, maeTicks, effectiveMaeTicks, close, sl), l_meta)
+            na
     else
-        f_log_entry_rejected("LONG", "INVALID_SL", str.format("initialStopLossMode={0} close={1,number,#.##} sl={2}", slMode, close, f_fmt_num(sl)), l_meta)
+        na
 else if fireLong and not isFlat
-    f_log_entry_rejected("LONG", "NOT_FLAT", str.format("pos={0}", str.tostring(strategy.position_size)), l_meta)
+    na
 
 // --- SHORT ENTRY ---
 if fireShort and isFlat and isBarClose
@@ -1830,13 +1728,13 @@ if fireShort and isFlat and isBarClose
             if shortFromCarry and (logLevel == "Trades Only" or logLevel == "Full (Deep State)")
                 log.info(str.format("↪ SHORT OPEN-CARRY EXECUTED @{0}: pendingBars={1}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(_shortCarryBars)))
             if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
-                log.info(str.format("🔴 SHORT ALLOWED @{0}: id={1} | entry={2,number,#.##} sl={3,number,#.##} distPts={4,number,#.##} | {5}", str.format_time(time, "HH:mm:ss", "America/New_York"), lbl_short_entry, close, sl, (sl - close), s_meta))
+                log.info(str.format("🔴 SHORT ALLOWED @{0}: id={1} | entry={2,number,#.##} sl={3,number,#.##} distPts={4,number,#.##}", str.format_time(time, "HH:mm:ss", "America/New_York"), lbl_short_entry, close, sl, (sl - close)))
         else
-            f_log_entry_rejected("SHORT", "MAE_LIMIT", str.format("maeEnforcementMode={0} maeTicks={1,number,#.##} effMaxTicks={2,number,#.##} close={3,number,#.##} sl={4,number,#.##}", maeLimitMode, maeTicks, effectiveMaeTicks, close, sl), s_meta)
+            na
     else
-        f_log_entry_rejected("SHORT", "INVALID_SL", str.format("initialStopLossMode={0} close={1,number,#.##} sl={2}", slMode, close, f_fmt_num(sl)), s_meta)
+        na
 else if fireShort and not isFlat
-    f_log_entry_rejected("SHORT", "NOT_FLAT", str.format("pos={0}", str.tostring(strategy.position_size)), s_meta)
+    na
 
 // =========================================================================
 // 21. 🎯 EXIT MANAGEMENT — TP / BE / Trail / MFFU
@@ -1884,16 +1782,12 @@ if not isFlat and not beHit and be_mode != "Off"
         float beLevel = isLong ? entryPrice + be_offset * syminfo.mintick : entryPrice - be_offset * syminfo.mintick
         entrySL := beLevel
         beHit   := true
-        if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
-            log.info(str.format("🛡️ BE ACTIVATED: side={0} | New SL: {1,number,#.##} | OffsetTicks: {2}", isLong ? "LONG" : "SHORT", beLevel, str.tostring(be_offset)))
 
 // --- Dynamic Trailing Stop Manager ---
 if not isFlat and not trailLocked
     if trail_act != "Off" and trail_act_trigger
         trailLocked := true
         trailStop   := f_getTrailAnchor(isLong)
-        if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
-            log.info(str.format("🧲 TRAIL LOCKED: side={0} | AnchorTF={1} | Anchor={2} | TrailSL: {3,number,#.##}", isLong ? "LONG" : "SHORT", trail_anchor_tf, trail_anchor_ind, nz(trailStop)))
 
 if trailLocked and not isFlat
     float newAnchor = f_getTrailAnchor(isLong)
@@ -1932,10 +1826,6 @@ bool tp1Trig = tp1TrigRaw and (not tp1_posOnly or netPosNow)
 bool tp2Trig = tp2TrigRaw and (not tp2_posOnly or netPosNow)
 bool tp3Trig = tp3TrigRaw and (not tp3_posOnly or netPosNow)
 bool tp4Trig = tp4TrigRaw and (not tp4_posOnly or netPosNow)
-string tp1Meta = f_trigger_meta(tp1_tf, tp1_ind, tp1_cond, tp1_comp, tp1_targ, float(tp1_val), tpDir)
-string tp2Meta = f_trigger_meta(tp2_tf, tp2_ind, tp2_cond, tp2_comp, tp2_targ, float(tp2_val), tpDir)
-string tp3Meta = f_trigger_meta(tp3_tf, tp3_ind, tp3_cond, tp3_comp, tp3_targ, float(tp3_val), tpDir)
-string tp4Meta = f_trigger_meta(tp4_tf, tp4_ind, tp4_cond, tp4_comp, tp4_targ, float(tp4_val), tpDir)
 
 string id_ex1 = "EX1-" + str.replace_all(ex1_tf, " ", "") + "-" + str.replace_all(ex1_ind, " ", "")
 string id_ex2 = "EX2-" + str.replace_all(ex2_tf, " ", "") + "-" + str.replace_all(ex2_ind, " ", "")
@@ -1951,18 +1841,9 @@ bool ex1Trig = ex1TrigRaw and (not ex1_posOnly or netPosNow)
 bool ex2Trig = ex2TrigRaw and (not ex2_posOnly or netPosNow)
 bool ex3Trig = ex3TrigRaw and (not ex3_posOnly or netPosNow)
 bool anyExitTrig = ex1Trig or ex2Trig or ex3Trig
-string ex1Meta = f_trigger_meta(ex1_tf, ex1_ind, ex1_cond, ex1_comp, ex1_targ, float(ex1_val), tpDir)
-string ex2Meta = f_trigger_meta(ex2_tf, ex2_ind, ex2_cond, ex2_comp, ex2_targ, float(ex2_val), tpDir)
-string ex3Meta = f_trigger_meta(ex3_tf, ex3_ind, ex3_cond, ex3_comp, ex3_targ, float(ex3_val), tpDir)
 
 if isBarClose and not isFlat
-    f_log_blocked_guard("TP1", tp1TrigRaw, tp1Trig, tp1Meta)
-    f_log_blocked_guard("TP2", tp2TrigRaw, tp2Trig, tp2Meta)
-    f_log_blocked_guard("TP3", tp3TrigRaw, tp3Trig, tp3Meta)
-    f_log_blocked_guard("TP4", tp4TrigRaw, tp4Trig, tp4Meta)
-    f_log_blocked_guard("EXIT1", ex1TrigRaw, ex1Trig, ex1Meta)
-    f_log_blocked_guard("EXIT2", ex2TrigRaw, ex2Trig, ex2Meta)
-    f_log_blocked_guard("EXIT3", ex3TrigRaw, ex3Trig, ex3Meta)
+    na
 
 // -------------------------------------------------------------------------
 // 21b. 🚪 OVERRIDE EXITS
@@ -1978,8 +1859,6 @@ if isBarClose and isLong
         else if ex1Qty > 0
             strategy.close(lbl_long_entry, qty=ex1Qty, comment=id_ex1)
             ex1Done := true
-        if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
-            log.info(str.format("🚪 EXIT1 HIT @{0}: side=LONG qty={1} id={2} | {3}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(ex1Qty), id_ex1, ex1Meta))
     if not ex2Done and ex2Trig
         int ex2Qty = f_scale_qty(ex2_qty, strategy.position_size, actualMaxContracts)
         if ex2_qty == 0
@@ -1990,8 +1869,6 @@ if isBarClose and isLong
         else if ex2Qty > 0
             strategy.close(lbl_long_entry, qty=ex2Qty, comment=id_ex2)
             ex2Done := true
-        if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
-            log.info(str.format("🚪 EXIT2 HIT @{0}: side=LONG qty={1} id={2} | {3}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(ex2Qty), id_ex2, ex2Meta))
     if not ex3Done and ex3Trig
         int ex3Qty = f_scale_qty(ex3_qty, strategy.position_size, actualMaxContracts)
         if ex3_qty == 0
@@ -2002,8 +1879,6 @@ if isBarClose and isLong
         else if ex3Qty > 0
             strategy.close(lbl_long_entry, qty=ex3Qty, comment=id_ex3)
             ex3Done := true
-        if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
-            log.info(str.format("🚪 EXIT3 HIT @{0}: side=LONG qty={1} id={2} | {3}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(ex3Qty), id_ex3, ex3Meta))
 
 if isBarClose and isShort
     if not ex1Done and ex1Trig
@@ -2016,8 +1891,6 @@ if isBarClose and isShort
         else if ex1Qty > 0
             strategy.close(lbl_short_entry, qty=ex1Qty, comment=id_ex1)
             ex1Done := true
-        if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
-            log.info(str.format("🚪 EXIT1 HIT @{0}: side=SHORT qty={1} id={2} | {3}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(ex1Qty), id_ex1, ex1Meta))
     if not ex2Done and ex2Trig
         int ex2Qty = f_scale_qty(ex2_qty, strategy.position_size, actualMaxContracts)
         if ex2_qty == 0
@@ -2028,8 +1901,6 @@ if isBarClose and isShort
         else if ex2Qty > 0
             strategy.close(lbl_short_entry, qty=ex2Qty, comment=id_ex2)
             ex2Done := true
-        if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
-            log.info(str.format("🚪 EXIT2 HIT @{0}: side=SHORT qty={1} id={2} | {3}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(ex2Qty), id_ex2, ex2Meta))
     if not ex3Done and ex3Trig
         int ex3Qty = f_scale_qty(ex3_qty, strategy.position_size, actualMaxContracts)
         if ex3_qty == 0
@@ -2040,23 +1911,21 @@ if isBarClose and isShort
         else if ex3Qty > 0
             strategy.close(lbl_short_entry, qty=ex3Qty, comment=id_ex3)
             ex3Done := true
-        if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
-            log.info(str.format("🚪 EXIT3 HIT @{0}: side=SHORT qty={1} id={2} | {3}", str.format_time(time, "HH:mm:ss", "America/New_York"), str.tostring(ex3Qty), id_ex3, ex3Meta))
 
 // -------------------------------------------------------------------------
 // 21c. 🎯 STANDARD TP EXECUTION
 // -------------------------------------------------------------------------
 if isBarClose and isLong
-    tp1Done := f_exec_tp_slot(lbl_long_entry, "LONG", "TP1", id_tp1, anyExitTrig, qtyTP1, tp1Done, tp1Trig, tp1Meta)
-    tp2Done := f_exec_tp_slot(lbl_long_entry, "LONG", "TP2", id_tp2, anyExitTrig, qtyTP2, tp2Done, tp2Trig, tp2Meta)
-    tp3Done := f_exec_tp_slot(lbl_long_entry, "LONG", "TP3", id_tp3, anyExitTrig, qtyTP3, tp3Done, tp3Trig, tp3Meta)
-    tp4Done := f_exec_tp_slot(lbl_long_entry, "LONG", "TP4", id_tp4, anyExitTrig, qtyTP4, tp4Done, tp4Trig, tp4Meta)
+    tp1Done := f_exec_tp_slot(lbl_long_entry, "LONG", "TP1", id_tp1, anyExitTrig, qtyTP1, tp1Done, tp1Trig, "")
+    tp2Done := f_exec_tp_slot(lbl_long_entry, "LONG", "TP2", id_tp2, anyExitTrig, qtyTP2, tp2Done, tp2Trig, "")
+    tp3Done := f_exec_tp_slot(lbl_long_entry, "LONG", "TP3", id_tp3, anyExitTrig, qtyTP3, tp3Done, tp3Trig, "")
+    tp4Done := f_exec_tp_slot(lbl_long_entry, "LONG", "TP4", id_tp4, anyExitTrig, qtyTP4, tp4Done, tp4Trig, "")
 
 if isBarClose and isShort
-    tp1Done := f_exec_tp_slot(lbl_short_entry, "SHORT", "TP1", id_tp1, anyExitTrig, qtyTP1, tp1Done, tp1Trig, tp1Meta)
-    tp2Done := f_exec_tp_slot(lbl_short_entry, "SHORT", "TP2", id_tp2, anyExitTrig, qtyTP2, tp2Done, tp2Trig, tp2Meta)
-    tp3Done := f_exec_tp_slot(lbl_short_entry, "SHORT", "TP3", id_tp3, anyExitTrig, qtyTP3, tp3Done, tp3Trig, tp3Meta)
-    tp4Done := f_exec_tp_slot(lbl_short_entry, "SHORT", "TP4", id_tp4, anyExitTrig, qtyTP4, tp4Done, tp4Trig, tp4Meta)
+    tp1Done := f_exec_tp_slot(lbl_short_entry, "SHORT", "TP1", id_tp1, anyExitTrig, qtyTP1, tp1Done, tp1Trig, "")
+    tp2Done := f_exec_tp_slot(lbl_short_entry, "SHORT", "TP2", id_tp2, anyExitTrig, qtyTP2, tp2Done, tp2Trig, "")
+    tp3Done := f_exec_tp_slot(lbl_short_entry, "SHORT", "TP3", id_tp3, anyExitTrig, qtyTP3, tp3Done, tp3Trig, "")
+    tp4Done := f_exec_tp_slot(lbl_short_entry, "SHORT", "TP4", id_tp4, anyExitTrig, qtyTP4, tp4Done, tp4Trig, "")
 
 // -------------------------------------------------------------------------
 // 21d. 🛑 STOP/EXIT ORDERS
@@ -2085,228 +1954,31 @@ if closedOut and (logLevel == "Trades Only" or logLevel == "Full (Deep State)")
 // -------------------------------------------------------------------------
 // --- MFFU Flatten ---
 if mffuFlattenNow and not isFlat
+    if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
+        log.warning(str.format("🧯 COMPLIANCE CLOSE @{0}: reason=MFFU_FLATTEN", str.format_time(time, "HH:mm:ss", "America/New_York")))
     strategy.close_all("MFFU Flatten")
 
 // --- News Killzone Flatten ---
 if newsForceFlattenNow and not isFlat
+    if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
+        log.warning(str.format("🧯 COMPLIANCE CLOSE @{0}: reason=NEWS_KILLZONE", str.format_time(time, "HH:mm:ss", "America/New_York")))
     strategy.close_all("News Killzone")
 
 // --- Session Close ---
 if useSession and not inSession and not isFlat
+    if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
+        log.warning(str.format("🧯 COMPLIANCE CLOSE @{0}: reason=SESSION_END", str.format_time(time, "HH:mm:ss", "America/New_York")))
     strategy.close_all("Session End")
 
 // --- Daily PnL Compliance Close ---
 if dailyPnlLimitHit and not isFlat
+    if logLevel == "Trades Only" or logLevel == "Full (Deep State)"
+        log.warning(str.format("🧯 COMPLIANCE CLOSE @{0}: reason=DAILY_PNL_LIMIT", str.format_time(time, "HH:mm:ss", "America/New_York")))
     strategy.close_all("Daily PnL Limit")
 
 // =========================================================================
 // 22. 🎨 VISUAL RENDERING — Unified Color Gradient + Lux-Style BOS/ChoCH
 // =========================================================================
-// Plot count budget: 10 plots + 26 plotshapes + 2 bgcolor = 38 of 64
-
-// --- SMART TRAIL PLOTS (Chart always on, HTFs toggled) ---
-plot(smartTrail, "Smart Trail (Chart)", color=trailState == 1 ? c_bull_c : c_bear_c, linewidth=2)
-plot(show_st_h1 ? h1_st : na, "Smart Trail (HTF 1)", color=h1_ts == 1.0 ? c_bull_h1 : c_bear_h1, linewidth=1)
-plot(show_st_h2 ? h2_st : na, "Smart Trail (HTF 2)", color=h2_ts == 1.0 ? c_bull_h2 : c_bear_h2, linewidth=1)
-plot(show_st_h3 ? h3_st : na, "Smart Trail (HTF 3)", color=h3_ts == 1.0 ? c_bull_h3 : c_bear_h3, linewidth=1)
-
-// --- EMA TREND PLOTS (Chart grey always on, HTFs toggled) ---
-plot(emaTrend, "EMA Trend (Chart)", color=emaSlope >= 0 ? c_bull_c : c_bear_c, linewidth=1)
-plot(show_ema_h1 ? h1_ema : na, "EMA Trend (HTF 1)", color=nz(h1_slp, 0) >= 0 ? c_bull_h1 : c_bear_h1, linewidth=2)
-plot(show_ema_h2 ? h2_ema : na, "EMA Trend (HTF 2)", color=nz(h2_slp, 0) >= 0 ? c_bull_h2 : c_bear_h2, linewidth=3)
-plot(show_ema_h3 ? h3_ema : na, "EMA Trend (HTF 3)", color=nz(h3_slp, 0) >= 0 ? c_bull_h3 : c_bear_h3, linewidth=4)
-
-// --- SWING LEVEL PLOTS (Chart + HTFs optional) ---
-plot(show_swing_chart ? swingHigh : na, "Swing High (Chart)", color=color.new(c_bear_c, 35), linewidth=1, style=plot.style_linebr)
-plot(show_swing_chart ? swingLow  : na, "Swing Low (Chart)",  color=color.new(c_bull_c, 35), linewidth=1, style=plot.style_linebr)
-plot(show_swing_h1 ? h1_sh : na, "Swing High (HTF 1)", color=color.new(c_bear_h1, 25), linewidth=1, style=plot.style_linebr)
-plot(show_swing_h1 ? h1_sl : na, "Swing Low (HTF 1)",  color=color.new(c_bull_h1, 25), linewidth=1, style=plot.style_linebr)
-plot(show_swing_h2 ? h2_sh : na, "Swing High (HTF 2)", color=color.new(c_bear_h2, 20), linewidth=1, style=plot.style_linebr)
-plot(show_swing_h2 ? h2_sl : na, "Swing Low (HTF 2)",  color=color.new(c_bull_h2, 20), linewidth=1, style=plot.style_linebr)
-plot(show_swing_h3 ? h3_sh : na, "Swing High (HTF 3)", color=color.new(c_bear_h3, 15), linewidth=1, style=plot.style_linebr)
-plot(show_swing_h3 ? h3_sl : na, "Swing Low (HTF 3)",  color=color.new(c_bull_h3, 15), linewidth=1, style=plot.style_linebr)
-
-// --- LIQUIDITY SWEEP MARKERS ---
-plotshape(isBullSweep, "Bullish Sweep (Chart)", style=shape.circle, location=location.belowbar, color=c_bull_c, size=size.tiny)
-plotshape(isBearSweep, "Bearish Sweep (Chart)", style=shape.circle, location=location.abovebar, color=c_bear_c, size=size.tiny)
-
-// --- NEWS CALENDAR EXPIRY WARNING ---
-plotshape(newsCalendarExpired and barstate.islast, "News Calendar Expired", style=shape.triangledown, location=location.top, color=color.new(c_bear_c, 0), size=size.small, text="NEWS CAL EXPIRED")
-
-// --- POLICY MODE LABEL ---
-var label policyModeLabel = na
-if showPolicyModeLabel and barstate.islast
-    string _policyText = "Policy Mode: " + policyMode +
-         "\nFirm=" + propFirm + " | Phase=" + propPhase + " | Type=" + propAccType +
-         "\nNewsRestr=" + str.tostring(firmMffuRestrictedNews) +
-         " | NewsKZ=" + str.tostring(newsKillzoneNow) +
-         " | Expired=" + str.tostring(newsCalendarExpired) +
-         " | Unsafe=" + str.tostring(allowTradingWhenNewsCalendarExpiredUnsafe)
-    color _policyBg = (firmMffuRestrictedNews or newsCalendarBlocksEntries) ? color.new(c_bear_c, 35) : color.new(c_bull_c, 35)
-    if not na(policyModeLabel)
-        label.delete(policyModeLabel)
-    policyModeLabel := label.new(bar_index, high * 1.01, _policyText, style=label.style_label_down, color=_policyBg, textcolor=color.white, size=size.small)
-else if not showPolicyModeLabel and not na(policyModeLabel)
-    label.delete(policyModeLabel)
-    policyModeLabel := na
-
-// --- RED FOLDER ALERT MARKERS (for firms where news trading is allowed) ---
-plotshape(newsPreAlertNow, "Red Folder Pre-Event", style=shape.flag, location=location.top, color=color.new(color.orange, 0), size=size.tiny, text="RED PRE")
-plotshape(newsPostAlertNow, "Red Folder Post-Event", style=shape.flag, location=location.bottom, color=color.new(color.green, 0), size=size.tiny, text="RED POST")
-
-alertcondition(newsPreAlertNow, "Red Folder PRE Alert", "Red-folder event window has started (pre-event boundary reached).")
-alertcondition(newsPostAlertNow, "Red Folder POST Alert", "Red-folder event window has ended (post-event boundary reached).")
-
-// --- CHART BOS/ChoCH (lux-ms-fractals style: line.new + label.new) ---
-var line chart_sup_line = na
-var bool chart_sup_broken = false
-var line chart_res_line = na
-var bool chart_res_broken = false
-
-if isBullBOS or isBullChoCh
-    int _start = nz(res_loc, bar_index - p_len)
-    line.new(_start, res_val, bar_index, res_val, color=c_bull_c)
-    label.new(int(math.avg(bar_index, _start)), res_val, isBullChoCh ? "ChoCH" : "BOS",
-      color=color(na), textcolor=c_bull_c, style=label.style_label_down, size=size.tiny)
-    int _bk = 1
-    float _min = low[1]
-    int _span = math.max(1, bar_index - _start - 1)
-    for i = 2 to _span
-        if low[i] < _min
-            _min := low[i]
-            _bk := i
-    chart_sup_line := line.new(bar_index - _bk, _min, bar_index, _min, color=c_bull_c, style=line.style_dashed)
-    chart_sup_broken := false
-
-if isBearBOS or isBearChoCh
-    int _start = nz(sup_loc, bar_index - p_len)
-    line.new(_start, sup_val, bar_index, sup_val, color=c_bear_c)
-    label.new(int(math.avg(bar_index, _start)), sup_val, isBearChoCh ? "ChoCH" : "BOS",
-      color=color(na), textcolor=c_bear_c, style=label.style_label_up, size=size.tiny)
-    int _bk = 1
-    float _max = high[1]
-    int _span = math.max(1, bar_index - _start - 1)
-    for i = 2 to _span
-        if high[i] > _max
-            _max := high[i]
-            _bk := i
-    chart_res_line := line.new(bar_index - _bk, _max, bar_index, _max, color=c_bear_c, style=line.style_dashed)
-    chart_res_broken := false
-
-if not chart_sup_broken and not na(chart_sup_line)
-    chart_sup_line.set_x2(bar_index)
-    if close < chart_sup_line.get_y2()
-        chart_sup_broken := true
-
-if not chart_res_broken and not na(chart_res_line)
-    chart_res_line.set_x2(bar_index)
-    if close > chart_res_line.get_y2()
-        chart_res_broken := true
-
-// --- HTF BOS/ChoCH (lux-style lines, transition-detected to avoid repetition) ---
-bool h1_bbos_new   = h1_bbos   and not h1_bbos[1]
-bool h1_bchoch_new = h1_bchoch and not h1_bchoch[1]
-bool h1_sbos_new   = h1_sbos   and not h1_sbos[1]
-bool h1_schoch_new = h1_schoch and not h1_schoch[1]
-
-if show_bos_h1
-    if h1_bbos_new or h1_bchoch_new
-        string _t = h1_bchoch_new ? "H1 ChoCH" : "H1 BOS"
-        float _lv = nz(h1_res, close)
-        line.new(bar_index - pivotLen, _lv, bar_index, _lv, color=c_bull_h1)
-        label.new(bar_index - int(pivotLen/2), _lv, _t, color=color(na), textcolor=c_bull_h1, style=label.style_label_down, size=size.tiny)
-    if h1_sbos_new or h1_schoch_new
-        string _t = h1_schoch_new ? "H1 ChoCH" : "H1 BOS"
-        float _lv = nz(h1_sup, close)
-        line.new(bar_index - pivotLen, _lv, bar_index, _lv, color=c_bear_h1)
-        label.new(bar_index - int(pivotLen/2), _lv, _t, color=color(na), textcolor=c_bear_h1, style=label.style_label_up, size=size.tiny)
-
-bool h2_bbos_new   = h2_bbos   and not h2_bbos[1]
-bool h2_bchoch_new = h2_bchoch and not h2_bchoch[1]
-bool h2_sbos_new   = h2_sbos   and not h2_sbos[1]
-bool h2_schoch_new = h2_schoch and not h2_schoch[1]
-
-if show_bos_h2
-    if h2_bbos_new or h2_bchoch_new
-        string _t = h2_bchoch_new ? "H2 ChoCH" : "H2 BOS"
-        float _lv = nz(h2_res, close)
-        line.new(bar_index - pivotLen, _lv, bar_index, _lv, color=c_bull_h2)
-        label.new(bar_index - int(pivotLen/2), _lv, _t, color=color(na), textcolor=c_bull_h2, style=label.style_label_down, size=size.tiny)
-    if h2_sbos_new or h2_schoch_new
-        string _t = h2_schoch_new ? "H2 ChoCH" : "H2 BOS"
-        float _lv = nz(h2_sup, close)
-        line.new(bar_index - pivotLen, _lv, bar_index, _lv, color=c_bear_h2)
-        label.new(bar_index - int(pivotLen/2), _lv, _t, color=color(na), textcolor=c_bear_h2, style=label.style_label_up, size=size.tiny)
-
-bool h3_bbos_new   = h3_bbos   and not h3_bbos[1]
-bool h3_bchoch_new = h3_bchoch and not h3_bchoch[1]
-bool h3_sbos_new   = h3_sbos   and not h3_sbos[1]
-bool h3_schoch_new = h3_schoch and not h3_schoch[1]
-
-if show_bos_h3
-    if h3_bbos_new or h3_bchoch_new
-        string _t = h3_bchoch_new ? "H3 ChoCH" : "H3 BOS"
-        float _lv = nz(h3_res, close)
-        line.new(bar_index - pivotLen, _lv, bar_index, _lv, color=c_bull_h3)
-        label.new(bar_index - int(pivotLen/2), _lv, _t, color=color(na), textcolor=c_bull_h3, style=label.style_label_down, size=size.tiny)
-    if h3_sbos_new or h3_schoch_new
-        string _t = h3_schoch_new ? "H3 ChoCH" : "H3 BOS"
-        float _lv = nz(h3_sup, close)
-        line.new(bar_index - pivotLen, _lv, bar_index, _lv, color=c_bear_h3)
-        label.new(bar_index - int(pivotLen/2), _lv, _t, color=color(na), textcolor=c_bear_h3, style=label.style_label_up, size=size.tiny)
-
-// --- EXHAUSTION SHAPES (Chart — always on) diamond / xcross / flag ---
-plotshape(isBullL1, "Chart Bull L1", style=shape.diamond, location=location.belowbar, color=c_bull_c,  size=size.small)
-plotshape(isBearL1, "Chart Bear L1", style=shape.diamond, location=location.abovebar, color=c_bear_c,  size=size.small)
-plotshape(isBullL2, "Chart Bull L2", style=shape.xcross,  location=location.belowbar, color=c_bull_c,  size=size.small)
-plotshape(isBearL2, "Chart Bear L2", style=shape.xcross,  location=location.abovebar, color=c_bear_c,  size=size.small)
-plotshape(isBullL3, "Chart Bull L3", style=shape.flag,    location=location.belowbar, color=c_l3_bull, size=size.normal)
-plotshape(isBearL3, "Chart Bear L3", style=shape.flag,    location=location.abovebar, color=c_l3_bear, size=size.normal)
-
-// --- EXHAUSTION SHAPES (HTF 1 — transition-detected to avoid repetition) ---
-bool h1_bu1_new = h1_bu1 and not h1_bu1[1]
-bool h1_be1_new = h1_be1 and not h1_be1[1]
-bool h1_bu2_new = h1_bu2 and not h1_bu2[1]
-bool h1_be2_new = h1_be2 and not h1_be2[1]
-bool h1_bu3_new = h1_bu3 and not h1_bu3[1]
-bool h1_be3_new = h1_be3 and not h1_be3[1]
-
-plotshape(show_exh_h1 and h1_bu1_new, "H1 Bull L1", style=shape.diamond, location=location.belowbar, color=c_bull_h1,     size=size.small)
-plotshape(show_exh_h1 and h1_be1_new, "H1 Bear L1", style=shape.diamond, location=location.abovebar, color=c_bear_h1,     size=size.small)
-plotshape(show_exh_h1 and h1_bu2_new, "H1 Bull L2", style=shape.xcross,  location=location.belowbar, color=c_bull_h1,     size=size.small)
-plotshape(show_exh_h1 and h1_be2_new, "H1 Bear L2", style=shape.xcross,  location=location.abovebar, color=c_bear_h1,     size=size.small)
-plotshape(show_exh_h1 and h1_bu3_new, "H1 Bull L3", style=shape.flag,    location=location.belowbar, color=c_l3_bull_h1,  size=size.normal)
-plotshape(show_exh_h1 and h1_be3_new, "H1 Bear L3", style=shape.flag,    location=location.abovebar, color=c_l3_bear_h1,  size=size.normal)
-
-// --- EXHAUSTION SHAPES (HTF 2) ---
-bool h2_bu1_new = h2_bu1 and not h2_bu1[1]
-bool h2_be1_new = h2_be1 and not h2_be1[1]
-bool h2_bu2_new = h2_bu2 and not h2_bu2[1]
-bool h2_be2_new = h2_be2 and not h2_be2[1]
-bool h2_bu3_new = h2_bu3 and not h2_bu3[1]
-bool h2_be3_new = h2_be3 and not h2_be3[1]
-
-plotshape(show_exh_h2 and h2_bu1_new, "H2 Bull L1", style=shape.diamond, location=location.belowbar, color=c_bull_h2,     size=size.small)
-plotshape(show_exh_h2 and h2_be1_new, "H2 Bear L1", style=shape.diamond, location=location.abovebar, color=c_bear_h2,     size=size.small)
-plotshape(show_exh_h2 and h2_bu2_new, "H2 Bull L2", style=shape.xcross,  location=location.belowbar, color=c_bull_h2,     size=size.small)
-plotshape(show_exh_h2 and h2_be2_new, "H2 Bear L2", style=shape.xcross,  location=location.abovebar, color=c_bear_h2,     size=size.small)
-plotshape(show_exh_h2 and h2_bu3_new, "H2 Bull L3", style=shape.flag,    location=location.belowbar, color=c_l3_bull_h2,  size=size.normal)
-plotshape(show_exh_h2 and h2_be3_new, "H2 Bear L3", style=shape.flag,    location=location.abovebar, color=c_l3_bear_h2,  size=size.normal)
-
-// --- EXHAUSTION SHAPES (HTF 3) ---
-bool h3_bu1_new = h3_bu1 and not h3_bu1[1]
-bool h3_be1_new = h3_be1 and not h3_be1[1]
-bool h3_bu2_new = h3_bu2 and not h3_bu2[1]
-bool h3_be2_new = h3_be2 and not h3_be2[1]
-bool h3_bu3_new = h3_bu3 and not h3_bu3[1]
-bool h3_be3_new = h3_be3 and not h3_be3[1]
-
-plotshape(show_exh_h3 and h3_bu1_new, "H3 Bull L1", style=shape.diamond, location=location.belowbar, color=c_bull_h3,     size=size.small)
-plotshape(show_exh_h3 and h3_be1_new, "H3 Bear L1", style=shape.diamond, location=location.abovebar, color=c_bear_h3,     size=size.small)
-plotshape(show_exh_h3 and h3_bu2_new, "H3 Bull L2", style=shape.xcross,  location=location.belowbar, color=c_bull_h3,     size=size.small)
-plotshape(show_exh_h3 and h3_be2_new, "H3 Bear L2", style=shape.xcross,  location=location.abovebar, color=c_bear_h3,     size=size.small)
-plotshape(show_exh_h3 and h3_bu3_new, "H3 Bull L3", style=shape.flag,    location=location.belowbar, color=c_l3_bull_h3,  size=size.normal)
-plotshape(show_exh_h3 and h3_be3_new, "H3 Bear L3", style=shape.flag,    location=location.abovebar, color=c_l3_bear_h3,  size=size.normal)
 // --- ENTRY SIGNAL OVERLAYS ---
 plotshape(showSignals and _entryLongBar  == bar_index, "Long Entry",  style=shape.triangleup,   location=location.belowbar, color=color.new(color.green, 0), size=size.small)
 plotshape(showSignals and _entryShortBar == bar_index, "Short Entry", style=shape.triangledown, location=location.abovebar, color=color.new(color.red,   0), size=size.small)
@@ -2314,79 +1986,5 @@ plotshape(showSignals and _entryShortBar == bar_index, "Short Entry", style=shap
 // --- ACTIVE TRADE LEVELS ---
 plot(not isFlat and not na(entrySL) ? entrySL : na,                            "Active SL",  color=color.new(color.orange,  0), style=plot.style_steplinebr, linewidth=1)
 plot(trailLocked and not isFlat and not na(trailStop) ? trailStop : na, "Trail Stop", color=color.new(color.fuchsia, 0), style=plot.style_steplinebr, linewidth=1)
-
-// --- CONDITION BACKGROUND (full duration filters are aligned) ---
-bgcolor(showSignals and longFiltersAligned  and not longInvalidated  ? color.new(color.green, 90) : na)
-bgcolor(showSignals and shortFiltersAligned and not shortInvalidated ? color.new(color.red,   90) : na)
-// --- INVALIDATION BACKGROUND (filters aligned but blocker fired) ---
-bgcolor(showSignals and longFiltersAligned  and longInvalidated  ? color.new(color.orange, 85) : na)
-bgcolor(showSignals and shortFiltersAligned and shortInvalidated ? color.new(color.orange, 85) : na)
-
-// =========================================================================
-// 23. 📊 FILTER STATE DEBUG DASHBOARD
-// =========================================================================
-var table dashTbl = showFilterDashboard ? table.new(position.top_right, 3, 12, border_width=1, border_color=color.gray, bgcolor=color.new(color.black, 20)) : na
-if showFilterDashboard and not na(dashTbl)
-    // --- Helper colors ---
-    color _cTrue  = color.new(#089981, 20)
-    color _cFalse = color.new(#f23645, 20)
-    color _cWarn  = color.new(color.orange, 20)
-    color _cHdr   = color.new(color.gray, 60)
-    // --- Header row ---
-    table.cell(dashTbl, 0, 0, "Filter",       text_color=color.white, bgcolor=_cHdr, text_size=size.small)
-    table.cell(dashTbl, 1, 0, "Long",          text_color=color.white, bgcolor=_cHdr, text_size=size.small)
-    table.cell(dashTbl, 2, 0, "Short",         text_color=color.white, bgcolor=_cHdr, text_size=size.small)
-    // --- Filter 1 ---
-    string _lf1_lbl = l_f1_tf_eff == "None" ? "—" : l_f1_tf_eff + " " + l_f1_ind
-    string _sf1_lbl = s_f1_tf_eff == "None" ? "—" : s_f1_tf_eff + " " + s_f1_ind
-    table.cell(dashTbl, 0, 1, "Filter 1",     text_color=color.white, bgcolor=_cHdr, text_size=size.small)
-    table.cell(dashTbl, 1, 1, str.tostring(l_f1) + "\n" + _lf1_lbl, text_color=color.white, bgcolor=l_f1 ? _cTrue : _cFalse, text_size=size.tiny)
-    table.cell(dashTbl, 2, 1, str.tostring(s_f1) + "\n" + _sf1_lbl, text_color=color.white, bgcolor=s_f1 ? _cTrue : _cFalse, text_size=size.tiny)
-    // --- Filter 2 ---
-    string _lf2_lbl = l_f2_tf_eff == "None" ? "—" : l_f2_tf_eff + " " + l_f2_ind
-    string _sf2_lbl = s_f2_tf_eff == "None" ? "—" : s_f2_tf_eff + " " + s_f2_ind
-    table.cell(dashTbl, 0, 2, "Filter 2",     text_color=color.white, bgcolor=_cHdr, text_size=size.small)
-    table.cell(dashTbl, 1, 2, str.tostring(l_f2) + "\n" + _lf2_lbl, text_color=color.white, bgcolor=l_f2 ? _cTrue : _cFalse, text_size=size.tiny)
-    table.cell(dashTbl, 2, 2, str.tostring(s_f2) + "\n" + _sf2_lbl, text_color=color.white, bgcolor=s_f2 ? _cTrue : _cFalse, text_size=size.tiny)
-    // --- Filter 3 ---
-    string _lf3_lbl = l_f3_tf_eff == "None" ? "—" : l_f3_tf_eff + " " + l_f3_ind
-    string _sf3_lbl = s_f3_tf_eff == "None" ? "—" : s_f3_tf_eff + " " + s_f3_ind
-    table.cell(dashTbl, 0, 3, "Filter 3",     text_color=color.white, bgcolor=_cHdr, text_size=size.small)
-    table.cell(dashTbl, 1, 3, str.tostring(l_f3) + "\n" + _lf3_lbl, text_color=color.white, bgcolor=l_f3 ? _cTrue : _cFalse, text_size=size.tiny)
-    table.cell(dashTbl, 2, 3, str.tostring(s_f3) + "\n" + _sf3_lbl, text_color=color.white, bgcolor=s_f3 ? _cTrue : _cFalse, text_size=size.tiny)
-    // --- Blocker ---
-    string _lblk_lbl = l_blk_tf_eff == "None" ? "—" : l_blk_tf_eff + " " + l_blk_ind
-    string _sblk_lbl = s_blk_tf_eff == "None" ? "—" : s_blk_tf_eff + " " + s_blk_ind
-    table.cell(dashTbl, 0, 4, "Blocker",      text_color=color.white, bgcolor=_cHdr, text_size=size.small)
-    table.cell(dashTbl, 1, 4, str.tostring(l_blk) + "\n" + _lblk_lbl, text_color=color.white, bgcolor=l_blk ? _cWarn : _cTrue, text_size=size.tiny)
-    table.cell(dashTbl, 2, 4, str.tostring(s_blk) + "\n" + _sblk_lbl, text_color=color.white, bgcolor=s_blk ? _cWarn : _cTrue, text_size=size.tiny)
-    // --- EMA OK ---
-    table.cell(dashTbl, 0, 5, "EMA Rev OK",   text_color=color.white, bgcolor=_cHdr, text_size=size.small)
-    table.cell(dashTbl, 1, 5, str.tostring(l_emaOk), text_color=color.white, bgcolor=l_emaOk ? _cTrue : _cFalse, text_size=size.tiny)
-    table.cell(dashTbl, 2, 5, str.tostring(s_emaOk), text_color=color.white, bgcolor=s_emaOk ? _cTrue : _cFalse, text_size=size.tiny)
-    // --- Aligned ---
-    table.cell(dashTbl, 0, 6, "Aligned",      text_color=color.white, bgcolor=_cHdr, text_size=size.small)
-    table.cell(dashTbl, 1, 6, str.tostring(longFiltersAligned), text_color=color.white, bgcolor=longFiltersAligned ? _cTrue : _cFalse, text_size=size.small)
-    table.cell(dashTbl, 2, 6, str.tostring(shortFiltersAligned), text_color=color.white, bgcolor=shortFiltersAligned ? _cTrue : _cFalse, text_size=size.small)
-    // --- Armed ---
-    table.cell(dashTbl, 0, 7, "Armed",        text_color=color.white, bgcolor=_cHdr, text_size=size.small)
-    table.cell(dashTbl, 1, 7, str.tostring(longArmed), text_color=color.white, bgcolor=longArmed ? _cTrue : _cFalse, text_size=size.small)
-    table.cell(dashTbl, 2, 7, str.tostring(shortArmed), text_color=color.white, bgcolor=shortArmed ? _cTrue : _cFalse, text_size=size.small)
-    // --- Trigger ---
-    table.cell(dashTbl, 0, 8, "Trigger",      text_color=color.white, bgcolor=_cHdr, text_size=size.small)
-    table.cell(dashTbl, 1, 8, str.tostring(l_prim), text_color=color.white, bgcolor=l_prim ? _cTrue : _cFalse, text_size=size.small)
-    table.cell(dashTbl, 2, 8, str.tostring(s_prim), text_color=color.white, bgcolor=s_prim ? _cTrue : _cFalse, text_size=size.small)
-    // --- Sweep State ---
-    table.cell(dashTbl, 0, 9, "Sweep",      text_color=color.white, bgcolor=_cHdr, text_size=size.small)
-    table.cell(dashTbl, 1, 9, "BAct=" + str.tostring(sweepBullActive) + " bSince=" + str.tostring(sweepBullSince), text_color=color.white, bgcolor=sweepBullActive ? _cTrue : _cFalse, text_size=size.tiny)
-    table.cell(dashTbl, 2, 9, "Act=" + str.tostring(sweepBearActive) + " rSince=" + str.tostring(sweepBearSince), text_color=color.white, bgcolor=sweepBearActive ? _cTrue : _cFalse, text_size=size.tiny)
-    // --- News Killzone ---
-    table.cell(dashTbl, 0, 10, "News",      text_color=color.white, bgcolor=_cHdr, text_size=size.small)
-    table.cell(dashTbl, 1, 10, "Block=" + str.tostring(newsKillzoneNow) + " Exp=" + str.tostring(newsCalendarExpired) + (newsKillzoneNow ? "\n" + activeNewsKillzone : ""), text_color=color.white, bgcolor=(newsKillzoneNow or newsCalendarBlocksEntries) ? _cWarn : _cTrue, text_size=size.tiny)
-    table.cell(dashTbl, 2, 10, "Act=" + newsKillzoneAction + "\nFirmRestr=" + str.tostring(firmMffuRestrictedNews), text_color=color.white, bgcolor=_cHdr, text_size=size.tiny)
-    // --- Session/Killzone ---
-    table.cell(dashTbl, 0, 11, "Session",      text_color=color.white, bgcolor=_cHdr, text_size=size.small)
-    table.cell(dashTbl, 1, 11, "Sess=" + str.tostring(inSession) + " KZ=" + str.tostring(isKillzone) + " NewsOk=" + str.tostring(newsEntryAllowed) + " Lim=" + str.tostring(not dailyLimitHit), text_color=color.white, bgcolor=(inSession and isKillzone and newsEntryAllowed and not dailyLimitHit) ? _cTrue : _cFalse, text_size=size.tiny)
-    table.cell(dashTbl, 2, 11, "Trades=" + str.tostring(todayTradeCount) + "/" + str.tostring(maxDailyTrades) + " | Prop=" + str.tostring(useCompliance) + " MaxC=" + str.tostring(actualMaxContracts), text_color=color.white, bgcolor=_cHdr, text_size=size.tiny)
 
 // — End of NQ Scalper Pro — Prop Firm Engine [GOD MODE] v6.1 —
