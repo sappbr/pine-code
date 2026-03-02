@@ -7,6 +7,7 @@ Current version: v6.2
 ### v6.2 (2026-03-02)
 - Added an on-chart `Policy Mode` label to display active firm/news compliance state in real time.
 - Added compliance reference documentation under `supporting docs/` (MFFU, Tradify, Lucid, 365-day schedule, and historical summary).
+- Added companion indicator for visuals/dashboard: [`indicators/visual-companion-dashboard.pine`](indicators/visual-companion-dashboard.pine).
 - **Compliance References:**
 - Compliance docs index: [MFFU](supporting%20docs/MyFundedFutures%20Compliance%20Overview%20for%20Apex%20Protocol%20Deployment.md) | [Tradify](supporting%20docs/Tradify%20Compliance%20Overview%20for%20Apex%20Protocol%20Deployment.md) | [Lucid](supporting%20docs/Lucid%20Trading%20Compliance%20Overview%20for%20Apex%20Protocol%20Deployment.md) | [365-day schedule](supporting%20docs/Prop%20Firm%20Compliance%20Schedule%20%28365-Day%20Outlook%29.md) | [Historical](supporting%20docs/Historical%20Prop%20Firm%20Compliance%20%28March%202025%20%E2%80%93%20February%202026%29.md)
 
