@@ -149,7 +149,18 @@ trailLongSource = input.source(close, "Trail Long Level", inline = "tr", group =
 trailShortSource = input.source(close, "Trail Short Level", inline = "tr", group = G_RISK)
 trailTriggerSource = input.source(close, "Trail Trigger (1/na)", inline = "tr2", group = G_RISK)
 
+var G_UI = "5. 🧠 AI Dashboard"
+showDashboard = input.bool(true, "Show Dashboard", group = G_UI)
+dashboardCorner = input.string("Top Right", "Dashboard Position", options = ["Top Right", "Top Left", "Bottom Right", "Bottom Left"], group = G_UI)
+
 barsPerDay = math.max(1, int(math.round(86400.0 / math.max(1.0, timeframe.in_seconds(timeframe.period)))))
+
+dashboardPosition(string corner) =>
+    switch corner
+        "Top Left" => position.top_left
+        "Bottom Right" => position.bottom_right
+        "Bottom Left" => position.bottom_left
+        => position.top_right
 
 resolveTarget(string mode, float targetSource, float customValue) =>
     mode == "Custom Value" ? customValue : targetSource
@@ -170,6 +181,12 @@ evalCondition(float src, string cond, float target, int lookbackBars, int lookba
 
 isTriggered(float src) =>
     not na(src) and src == 1
+
+stateText(bool condition) =>
+    condition ? "ON" : "OFF"
+
+fmtPrice(float level) =>
+    na(level) ? "na" : str.tostring(level, format.mintick)
 
 lF1 = not enableLf1 or evalCondition(l_f1_src, l_f1_cond, resolveTarget(l_f1_targ_mode, l_f1_targ_src, l_f1_custom), l_f1_lookbackBars, l_f1_lookbackDays, barsPerDay)
 lF2 = not enableLf2 or evalCondition(l_f2_src, l_f2_cond, resolveTarget(l_f2_targ_mode, l_f2_targ_src, l_f2_custom), l_f2_lookbackBars, l_f2_lookbackDays, barsPerDay)
@@ -262,3 +279,48 @@ plotchar(longSignal, "Long Signal", "▲", location.bottom, color.new(color.lime
 plotchar(shortSignal, "Short Signal", "▼", location.top, color.new(color.red, 0), size = size.tiny)
 plot(longStop, "Long Stop", color.new(color.red, 0), 1, plot.style_linebr)
 plot(shortStop, "Short Stop", color.new(color.aqua, 0), 1, plot.style_linebr)
+
+int longRequired = (enableLf1 ? 1 : 0) + (enableLf2 ? 1 : 0) + (enableLf3 ? 1 : 0) + 1 + (enableLongBlocker ? 1 : 0)
+int shortRequired = (enableSf1 ? 1 : 0) + (enableSf2 ? 1 : 0) + (enableSf3 ? 1 : 0) + 1 + (enableShortBlocker ? 1 : 0)
+int longPassed = (enableLf1 and lF1 ? 1 : 0) + (enableLf2 and lF2 ? 1 : 0) + (enableLf3 and lF3 ? 1 : 0) + (lEntryTrig ? 1 : 0) + (enableLongBlocker and not lBlocked ? 1 : 0)
+int shortPassed = (enableSf1 and sF1 ? 1 : 0) + (enableSf2 and sF2 ? 1 : 0) + (enableSf3 and sF3 ? 1 : 0) + (sEntryTrig ? 1 : 0) + (enableShortBlocker and not sBlocked ? 1 : 0)
+
+string positionText = strategy.position_size > 0 ? "LONG" : strategy.position_size < 0 ? "SHORT" : "FLAT"
+color positionColor = strategy.position_size > 0 ? color.lime : strategy.position_size < 0 ? color.red : color.gray
+
+passColor(bool ok) =>
+    ok ? color.lime : color.red
+
+var table aiDash = na
+if showDashboard and na(aiDash)
+    aiDash := table.new(dashboardPosition(dashboardCorner), 2, 8, frame_color = color.new(color.gray, 70), frame_width = 1, border_width = 1, border_color = color.new(color.gray, 80), bgcolor = color.new(color.black, 78))
+
+if not showDashboard and not na(aiDash)
+    table.delete(aiDash)
+    aiDash := na
+
+if showDashboard and not na(aiDash) and barstate.islast
+    table.clear(aiDash, 0, 0, 1, 7)
+    table.cell(aiDash, 0, 0, "AI Engine", text_color = color.white, text_size = size.small, bgcolor = color.new(color.gray, 80))
+    table.cell(aiDash, 1, 0, syminfo.ticker + " " + timeframe.period, text_color = color.silver, text_size = size.small, bgcolor = color.new(color.gray, 80))
+
+    table.cell(aiDash, 0, 1, "Position", text_color = color.silver)
+    table.cell(aiDash, 1, 1, positionText, text_color = positionColor)
+
+    table.cell(aiDash, 0, 2, "Long Ready", text_color = color.silver)
+    table.cell(aiDash, 1, 2, stateText(longSignal), text_color = passColor(longSignal))
+
+    table.cell(aiDash, 0, 3, "Short Ready", text_color = color.silver)
+    table.cell(aiDash, 1, 3, stateText(shortSignal), text_color = passColor(shortSignal))
+
+    table.cell(aiDash, 0, 4, "Long Gates", text_color = color.silver)
+    table.cell(aiDash, 1, 4, str.tostring(longPassed) + "/" + str.tostring(longRequired), text_color = passColor(longPassed == longRequired))
+
+    table.cell(aiDash, 0, 5, "Short Gates", text_color = color.silver)
+    table.cell(aiDash, 1, 5, str.tostring(shortPassed) + "/" + str.tostring(shortRequired), text_color = passColor(shortPassed == shortRequired))
+
+    table.cell(aiDash, 0, 6, "Blockers", text_color = color.silver)
+    table.cell(aiDash, 1, 6, "L:" + stateText(lBlocked) + "  S:" + stateText(sBlocked), text_color = lBlocked or sBlocked ? color.orange : color.lime)
+
+    table.cell(aiDash, 0, 7, "Active Stop", text_color = color.silver)
+    table.cell(aiDash, 1, 7, strategy.position_size > 0 ? fmtPrice(longStop) : strategy.position_size < 0 ? fmtPrice(shortStop) : "na", text_color = color.aqua)
