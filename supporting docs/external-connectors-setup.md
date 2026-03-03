@@ -18,37 +18,37 @@
   - HTF Reversal - Strategy Compatible
 2. Add `NQ Scalper Pro v02 - External Connectors` strategy.
 3. Open strategy settings → Inputs.
-4. For each `... Source` field, select the desired plot from one of the added indicators.
+4. For each `... Source` field, select the desired connector from one of the added indicators.
 
 ## Connector Plot Naming Convention
-All connector plots are prefixed with `LC`.
+All connector plots are prefixed with `LC`. In this guide, mappings use `Indicator Name: LC ...`.
 
 ### Lux IFVG connectors
-- Triggers: `LC Bullish Trigger`, `LC Bearish Trigger`
-- States: `LC Bullish Active`, `LC Bearish Active`
-- Levels: `LC Bull IFVG Top/Bottom/Mid`, `LC Bear IFVG Top/Bottom/Mid`
+- Triggers: `Lux IFVG: LC Bullish Trigger`, `Lux IFVG: LC Bearish Trigger`
+- States: `Lux IFVG: LC Bullish Active`, `Lux IFVG: LC Bearish Active`
+- Levels: `Lux IFVG: LC Bull IFVG Top`, `Lux IFVG: LC Bull IFVG Bottom`, `Lux IFVG: LC Bull IFVG Mid`, `Lux IFVG: LC Bear IFVG Top`, `Lux IFVG: LC Bear IFVG Bottom`, `Lux IFVG: LC Bear IFVG Mid`
 
 ### RTH Opening Range connectors
-- Triggers: `LC OR Break Above`, `LC OR Break Below`, `LC OR Mid Reclaim Bull`, `LC OR Mid Reclaim Bear`, `LC OR In Range`
-- Levels: `LC OR High`, `LC OR Low`, `LC OR Mid`, `LC OR Ext1 High/Low`, `LC OR Ext2 High/Low`
+- Triggers: `RTH Opening Range: LC OR Break Above`, `RTH Opening Range: LC OR Break Below`, `RTH Opening Range: LC OR Mid Reclaim Bull`, `RTH Opening Range: LC OR Mid Reclaim Bear`, `RTH Opening Range: LC OR In Range`
+- Levels: `RTH Opening Range: LC OR High`, `RTH Opening Range: LC OR Low`, `RTH Opening Range: LC OR Mid`, `RTH Opening Range: LC OR Ext1 High`, `RTH Opening Range: LC OR Ext1 Low`, `RTH Opening Range: LC OR Ext2 High`, `RTH Opening Range: LC OR Ext2 Low`
 
 ### HTF Reversal connectors
-- Triggers: `LC HTF Bull Pattern Trigger`, `LC HTF Bear Pattern Trigger`, `LC HTF Bull Divergence Trigger`, `LC HTF Bear Divergence Trigger`
-- Bias: `LC RSI Bull Bias`, `LC RSI Bear Bias`
-- Levels: `LC HTF Open`, `LC HTF High`, `LC HTF Low`, `LC HTF Close`, `LC RSI Value`
+- Triggers: `HTF Reversal: LC HTF Bull Pattern Trigger`, `HTF Reversal: LC HTF Bear Pattern Trigger`, `HTF Reversal: LC HTF Bull Divergence Trigger`, `HTF Reversal: LC HTF Bear Divergence Trigger`
+- Bias: `HTF Reversal: LC RSI Bull Bias`, `HTF Reversal: LC RSI Bear Bias`
+- Levels: `HTF Reversal: LC HTF Open`, `HTF Reversal: LC HTF High`, `HTF Reversal: LC HTF Low`, `HTF Reversal: LC HTF Close`, `HTF Reversal: LC RSI Value`
 
 ## How to Wire in Strategy
 - Filters / Entry / Blockers:
   - Use trigger plots (`1/na`) with condition `Is True (1/na)`.
   - Use level plots with `Greater Than`, `Less Than`, `Crosses Over`, `Crosses Under`.
 - Stop Loss:
-  - `Stop Loss Mode = External Level` and map `Long SL Source` / `Short SL Source`.
+  - `Stop Loss Mode = External Level` and map `Long SL Source` / `Short SL Source` (example: `Lux IFVG: LC Bull IFVG Bottom`, `Lux IFVG: LC Bear IFVG Top`).
 - Take Profit:
-  - Map TP level fields to level plots.
+  - Map TP level fields to level plots (example: `RTH Opening Range: LC OR Ext1 High`, `RTH Opening Range: LC OR Ext1 Low`, `RTH Opening Range: LC OR Ext2 High`, `RTH Opening Range: LC OR Ext2 Low`).
   - Optional trigger-based TP uses `TPx Trigger (1/na)`.
 - Break-Even / Trail:
-  - Map trigger source(s) to `1/na` plots.
-  - Map trail long/short levels to any level plot.
+  - Map trigger source(s) to `1/na` plots (example: `RTH Opening Range: LC OR Mid Reclaim Bull`, `RTH Opening Range: LC OR In Range`).
+  - Map trail long/short levels to any level plot (example: `RTH Opening Range: LC OR Mid`).
 
 ## Notes
 - This v02 strategy intentionally contains no internal indicator calculations to reduce tokens/memory/runtime load.
