@@ -1,0 +1,73 @@
+//@version=6
+indicator("RTH Opening Range - Strategy Compatible", shorttitle = "LC RTH OR", overlay = true)
+
+orDuration = input.int(5, "Opening Range Duration (minutes)", options = [1, 5, 15, 30])
+ext1Mult = input.float(1.0, "Extension 1 Multiplier", minval = 0.1, step = 0.1)
+ext2Mult = input.float(2.0, "Extension 2 Multiplier", minval = 0.1, step = 0.1)
+
+nyHour = hour(time, "America/New_York")
+nyMinute = minute(time, "America/New_York")
+nyDay = dayofmonth(time, "America/New_York")
+nyMonth = month(time, "America/New_York")
+nyYear = year(time, "America/New_York")
+nyDateKey = nyYear * 10000 + nyMonth * 100 + nyDay
+nyMinutes = nyHour * 60 + nyMinute
+
+orStartMinutes = 9 * 60 + 30
+orEndMinutes = orStartMinutes + orDuration
+
+var int lastDateKey = na
+var float orHigh = na
+var float orLow = na
+var float orMid = na
+var float orExt1High = na
+var float orExt1Low = na
+var float orExt2High = na
+var float orExt2Low = na
+var bool rangeReady = false
+
+if na(lastDateKey) or nyDateKey != lastDateKey
+    lastDateKey := nyDateKey
+    orHigh := na
+    orLow := na
+    orMid := na
+    orExt1High := na
+    orExt1Low := na
+    orExt2High := na
+    orExt2Low := na
+    rangeReady := false
+
+inOpeningRange = nyMinutes >= orStartMinutes and nyMinutes < orEndMinutes
+
+if inOpeningRange
+    orHigh := na(orHigh) ? high : math.max(orHigh, high)
+    orLow := na(orLow) ? low : math.min(orLow, low)
+
+if not inOpeningRange and not rangeReady and not na(orHigh) and not na(orLow)
+    orRange = orHigh - orLow
+    orMid := (orHigh + orLow) / 2
+    orExt1High := orHigh + ext1Mult * orRange
+    orExt1Low := orLow - ext1Mult * orRange
+    orExt2High := orHigh + ext2Mult * orRange
+    orExt2Low := orLow - ext2Mult * orRange
+    rangeReady := true
+
+orBreakAbove = ta.crossover(close, orHigh) ? 1 : na
+orBreakBelow = ta.crossunder(close, orLow) ? 1 : na
+orReclaimMidBull = ta.crossover(close, orMid) ? 1 : na
+orReclaimMidBear = ta.crossunder(close, orMid) ? 1 : na
+orInRange = (not na(orHigh) and not na(orLow) and close <= orHigh and close >= orLow) ? 1 : na
+
+plot(orBreakAbove, "LC OR Break Above", color = color.new(color.lime, 100), style = plot.style_linebr)
+plot(orBreakBelow, "LC OR Break Below", color = color.new(color.red, 100), style = plot.style_linebr)
+plot(orReclaimMidBull, "LC OR Mid Reclaim Bull", color = color.new(color.green, 100), style = plot.style_linebr)
+plot(orReclaimMidBear, "LC OR Mid Reclaim Bear", color = color.new(color.orange, 100), style = plot.style_linebr)
+plot(orInRange, "LC OR In Range", color = color.new(color.gray, 100), style = plot.style_linebr)
+
+plot(orHigh, "LC OR High", color = color.new(color.white, 100), style = plot.style_linebr)
+plot(orLow, "LC OR Low", color = color.new(color.white, 100), style = plot.style_linebr)
+plot(orMid, "LC OR Mid", color = color.new(color.white, 100), style = plot.style_linebr)
+plot(orExt1High, "LC OR Ext1 High", color = color.new(color.white, 100), style = plot.style_linebr)
+plot(orExt1Low, "LC OR Ext1 Low", color = color.new(color.white, 100), style = plot.style_linebr)
+plot(orExt2High, "LC OR Ext2 High", color = color.new(color.white, 100), style = plot.style_linebr)
+plot(orExt2Low, "LC OR Ext2 Low", color = color.new(color.white, 100), style = plot.style_linebr)

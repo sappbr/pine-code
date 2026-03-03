@@ -1,0 +1,132 @@
+//@version=6
+indicator('RTH Opening Range with Extensions', overlay = true, max_boxes_count = 500, max_lines_count = 500)
+
+// ==================== INPUTS ====================
+
+// Opening Range Settings
+orDuration = input.int(5, 'Opening Range Duration (minutes)', options = [1, 5, 15, 30])
+rangeColor = input.color(color.gray, 'Range Line Color', group = 'Opening Range')
+rangeFillColor = input.color(color.new(color.gray, 85), 'Range Fill Color', group = 'Opening Range')
+rangeStyle = input.string('Solid', 'Range Line Style', options = ['Solid', 'Dashed', 'Dotted'], group = 'Opening Range')
+rangeWidth = input.int(2, 'Range Line Width', minval = 1, maxval = 4, group = 'Opening Range')
+
+// Midline Settings
+showMidline = input.bool(true, 'Show Midline', group = 'Midline')
+midColor = input.color(color.green, 'Midline Color', group = 'Midline')
+midStyle = input.string('Solid', 'Midline Style', options = ['Solid', 'Dashed', 'Dotted'], group = 'Midline')
+midWidth = input.int(2, 'Midline Width', minval = 1, maxval = 4, group = 'Midline')
+
+// Extension 1 Settings
+showExt1 = input.bool(true, 'Show Extension 1', group = 'Extension 1')
+ext1Mult = input.float(1.0, 'Extension 1 Multiplier', minval = 0.1, step = 0.1, group = 'Extension 1')
+ext1Color = input.color(color.green, 'Extension 1 Color', group = 'Extension 1')
+ext1Style = input.string('Solid', 'Extension 1 Style', options = ['Solid', 'Dashed', 'Dotted'], group = 'Extension 1')
+ext1Width = input.int(1, 'Extension 1 Width', minval = 1, maxval = 4, group = 'Extension 1')
+
+// Extension 2 Settings
+showExt2 = input.bool(false, 'Show Extension 2', group = 'Extension 2')
+ext2Mult = input.float(2.0, 'Extension 2 Multiplier', minval = 0.1, step = 0.1, group = 'Extension 2')
+ext2Color = input.color(color.blue, 'Extension 2 Color', group = 'Extension 2')
+ext2Style = input.string('Dotted', 'Extension 2 Style', options = ['Solid', 'Dashed', 'Dotted'], group = 'Extension 2')
+ext2Width = input.int(1, 'Extension 2 Width', minval = 1, maxval = 4, group = 'Extension 2')
+
+// ==================== FUNCTIONS ====================
+
+getLineStyle(style) =>
+    switch style
+        'Solid' => line.style_solid
+        'Dashed' => line.style_dashed
+        'Dotted' => line.style_dotted
+
+// ==================== TIME CALCULATIONS ====================
+
+rth_start = timestamp('America/New_York', year, month, dayofmonth, 9, 30)
+rth_end = timestamp('America/New_York', year, month, dayofmonth, 9, 30 + orDuration)
+rth_close = timestamp('America/New_York', year, month, dayofmonth, 16, 0)
+
+// ==================== VARIABLES ====================
+
+var float orHigh = na
+var float orLow = na
+var float orMid = na
+var float orExt1High = na
+var float orExt1Low = na
+var float orExt2High = na
+var float orExt2Low = na
+var bool rangeDrawn = false
+
+// ==================== LOGIC ====================
+
+newDay = ta.change(time('D'))
+if bool(newDay)
+    orHigh := na
+    orLow := na
+    orMid := na
+    orExt1High := na
+    orExt1Low := na
+    orExt2High := na
+    orExt2Low := na
+    rangeDrawn := false
+
+inOpeningRange = time >= rth_start and time < rth_end
+if inOpeningRange
+    orHigh := na(orHigh) ? high : math.max(orHigh, high)
+    orLow := na(orLow) ? low : math.min(orLow, low)
+
+if not inOpeningRange and not rangeDrawn and not na(orHigh) and not na(orLow)
+    orRange = orHigh - orLow
+    mid = (orHigh + orLow) / 2
+    ext1High = orHigh + ext1Mult * orRange
+    ext1Low = orLow - ext1Mult * orRange
+    ext2High = orHigh + ext2Mult * orRange
+    ext2Low = orLow - ext2Mult * orRange
+
+    orMid := mid
+    orExt1High := ext1High
+    orExt1Low := ext1Low
+    orExt2High := ext2High
+    orExt2Low := ext2Low
+
+    // Draw shaded range box (backpainted to 9:30)
+    box.new(left = rth_start, top = orHigh, right = rth_close, bottom = orLow, xloc = xloc.bar_time, bgcolor = rangeFillColor, border_color = color.new(color.white, 100))
+
+    // Draw range lines (backpainted to 9:30)
+    line.new(x1 = rth_start, y1 = orHigh, x2 = rth_close, y2 = orHigh, xloc = xloc.bar_time, color = rangeColor, style = getLineStyle(rangeStyle), width = rangeWidth)
+    line.new(x1 = rth_start, y1 = orLow, x2 = rth_close, y2 = orLow, xloc = xloc.bar_time, color = rangeColor, style = getLineStyle(rangeStyle), width = rangeWidth)
+
+    // Draw midline (backpainted to 9:30)
+    if showMidline
+        line.new(x1 = rth_start, y1 = mid, x2 = rth_close, y2 = mid, xloc = xloc.bar_time, color = midColor, style = getLineStyle(midStyle), width = midWidth)
+
+    // Draw Extension 1 (backpainted to 9:30)
+    if showExt1
+        line.new(x1 = rth_start, y1 = ext1High, x2 = rth_close, y2 = ext1High, xloc = xloc.bar_time, color = ext1Color, style = getLineStyle(ext1Style), width = ext1Width)
+        line.new(x1 = rth_start, y1 = ext1Low, x2 = rth_close, y2 = ext1Low, xloc = xloc.bar_time, color = ext1Color, style = getLineStyle(ext1Style), width = ext1Width)
+
+    // Draw Extension 2 (backpainted to 9:30)
+    if showExt2
+        line.new(x1 = rth_start, y1 = ext2High, x2 = rth_close, y2 = ext2High, xloc = xloc.bar_time, color = ext2Color, style = getLineStyle(ext2Style), width = ext2Width)
+        line.new(x1 = rth_start, y1 = ext2Low, x2 = rth_close, y2 = ext2Low, xloc = xloc.bar_time, color = ext2Color, style = getLineStyle(ext2Style), width = ext2Width)
+
+    rangeDrawn := true
+
+// Connector Outputs (for strategy input.source wiring)
+orBreakAbove = ta.crossover(close, orHigh) ? 1 : na
+orBreakBelow = ta.crossunder(close, orLow) ? 1 : na
+orReclaimMidBull = ta.crossover(close, orMid) ? 1 : na
+orReclaimMidBear = ta.crossunder(close, orMid) ? 1 : na
+orInRange = (not na(orHigh) and not na(orLow) and close <= orHigh and close >= orLow) ? 1 : na
+
+plot(orBreakAbove, 'LC OR Break Above', color = color.new(color.lime, 100), style = plot.style_linebr)
+plot(orBreakBelow, 'LC OR Break Below', color = color.new(color.red, 100), style = plot.style_linebr)
+plot(orReclaimMidBull, 'LC OR Mid Reclaim Bull', color = color.new(color.green, 100), style = plot.style_linebr)
+plot(orReclaimMidBear, 'LC OR Mid Reclaim Bear', color = color.new(color.orange, 100), style = plot.style_linebr)
+plot(orInRange, 'LC OR In Range', color = color.new(color.gray, 100), style = plot.style_linebr)
+
+plot(orHigh, 'LC OR High', color = color.new(color.white, 100), style = plot.style_linebr)
+plot(orLow, 'LC OR Low', color = color.new(color.white, 100), style = plot.style_linebr)
+plot(orMid, 'LC OR Mid', color = color.new(color.white, 100), style = plot.style_linebr)
+plot(orExt1High, 'LC OR Ext1 High', color = color.new(color.white, 100), style = plot.style_linebr)
+plot(orExt1Low, 'LC OR Ext1 Low', color = color.new(color.white, 100), style = plot.style_linebr)
+plot(orExt2High, 'LC OR Ext2 High', color = color.new(color.white, 100), style = plot.style_linebr)
+plot(orExt2Low, 'LC OR Ext2 Low', color = color.new(color.white, 100), style = plot.style_linebr)

@@ -1,0 +1,244 @@
+//@version=6
+strategy("NQ Scalper Pro v02 - External Connectors", overlay = true, calc_on_every_tick = true, pyramiding = 0, initial_capital = 50000, commission_type = strategy.commission.cash_per_contract, commission_value = 2.50, slippage = 2)
+
+var G_ENGINE = "1. ⚙️ Connector Engine"
+qtyInput = input.int(3, "Order Size (Contracts)", minval = 1, maxval = 200, group = G_ENGINE)
+allowLong = input.bool(true, "Allow Long", inline = "dir", group = G_ENGINE)
+allowShort = input.bool(true, "Allow Short", inline = "dir", group = G_ENGINE)
+
+var G_L_FILTERS = "2. 🛡️ Long Filters + Trigger"
+enableLf1 = input.bool(true, "Enable L Filter 1", inline = "lf1", group = G_L_FILTERS)
+l_f1_src = input.source(close, "L Filter 1 Source", inline = "lf1", group = G_L_FILTERS)
+l_f1_cond = input.string("Is True (1/na)", "", options = ["Is True (1/na)", "Greater Than", "Less Than", "Crosses Over", "Crosses Under", "Occurred Within X Bars", "Occurred Within X Days"], inline = "lf1", group = G_L_FILTERS)
+l_f1_targ_mode = input.string("Value/Price", "", options = ["Value/Price", "Custom Value"], inline = "lf1b", group = G_L_FILTERS)
+l_f1_targ_src = input.source(close, "L Filter 1 Target", inline = "lf1b", group = G_L_FILTERS)
+l_f1_custom = input.float(0.0, "", inline = "lf1b", group = G_L_FILTERS)
+l_f1_lookbackBars = input.int(6, "L Filter 1 Bars", minval = 1, inline = "lf1c", group = G_L_FILTERS)
+l_f1_lookbackDays = input.int(1, "Days", minval = 1, inline = "lf1c", group = G_L_FILTERS)
+
+enableLf2 = input.bool(true, "Enable L Filter 2", inline = "lf2", group = G_L_FILTERS)
+l_f2_src = input.source(close, "L Filter 2 Source", inline = "lf2", group = G_L_FILTERS)
+l_f2_cond = input.string("Is True (1/na)", "", options = ["Is True (1/na)", "Greater Than", "Less Than", "Crosses Over", "Crosses Under", "Occurred Within X Bars", "Occurred Within X Days"], inline = "lf2", group = G_L_FILTERS)
+l_f2_targ_mode = input.string("Value/Price", "", options = ["Value/Price", "Custom Value"], inline = "lf2b", group = G_L_FILTERS)
+l_f2_targ_src = input.source(close, "L Filter 2 Target", inline = "lf2b", group = G_L_FILTERS)
+l_f2_custom = input.float(0.0, "", inline = "lf2b", group = G_L_FILTERS)
+l_f2_lookbackBars = input.int(6, "L Filter 2 Bars", minval = 1, inline = "lf2c", group = G_L_FILTERS)
+l_f2_lookbackDays = input.int(1, "Days", minval = 1, inline = "lf2c", group = G_L_FILTERS)
+
+enableLf3 = input.bool(false, "Enable L Filter 3", inline = "lf3", group = G_L_FILTERS)
+l_f3_src = input.source(close, "L Filter 3 Source", inline = "lf3", group = G_L_FILTERS)
+l_f3_cond = input.string("Is True (1/na)", "", options = ["Is True (1/na)", "Greater Than", "Less Than", "Crosses Over", "Crosses Under", "Occurred Within X Bars", "Occurred Within X Days"], inline = "lf3", group = G_L_FILTERS)
+l_f3_targ_mode = input.string("Value/Price", "", options = ["Value/Price", "Custom Value"], inline = "lf3b", group = G_L_FILTERS)
+l_f3_targ_src = input.source(close, "L Filter 3 Target", inline = "lf3b", group = G_L_FILTERS)
+l_f3_custom = input.float(0.0, "", inline = "lf3b", group = G_L_FILTERS)
+l_f3_lookbackBars = input.int(6, "L Filter 3 Bars", minval = 1, inline = "lf3c", group = G_L_FILTERS)
+l_f3_lookbackDays = input.int(1, "Days", minval = 1, inline = "lf3c", group = G_L_FILTERS)
+
+enableLongBlocker = input.bool(false, "Enable L Blocker", inline = "lblk", group = G_L_FILTERS)
+l_blk_src = input.source(close, "L Blocker Source", inline = "lblk", group = G_L_FILTERS)
+l_blk_cond = input.string("Is True (1/na)", "", options = ["Is True (1/na)", "Greater Than", "Less Than", "Crosses Over", "Crosses Under", "Occurred Within X Bars", "Occurred Within X Days"], inline = "lblk", group = G_L_FILTERS)
+l_blk_targ_mode = input.string("Value/Price", "", options = ["Value/Price", "Custom Value"], inline = "lblkb", group = G_L_FILTERS)
+l_blk_targ_src = input.source(close, "L Blocker Target", inline = "lblkb", group = G_L_FILTERS)
+l_blk_custom = input.float(0.0, "", inline = "lblkb", group = G_L_FILTERS)
+l_blk_lookbackBars = input.int(6, "L Blocker Bars", minval = 1, inline = "lblkc", group = G_L_FILTERS)
+l_blk_lookbackDays = input.int(1, "Days", minval = 1, inline = "lblkc", group = G_L_FILTERS)
+
+l_entry_src = input.source(close, "Long Entry Trigger Source", inline = "lent", group = G_L_FILTERS)
+l_entry_cond = input.string("Is True (1/na)", "", options = ["Is True (1/na)", "Greater Than", "Less Than", "Crosses Over", "Crosses Under", "Occurred Within X Bars", "Occurred Within X Days"], inline = "lent", group = G_L_FILTERS)
+l_entry_targ_mode = input.string("Value/Price", "", options = ["Value/Price", "Custom Value"], inline = "lentb", group = G_L_FILTERS)
+l_entry_targ_src = input.source(close, "Long Entry Target", inline = "lentb", group = G_L_FILTERS)
+l_entry_custom = input.float(0.0, "", inline = "lentb", group = G_L_FILTERS)
+l_entry_lookbackBars = input.int(3, "L Entry Bars", minval = 1, inline = "lentc", group = G_L_FILTERS)
+l_entry_lookbackDays = input.int(1, "Days", minval = 1, inline = "lentc", group = G_L_FILTERS)
+
+var G_S_FILTERS = "3. 🛡️ Short Filters + Trigger"
+enableSf1 = input.bool(true, "Enable S Filter 1", inline = "sf1", group = G_S_FILTERS)
+s_f1_src = input.source(close, "S Filter 1 Source", inline = "sf1", group = G_S_FILTERS)
+s_f1_cond = input.string("Is True (1/na)", "", options = ["Is True (1/na)", "Greater Than", "Less Than", "Crosses Over", "Crosses Under", "Occurred Within X Bars", "Occurred Within X Days"], inline = "sf1", group = G_S_FILTERS)
+s_f1_targ_mode = input.string("Value/Price", "", options = ["Value/Price", "Custom Value"], inline = "sf1b", group = G_S_FILTERS)
+s_f1_targ_src = input.source(close, "S Filter 1 Target", inline = "sf1b", group = G_S_FILTERS)
+s_f1_custom = input.float(0.0, "", inline = "sf1b", group = G_S_FILTERS)
+s_f1_lookbackBars = input.int(6, "S Filter 1 Bars", minval = 1, inline = "sf1c", group = G_S_FILTERS)
+s_f1_lookbackDays = input.int(1, "Days", minval = 1, inline = "sf1c", group = G_S_FILTERS)
+
+enableSf2 = input.bool(true, "Enable S Filter 2", inline = "sf2", group = G_S_FILTERS)
+s_f2_src = input.source(close, "S Filter 2 Source", inline = "sf2", group = G_S_FILTERS)
+s_f2_cond = input.string("Is True (1/na)", "", options = ["Is True (1/na)", "Greater Than", "Less Than", "Crosses Over", "Crosses Under", "Occurred Within X Bars", "Occurred Within X Days"], inline = "sf2", group = G_S_FILTERS)
+s_f2_targ_mode = input.string("Value/Price", "", options = ["Value/Price", "Custom Value"], inline = "sf2b", group = G_S_FILTERS)
+s_f2_targ_src = input.source(close, "S Filter 2 Target", inline = "sf2b", group = G_S_FILTERS)
+s_f2_custom = input.float(0.0, "", inline = "sf2b", group = G_S_FILTERS)
+s_f2_lookbackBars = input.int(6, "S Filter 2 Bars", minval = 1, inline = "sf2c", group = G_S_FILTERS)
+s_f2_lookbackDays = input.int(1, "Days", minval = 1, inline = "sf2c", group = G_S_FILTERS)
+
+enableSf3 = input.bool(false, "Enable S Filter 3", inline = "sf3", group = G_S_FILTERS)
+s_f3_src = input.source(close, "S Filter 3 Source", inline = "sf3", group = G_S_FILTERS)
+s_f3_cond = input.string("Is True (1/na)", "", options = ["Is True (1/na)", "Greater Than", "Less Than", "Crosses Over", "Crosses Under", "Occurred Within X Bars", "Occurred Within X Days"], inline = "sf3", group = G_S_FILTERS)
+s_f3_targ_mode = input.string("Value/Price", "", options = ["Value/Price", "Custom Value"], inline = "sf3b", group = G_S_FILTERS)
+s_f3_targ_src = input.source(close, "S Filter 3 Target", inline = "sf3b", group = G_S_FILTERS)
+s_f3_custom = input.float(0.0, "", inline = "sf3b", group = G_S_FILTERS)
+s_f3_lookbackBars = input.int(6, "S Filter 3 Bars", minval = 1, inline = "sf3c", group = G_S_FILTERS)
+s_f3_lookbackDays = input.int(1, "Days", minval = 1, inline = "sf3c", group = G_S_FILTERS)
+
+enableShortBlocker = input.bool(false, "Enable S Blocker", inline = "sblk", group = G_S_FILTERS)
+s_blk_src = input.source(close, "S Blocker Source", inline = "sblk", group = G_S_FILTERS)
+s_blk_cond = input.string("Is True (1/na)", "", options = ["Is True (1/na)", "Greater Than", "Less Than", "Crosses Over", "Crosses Under", "Occurred Within X Bars", "Occurred Within X Days"], inline = "sblk", group = G_S_FILTERS)
+s_blk_targ_mode = input.string("Value/Price", "", options = ["Value/Price", "Custom Value"], inline = "sblkb", group = G_S_FILTERS)
+s_blk_targ_src = input.source(close, "S Blocker Target", inline = "sblkb", group = G_S_FILTERS)
+s_blk_custom = input.float(0.0, "", inline = "sblkb", group = G_S_FILTERS)
+s_blk_lookbackBars = input.int(6, "S Blocker Bars", minval = 1, inline = "sblkc", group = G_S_FILTERS)
+s_blk_lookbackDays = input.int(1, "Days", minval = 1, inline = "sblkc", group = G_S_FILTERS)
+
+s_entry_src = input.source(close, "Short Entry Trigger Source", inline = "sent", group = G_S_FILTERS)
+s_entry_cond = input.string("Is True (1/na)", "", options = ["Is True (1/na)", "Greater Than", "Less Than", "Crosses Over", "Crosses Under", "Occurred Within X Bars", "Occurred Within X Days"], inline = "sent", group = G_S_FILTERS)
+s_entry_targ_mode = input.string("Value/Price", "", options = ["Value/Price", "Custom Value"], inline = "sentb", group = G_S_FILTERS)
+s_entry_targ_src = input.source(close, "Short Entry Target", inline = "sentb", group = G_S_FILTERS)
+s_entry_custom = input.float(0.0, "", inline = "sentb", group = G_S_FILTERS)
+s_entry_lookbackBars = input.int(3, "S Entry Bars", minval = 1, inline = "sentc", group = G_S_FILTERS)
+s_entry_lookbackDays = input.int(1, "Days", minval = 1, inline = "sentc", group = G_S_FILTERS)
+
+var G_RISK = "4. 🛑 SL / TP / Trail / Break-Even"
+slMode = input.string("External Level", "Stop Loss Mode", options = ["External Level", "Fixed Ticks"], group = G_RISK)
+slLongSource = input.source(close, "Long SL Source", inline = "sl", group = G_RISK)
+slShortSource = input.source(close, "Short SL Source", inline = "sl", group = G_RISK)
+slFixedTicks = input.int(40, "Fixed SL Ticks", minval = 1, inline = "sl", group = G_RISK)
+
+enableTp1 = input.bool(true, "Enable TP1", inline = "tp1", group = G_RISK)
+tp1Pct = input.float(40.0, "%", minval = 0, maxval = 100, inline = "tp1", group = G_RISK)
+tp1LongLevelSource = input.source(close, "TP1 Long Level", inline = "tp1b", group = G_RISK)
+tp1ShortLevelSource = input.source(close, "TP1 Short Level", inline = "tp1b", group = G_RISK)
+tp1TriggerSource = input.source(close, "TP1 Trigger (1/na)", inline = "tp1c", group = G_RISK)
+
+enableTp2 = input.bool(true, "Enable TP2", inline = "tp2", group = G_RISK)
+tp2Pct = input.float(35.0, "%", minval = 0, maxval = 100, inline = "tp2", group = G_RISK)
+tp2LongLevelSource = input.source(close, "TP2 Long Level", inline = "tp2b", group = G_RISK)
+tp2ShortLevelSource = input.source(close, "TP2 Short Level", inline = "tp2b", group = G_RISK)
+tp2TriggerSource = input.source(close, "TP2 Trigger (1/na)", inline = "tp2c", group = G_RISK)
+
+enableTp3 = input.bool(true, "Enable TP3", inline = "tp3", group = G_RISK)
+tp3Pct = input.float(25.0, "%", minval = 0, maxval = 100, inline = "tp3", group = G_RISK)
+tp3LongLevelSource = input.source(close, "TP3 Long Level", inline = "tp3b", group = G_RISK)
+tp3ShortLevelSource = input.source(close, "TP3 Short Level", inline = "tp3b", group = G_RISK)
+tp3TriggerSource = input.source(close, "TP3 Trigger (1/na)", inline = "tp3c", group = G_RISK)
+
+enableBE = input.bool(true, "Enable Break-Even", inline = "be", group = G_RISK)
+beTriggerSource = input.source(close, "BE Trigger (1/na)", inline = "be", group = G_RISK)
+beOffsetTicks = input.int(2, "Offset Ticks", minval = 0, inline = "be", group = G_RISK)
+
+enableTrail = input.bool(true, "Enable Trail", inline = "tr", group = G_RISK)
+trailLongSource = input.source(close, "Trail Long Level", inline = "tr", group = G_RISK)
+trailShortSource = input.source(close, "Trail Short Level", inline = "tr", group = G_RISK)
+trailTriggerSource = input.source(close, "Trail Trigger (1/na)", inline = "tr2", group = G_RISK)
+
+barsPerDay = math.max(1, int(math.round(86400.0 / math.max(1.0, timeframe.in_seconds(timeframe.period)))))
+
+resolveTarget(string mode, float targetSource, float customValue) =>
+    mode == "Custom Value" ? customValue : targetSource
+
+evalCondition(float src, string cond, float target, int lookbackBars, int lookbackDays, int barsInDay) =>
+    bool trig = not na(src) and src == 1
+    int barsSinceTrig = ta.barssince(trig)
+    int daysBars = math.max(1, lookbackDays * barsInDay)
+    switch cond
+        "Is True (1/na)" => trig
+        "Greater Than" => src > target
+        "Less Than" => src < target
+        "Crosses Over" => ta.crossover(src, target)
+        "Crosses Under" => ta.crossunder(src, target)
+        "Occurred Within X Bars" => not na(barsSinceTrig) and barsSinceTrig <= lookbackBars
+        "Occurred Within X Days" => not na(barsSinceTrig) and barsSinceTrig <= daysBars
+        => false
+
+isTriggered(float src) =>
+    not na(src) and src == 1
+
+lF1 = not enableLf1 or evalCondition(l_f1_src, l_f1_cond, resolveTarget(l_f1_targ_mode, l_f1_targ_src, l_f1_custom), l_f1_lookbackBars, l_f1_lookbackDays, barsPerDay)
+lF2 = not enableLf2 or evalCondition(l_f2_src, l_f2_cond, resolveTarget(l_f2_targ_mode, l_f2_targ_src, l_f2_custom), l_f2_lookbackBars, l_f2_lookbackDays, barsPerDay)
+lF3 = not enableLf3 or evalCondition(l_f3_src, l_f3_cond, resolveTarget(l_f3_targ_mode, l_f3_targ_src, l_f3_custom), l_f3_lookbackBars, l_f3_lookbackDays, barsPerDay)
+lBlocked = enableLongBlocker and evalCondition(l_blk_src, l_blk_cond, resolveTarget(l_blk_targ_mode, l_blk_targ_src, l_blk_custom), l_blk_lookbackBars, l_blk_lookbackDays, barsPerDay)
+lEntryTrig = evalCondition(l_entry_src, l_entry_cond, resolveTarget(l_entry_targ_mode, l_entry_targ_src, l_entry_custom), l_entry_lookbackBars, l_entry_lookbackDays, barsPerDay)
+
+sF1 = not enableSf1 or evalCondition(s_f1_src, s_f1_cond, resolveTarget(s_f1_targ_mode, s_f1_targ_src, s_f1_custom), s_f1_lookbackBars, s_f1_lookbackDays, barsPerDay)
+sF2 = not enableSf2 or evalCondition(s_f2_src, s_f2_cond, resolveTarget(s_f2_targ_mode, s_f2_targ_src, s_f2_custom), s_f2_lookbackBars, s_f2_lookbackDays, barsPerDay)
+sF3 = not enableSf3 or evalCondition(s_f3_src, s_f3_cond, resolveTarget(s_f3_targ_mode, s_f3_targ_src, s_f3_custom), s_f3_lookbackBars, s_f3_lookbackDays, barsPerDay)
+sBlocked = enableShortBlocker and evalCondition(s_blk_src, s_blk_cond, resolveTarget(s_blk_targ_mode, s_blk_targ_src, s_blk_custom), s_blk_lookbackBars, s_blk_lookbackDays, barsPerDay)
+sEntryTrig = evalCondition(s_entry_src, s_entry_cond, resolveTarget(s_entry_targ_mode, s_entry_targ_src, s_entry_custom), s_entry_lookbackBars, s_entry_lookbackDays, barsPerDay)
+
+longSignal = allowLong and lEntryTrig and lF1 and lF2 and lF3 and not lBlocked
+shortSignal = allowShort and sEntryTrig and sF1 and sF2 and sF3 and not sBlocked
+
+if longSignal and strategy.position_size <= 0
+    strategy.entry("Long", strategy.long, qty = qtyInput)
+
+if shortSignal and strategy.position_size >= 0
+    strategy.entry("Short", strategy.short, qty = qtyInput)
+
+var float longStop = na
+var float shortStop = na
+
+if strategy.position_size <= 0
+    longStop := na
+if strategy.position_size >= 0
+    shortStop := na
+
+float tick = syminfo.mintick
+
+if strategy.position_size > 0
+    float baseLongStop = slMode == "External Level" and not na(slLongSource) ? slLongSource : strategy.position_avg_price - slFixedTicks * tick
+    longStop := na(longStop) ? baseLongStop : math.max(longStop, baseLongStop)
+
+    if enableBE and isTriggered(beTriggerSource)
+        float beLevel = strategy.position_avg_price + beOffsetTicks * tick
+        longStop := math.max(longStop, beLevel)
+
+    if enableTrail and (isTriggered(trailTriggerSource) or not na(trailLongSource)) and not na(trailLongSource)
+        longStop := math.max(longStop, trailLongSource)
+
+    strategy.exit("L-SL", "Long", stop = longStop)
+
+if strategy.position_size < 0
+    float baseShortStop = slMode == "External Level" and not na(slShortSource) ? slShortSource : strategy.position_avg_price + slFixedTicks * tick
+    shortStop := na(shortStop) ? baseShortStop : math.min(shortStop, baseShortStop)
+
+    if enableBE and isTriggered(beTriggerSource)
+        float beLevel = strategy.position_avg_price - beOffsetTicks * tick
+        shortStop := math.min(shortStop, beLevel)
+
+    if enableTrail and (isTriggered(trailTriggerSource) or not na(trailShortSource)) and not na(trailShortSource)
+        shortStop := math.min(shortStop, trailShortSource)
+
+    strategy.exit("S-SL", "Short", stop = shortStop)
+
+if strategy.position_size > 0
+    if enableTp1 and not na(tp1LongLevelSource)
+        strategy.exit("L-TP1", "Long", limit = tp1LongLevelSource, qty_percent = tp1Pct)
+    if enableTp2 and not na(tp2LongLevelSource)
+        strategy.exit("L-TP2", "Long", limit = tp2LongLevelSource, qty_percent = tp2Pct)
+    if enableTp3 and not na(tp3LongLevelSource)
+        strategy.exit("L-TP3", "Long", limit = tp3LongLevelSource, qty_percent = tp3Pct)
+
+    if enableTp1 and isTriggered(tp1TriggerSource)
+        strategy.close("Long", qty_percent = tp1Pct, comment = "TP1 Trigger")
+    if enableTp2 and isTriggered(tp2TriggerSource)
+        strategy.close("Long", qty_percent = tp2Pct, comment = "TP2 Trigger")
+    if enableTp3 and isTriggered(tp3TriggerSource)
+        strategy.close("Long", qty_percent = tp3Pct, comment = "TP3 Trigger")
+
+if strategy.position_size < 0
+    if enableTp1 and not na(tp1ShortLevelSource)
+        strategy.exit("S-TP1", "Short", limit = tp1ShortLevelSource, qty_percent = tp1Pct)
+    if enableTp2 and not na(tp2ShortLevelSource)
+        strategy.exit("S-TP2", "Short", limit = tp2ShortLevelSource, qty_percent = tp2Pct)
+    if enableTp3 and not na(tp3ShortLevelSource)
+        strategy.exit("S-TP3", "Short", limit = tp3ShortLevelSource, qty_percent = tp3Pct)
+
+    if enableTp1 and isTriggered(tp1TriggerSource)
+        strategy.close("Short", qty_percent = tp1Pct, comment = "TP1 Trigger")
+    if enableTp2 and isTriggered(tp2TriggerSource)
+        strategy.close("Short", qty_percent = tp2Pct, comment = "TP2 Trigger")
+    if enableTp3 and isTriggered(tp3TriggerSource)
+        strategy.close("Short", qty_percent = tp3Pct, comment = "TP3 Trigger")
+
+plotchar(longSignal, "Long Signal", "▲", location.bottom, color.new(color.lime, 0), size = size.tiny)
+plotchar(shortSignal, "Short Signal", "▼", location.top, color.new(color.red, 0), size = size.tiny)
+plot(longStop, "Long Stop", color.new(color.red, 0), 1, plot.style_linebr)
+plot(shortStop, "Short Stop", color.new(color.aqua, 0), 1, plot.style_linebr)

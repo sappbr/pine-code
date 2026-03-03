@@ -1,0 +1,52 @@
+//@version=6
+indicator("HTF Reversal - Strategy Compatible", shorttitle = "LC HTF Reversal", overlay = false)
+
+htfInput = input.timeframe("15", "High Timeframe")
+showEngulfing = input.bool(true, "Show Engulfing Patterns")
+showPinBars = input.bool(true, "Show Pin Bars")
+rsiLen = input.int(14, "RSI Length", minval = 1)
+divLookback = input.int(5, "Divergence Lookback", minval = 2)
+
+[hOpen, hHigh, hLow, hClose, hPrevOpen, hPrevClose] = request.security(
+     syminfo.tickerid,
+     htfInput,
+     [open[1], high[1], low[1], close[1], open[2], close[2]]
+)
+
+htfNewBar = ta.change(time(htfInput)) != 0
+
+isBullEngulfing = showEngulfing and hClose > hOpen and hPrevClose < hPrevOpen and hClose >= hPrevOpen and hOpen <= hPrevClose
+isBearEngulfing = showEngulfing and hClose < hOpen and hPrevClose > hPrevOpen and hClose <= hPrevOpen and hOpen >= hPrevClose
+isHammer = showPinBars and (math.min(hOpen, hClose) - hLow) > (hHigh - hLow) * 0.6 and math.abs(hClose - hOpen) < (hHigh - hLow) * 0.3
+isShootingStar = showPinBars and (hHigh - math.max(hOpen, hClose)) > (hHigh - hLow) * 0.6 and math.abs(hClose - hOpen) < (hHigh - hLow) * 0.3
+
+isBullPattern = isBullEngulfing or isHammer
+isBearPattern = isBearEngulfing or isShootingStar
+
+rsi = ta.rsi(close, rsiLen)
+
+bullDivConfirmed = low < low[divLookback] and rsi > rsi[divLookback]
+bearDivConfirmed = high > high[divLookback] and rsi < rsi[divLookback]
+
+bullPatternTrigger = isBullPattern and htfNewBar ? 1 : na
+bearPatternTrigger = isBearPattern and htfNewBar ? 1 : na
+bullDivTrigger = bullDivConfirmed ? 1 : na
+bearDivTrigger = bearDivConfirmed ? 1 : na
+rsiBullBias = rsi > 50 ? 1 : na
+rsiBearBias = rsi < 50 ? 1 : na
+
+plot(bullPatternTrigger, "LC HTF Bull Pattern Trigger", color = color.new(color.lime, 100), style = plot.style_linebr)
+plot(bearPatternTrigger, "LC HTF Bear Pattern Trigger", color = color.new(color.red, 100), style = plot.style_linebr)
+plot(bullDivTrigger, "LC HTF Bull Divergence Trigger", color = color.new(color.green, 100), style = plot.style_linebr)
+plot(bearDivTrigger, "LC HTF Bear Divergence Trigger", color = color.new(color.maroon, 100), style = plot.style_linebr)
+plot(rsiBullBias, "LC RSI Bull Bias", color = color.new(color.green, 100), style = plot.style_linebr)
+plot(rsiBearBias, "LC RSI Bear Bias", color = color.new(color.red, 100), style = plot.style_linebr)
+
+plot(hOpen, "LC HTF Open", color = color.new(color.white, 100), style = plot.style_linebr)
+plot(hHigh, "LC HTF High", color = color.new(color.white, 100), style = plot.style_linebr)
+plot(hLow, "LC HTF Low", color = color.new(color.white, 100), style = plot.style_linebr)
+plot(hClose, "LC HTF Close", color = color.new(color.white, 100), style = plot.style_linebr)
+plot(rsi, "LC RSI Value", color = color.new(color.white, 100), style = plot.style_line)
+
+alertcondition(not na(bullPatternTrigger), "LC Bull Pattern", "LC HTF Bull Pattern Trigger")
+alertcondition(not na(bearPatternTrigger), "LC Bear Pattern", "LC HTF Bear Pattern Trigger")

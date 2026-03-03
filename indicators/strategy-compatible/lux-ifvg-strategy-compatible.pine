@@ -1,0 +1,59 @@
+//@version=6
+indicator("Lux IFVG - Strategy Compatible", shorttitle = "LC Lux IFVG", overlay = true)
+
+atrLen = input.int(200, "ATR Length", minval = 1)
+atrMult = input.float(0.25, "ATR Multiplier", minval = 0.0, step = 0.25)
+
+atr = nz(ta.atr(atrLen) * atrMult, ta.cum(high - low) / (bar_index + 1))
+
+fvgUp = low > high[2] and close[1] > high[2] and math.abs(low - high[2]) > atr
+fvgDown = high < low[2] and close[1] < low[2] and math.abs(low[2] - high) > atr
+
+var float bullTop = na
+var float bullBot = na
+var bool bullActive = false
+
+var float bearTop = na
+var float bearBot = na
+var bool bearActive = false
+
+if fvgUp
+    bullTop := low
+    bullBot := high[2]
+    bullActive := true
+
+if fvgDown
+    bearTop := low[2]
+    bearBot := high
+    bearActive := true
+
+cTop = math.max(open, close)
+cBot = math.min(open, close)
+
+if bullActive and cBot < bullBot
+    bullActive := false
+
+if bearActive and cTop > bearTop
+    bearActive := false
+
+bullSignal = bullActive and close > bullTop and close[1] <= bullTop
+bearSignal = bearActive and close < bearBot and close[1] >= bearBot
+
+bullMid = bullActive ? math.avg(bullTop, bullBot) : na
+bearMid = bearActive ? math.avg(bearTop, bearBot) : na
+
+plot(bullSignal ? 1 : na, "LC Bullish Trigger", color = color.new(color.lime, 100), style = plot.style_linebr)
+plot(bearSignal ? 1 : na, "LC Bearish Trigger", color = color.new(color.red, 100), style = plot.style_linebr)
+plot(bullActive ? 1 : na, "LC Bullish Active", color = color.new(color.green, 100), style = plot.style_linebr)
+plot(bearActive ? 1 : na, "LC Bearish Active", color = color.new(color.maroon, 100), style = plot.style_linebr)
+
+plot(bullTop, "LC Bull IFVG Top", color = color.new(color.green, 100), style = plot.style_linebr)
+plot(bullBot, "LC Bull IFVG Bottom", color = color.new(color.green, 100), style = plot.style_linebr)
+plot(bullMid, "LC Bull IFVG Mid", color = color.new(color.green, 100), style = plot.style_linebr)
+
+plot(bearTop, "LC Bear IFVG Top", color = color.new(color.red, 100), style = plot.style_linebr)
+plot(bearBot, "LC Bear IFVG Bottom", color = color.new(color.red, 100), style = plot.style_linebr)
+plot(bearMid, "LC Bear IFVG Mid", color = color.new(color.red, 100), style = plot.style_linebr)
+
+alertcondition(bullSignal, "LC Bullish Signal", "LC Bullish Signal")
+alertcondition(bearSignal, "LC Bearish Signal", "LC Bearish Signal")
